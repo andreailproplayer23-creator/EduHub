@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Accesso 1BI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <button id="themeToggleBtn" class="theme-toggle floating-theme" title="Cambia tema"></button>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="brand-header">
+        <h1>EDUHUB</h1>
+        <p id="subHeader">Portale Studenti • Classe 1BI</p>
+      </div>
+
+      <div id="errorBox" class="error-msg"></div>
+
+      <form id="authForm">
+        <div class="form-group" id="nameGroup" style="display: none;">
+          <label>Nome e Cognome</label>
+          <div class="input-box">
+            <i data-lucide="graduation-cap"></i>
+            <input type="text" id="nameInput" placeholder="Es. Andrea & Ale" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Studente</label>
+          <div class="input-box">
+            <i data-lucide="user"></i>
+            <input type="email" id="emailInput" placeholder="nome.cognome@scuola.it" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-box">
+            <i data-lucide="lock"></i>
+            <input type="password" id="passwordInput" placeholder="••••••••••••" required />
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary">ACCEDI</button>
+      </form>
+
+      <div class="divider">oppure continua con</div>
+
+      <button type="button" id="googleLoginBtn" class="btn btn-google">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" />
+        <span id="googleBtnText">Accedi con Google</span>
+      </button>
+
+      <div class="toggle-auth">
+        <a id="toggleMode">Nuovo compagno? Registrati</a>
+      </div>
+
+      <div class="login-footer">
+        © 2026 EDUHUB • Classe 1BI • Andrea & Ale
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

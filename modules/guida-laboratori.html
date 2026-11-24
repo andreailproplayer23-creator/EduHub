@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Manuali & Tips Software 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+    .app-card {
+      background: var(--surface-sub);
+      border: 2px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 24px 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-card:hover {
+      transform: translateY(-5px);
+    }
+    .app-card.active {
+      background: var(--glass-card-hover);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
+    }
+    .app-icon-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.35rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+    .app-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+    .app-card small {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* SEZIONE DETTAGLIO GUIDA + TIPS */
+    .guide-viewer {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 26px;
+      animation: fadeSlideUp 0.35s ease-out both;
+    }
+    .viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 18px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .tab-switcher {
+      display: inline-flex;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .tab-btn {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: 0.2s;
+    }
+    .tab-btn.active {
+      color: #fff;
+    }
+
+    .lesson-card {
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      border-left: 4px solid var(--primary);
+      border-radius: 13px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      animation: fadeSlideUp 0.3s ease-out both;
+    }
+    .lesson-card h4 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lesson-card p, .lesson-card li {
+      font-size: 0.91rem;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+    .lesson-card ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+    .lesson-card li {
+      margin-bottom: 5px;
+    }
+    .kbd-tag {
+      background: rgba(59, 130, 246, 0.14);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Manuali & Tips Software</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <h2 class="section-title">Manuali & Tips <span>Software di Laboratorio</span></h2>
+
+      <!-- 4 ICONE SOFTWARE CON COLORI UFFICIALI -->
+      <div class="apps-grid" id="appsGrid">
+        <div class="app-card active" data-app="word" style="border-color: #2b579a;">
+          <div class="app-icon-box" style="background: linear-gradient(135deg, #2b579a, #185abd);">
+            <i data-lucide="file-text" style="width: 30px; height: 30px;"></i>
+          </div>
+          <h3 style="color: #2b579a;">Microsoft Word</h3>
+          <small>Elaborazione Testi</small>
+        </div>
+
+        <div class="app-card" data-app="excel">
+          <div class="app-icon-box" style="background: linear-gradient(135deg, #217346, #107c41);">
+            <i data-lucide="sheet" style="width: 30px; height: 30px;"></i>
+          </div>
+          <h3 style="color: #217346;">Microsoft Excel</h3>
+          <small>Fogli di Calcolo & Formule</small>
+        </div>
+
+        <div class="app-card" data-app="powerpoint">
+          <div class="app-icon-box" style="background: linear-gradient(135deg, #d24726, #c43e1c);">
+            <i data-lucide="presentation" style="width: 30px; height: 30px;"></i>
+          </div>
+          <h3 style="color: #d24726;">PowerPoint</h3>
+          <small>Presentazioni & Slide</small>
+        </div>
+
+        <div class="app-card" data-app="autocad">
+          <div class="app-icon-box" style="background: linear-gradient(135deg, #e51937, #a61126);">
+            <i data-lucide="drafting-compass" style="width: 30px; height: 30px;"></i>
+          </div>
+          <h3 style="color: #e51937;">AutoCAD</h3>
+          <small>Disegno Tecnico 2D/3D</small>
+        </div>
+      </div>
+
+      <!-- AREA CONTENUTO DINAMICO -->
+      <div class="guide-viewer" id="guideViewer">
+        <div class="viewer-header">
+          <div>
+            <h3 id="viewerTitle" style="font-size: 1.3rem; font-weight: 800;">Microsoft Word</h3>
+            <p id="viewerSubtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Guida completa alle funzioni base e trucchi avanzati</p>
+          </div>
+
+          <div class="tab-switcher">
+            <button class="tab-btn active" id="tabGuida" data-tab="guida">
+              <i data-lucide="book-open" style="width: 16px; height: 16px;"></i> Guida Completa
+            </button>
+            <button class="tab-btn" id="tabTips" data-tab="tips">
+              <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Tips & Trucchetti
+            </button>
+          </div>
+        </div>
+
+        <div id="contentArea"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script>
+    const MANUALI_DATA = {
+      word: {
+        name: "Microsoft Word",
+        color: "#2b579a",
+        subtitle: "Impaginazione, stili, indici automatici e formattazione professionale",
+        guida: [
+          {
+            title: "1. Struttura del Documento e Stili",
+            items: [
+              "Non ingrandire i titoli a mano: usa sempre gli <strong>Stili</strong> nella scheda Home (<code>Titolo 1</code>, <code>Titolo 2</code>, <code>Normale</code>).",
+              "Usare gli Stili permette di mantenere tutto il documento coerente e di creare l'indice automatico in un clic."
+            ]
+          },
+          {
+            title: "2. Margini, Orientamento e Interruzioni",
+            items: [
+              "Vai su <strong>Layout → Margini</strong> per impostare margini stretti o normali prima di iniziare a scrivere.",
+              "Per iniziare un nuovo capitolo su una pagina pulita non premere 20 volte Invio: usa <strong>Inserisci → Interruzione di pagina</strong> (<span class='kbd-tag'>Ctrl + Invio</span>)."
+            ]
+          },
+          {
+            title: "3. Intestazione, Piè di Pagina e Numeri",
+            items: [
+              "Fai doppio clic sul bordo superiore o inferiore del foglio per inserire <strong>Intestazione</strong> (es. Nome, Cognome, Classe 1BI) e <strong>Numero di pagina</strong>."
+            ]
+          },
+          {
+            title: "4. Inserimento Immagini e Tabelle",
+            items: [
+              "Quando inserisci una foto, clicca sull'icona a destra dell'immagine (<strong>Opzioni layout</strong>) e scegli <em>Ravvicinato</em> o <em>Davanti al testo</em> per spostarla liberamente.",
+              "Usa <strong>Riferimenti → Sommario</strong> per generare automaticamente l'indice delle pagine a fine relazione."
+            ]
+          }
+        ],
+        tips: [
+          {
+            title: "Generare testo di prova istantaneo",
+            items: [
+              "Scrivi <code>=rand(3,4)</code> su una riga vuota e premi <span class='kbd-tag'>Invio</span>: Word genera subito 3 paragrafi di testo per testare l'impaginazione."
+            ]
+          },
+          {
+            title: "Copia Formato (Il pennello magico)",
+            items: [
+              "Seleziona un testo formattato bene e fai <strong>doppio clic</strong> su <em>Copia formato</em> in alto a sinistra per applicare lo stesso stile a più paragrafi di fila."
+            ]
+          },
+          {
+            title: "Scorciatoie fondamentali",
+            items: [
+              "<span class='kbd-tag'>Ctrl + Invio</span>: Nuova pagina immediata.",
+              "<span class='kbd-tag'>Ctrl + Shift + V</span>: Incolla solo testo senza formattazione copiata da internet.",
+              "<span class='kbd-tag'>Ctrl + H</span>: Trova e sostituisci una parola in tutto il file."
+            ]
+          }
+        ]
+      },
+
+      excel: {
+        name: "Microsoft Excel",
+        color: "#217346",
+        subtitle: "Celle, formule essenziali, riferimenti assoluti e grafici",
+        guida: [
+          {
+            title: "1. Celle, Righe, Colonne e Tipi di Dato",
+            items: [
+              "Ogni cella ha una coordinata (es. <code>B4</code> = Colonna B, Riga 4).",
+              "Imposta sempre il formato corretto nella scheda Home: <strong>Numero</strong>, <strong>Valuta (€)</strong>, <strong>Percentuale (%)</strong> o <strong>Data</strong>."
+            ]
+          },
+          {
+            title: "2. Le 5 Formule Obbligatorie in 1ª Superiore",
+            items: [
+              "Ogni formula inizia SEMPRE con il simbolo <code>=</code>.",
+              "<code>=SOMMA(A1:A10)</code> → Somma tutti i numeri da A1 a A10.",
+              "<code>=MEDIA(A1:A10)</code> → Calcola la media aritmetica.",
+              "<code>=MIN(A1:A10)</code> e <code>=MAX(A1:A10)</code> → Trovano il valore più piccolo e più grande.",
+              "<code>=SE(B2>=6; \"Promosso\"; \"Debito\")</code> → Verifica una condizione logica."
+            ]
+          },
+          {
+            title: "3. Riferimenti Relativi vs Assoluti ($)",
+            items: [
+              "Quando trascini una formula verso il basso, <code>A1</code> diventa <code>A2</code>, <code>A3</code> (riferimento relativo).",
+              "Se vuoi bloccare una cella fissa (es. un'aliquota IVA in <code>C1</code>), usa il dollaro: <code>$C$1</code>."
+            ]
+          },
+          {
+            title: "4. Creare Grafici",
+            items: [
+              "Seleziona sia le intestazioni che i dati numerici, poi vai su <strong>Inserisci → Grafici consigliati</strong> (Istogramma per confronti, Torta per percentuali)."
+            ]
+          }
+        ],
+        tips: [
+          {
+            title: "Somma Automatica in 1 secondo",
+            items: [
+              "Clicca nella cella vuota subito sotto una colonna di numeri e premi <span class='kbd-tag'>Alt + =</span> (oppure <span class='kbd-tag'>Alt + Shift + =</span>): Excel scrive <code>=SOMMA(...)</code> da solo."
+            ]
+          },
+          {
+            title: "Doppio clic sul quadratino di riempimento",
+            items: [
+              "Invece di trascinare una formula per 200 righe, fai <strong>doppio clic</strong> sull'angolo verde in basso a destra della cella: la compila automaticamente fino alla fine della tabella."
+            ]
+          },
+          {
+            title: "Bloccare la prima riga (Intestazioni)",
+            items: [
+              "Vai su <strong>Visualizza → Blocca riquadri → Blocca riga superiore</strong> per tenere visibili i titoli delle colonne mentre scorri verso il basso."
+            ]
+          }
+        ]
+      },
+
+      powerpoint: {
+        name: "Microsoft PowerPoint",
+        color: "#d24726",
+        subtitle: "Progettazione slide efficaci, transizioni, animazioni e presentazione",
+        guida: [
+          {
+            title: "1. Struttura e Layout delle Slide",
+            items: [
+              "Usa la prima slide solo per <strong>Titolo, Sottotitolo e Nomi del gruppo</strong>.",
+              "Non usare sempre la slide vuota: sfrutta <strong>Home → Layout</strong> (Titolo e contenuto, Due contenuti, Confronto) per allineare gli elementi."
+            ]
+          },
+          {
+            title: "2. Temi e Schema Diapositiva",
+            items: [
+              "Scegli una palette coerente in <strong>Progettazione</strong>.",
+              "Se vuoi mettere il logo della scuola o il numero slide su tutte le pagine in una volta sola, usa <strong>Visualizza → Schema diapositiva</strong>."
+            ]
+          },
+          {
+            title: "3. Transizioni vs Animazioni",
+            items: [
+              "<strong>Transizioni:</strong> effetto di passaggio da una slide all'altra (usa <em>Dissolvenza</em> o <em>Trasformazione</em>).",
+              "<strong>Animazioni:</strong> movimento dei singoli testi o immagini dentro la slide. Usa <strong>Riquadro animazione</strong> per controllare l'ordine di uscita."
+            ]
+          }
+        ],
+        tips: [
+          {
+            title: "La Regola del 6x6 (Mai muri di testo!)",
+            items: [
+              "Massimo <strong>6 righe per slide</strong> e massimo <strong>6 parole per riga</strong>. Le slide servono come mappa visiva mentre parli, non da leggere ad alta voce."
+            ]
+          },
+          {
+            title: "Effetto Morph (Trasformazione) da pro",
+            items: [
+              "Duplica una slide, sposta o ingrandisci un'immagine nella seconda slide e applica la transizione <strong>Trasformazione</strong>: PowerPoint animerà lo spostamento in modo cinematografico."
+            ]
+          },
+          {
+            title: "Scorciatoie durante l'esposizione in classe",
+            items: [
+              "<span class='kbd-tag'>F5</span>: Avvia presentazione dall'inizio (<span class='kbd-tag'>Shift + F5</span> dalla slide attuale).",
+              "<span class='kbd-tag'>B</span>: Oscura lo schermo di nero mentre spieghi a voce.",
+              "<span class='kbd-tag'>Ctrl + P</span>: Trasforma il mouse in una penna rossa per evidenziare sulla LIM."
+            ]
+          }
+        ]
+      },
+
+      autocad: {
+        name: "AutoCAD",
+        color: "#e51937",
+        subtitle: "Comandi base 2D, coordinate, Snap ad oggetto (OSNAP) e gestione Layer",
+        guida: [
+          {
+            title: "1. Interfaccia e Riga di Comando",
+            items: [
+              "In AutoCAD non serve cercare sempre le icone: basta digitare il comando sulla tastiera e premere <span class='kbd-tag'>Invio</span> o <span class='kbd-tag'>Spazio</span>.",
+              "<strong>Rotella del mouse:</strong> gira per fare Zoom, tieni premuta la rotella per spostare il foglio (Pan)."
+            ]
+          },
+          {
+            title: "2. Comandi di Disegno Principali",
+            items: [
+              "<code>LINEA</code> (<span class='kbd-tag'>L</span>): Disegna segmenti collegati tra loro.",
+              "<code>CERCHIO</code> (<span class='kbd-tag'>C</span>): Disegna un cerchio dato centro e raggio (o diametro).",
+              "<code>RETTANG</code> (<span class='kbd-tag'>REC</span>): Disegna un rettangolo indicando due vertici opposti.",
+              "<code>POLILINEA</code> (<span class='kbd-tag'>PL</span>): Crea una linea unica formata da più segmenti uniti."
+            ]
+          },
+          {
+            title: "3. Comandi di Modifica Essenziali",
+            items: [
+              "<code>TAGLIA</code> (<span class='kbd-tag'>TR</span>): Taglia le parti di linea in eccesso.",
+              "<code>SPOSTA</code> (<span class='kbd-tag'>M</span>) e <code>COPIA</code> (<span class='kbd-tag'>CO</span>): Spostano o duplicano gli oggetti selezionati.",
+              "<code>OFFSET</code> (<span class='kbd-tag'>O</span>): Crea copie parallele a una distanza precisa (fondamentale per muri e spessori).",
+              "<code>RACCORDO</code> (<span class='kbd-tag'>F</span>): Unisce due linee ad angolo (con raggio 0 chiude perfettamente gli spigoli)."
+            ]
+          },
+          {
+            title: "4. Precisione: ORTO (F8) e OSNAP (F3)",
+            items: [
+              "<strong>Modalità Orto (<span class='kbd-tag'>F8</span>):</strong> Blocca il cursore solo in orizzontale e verticale (0° e 90°).",
+              "<strong>Snap ad Oggetto / OSNAP (<span class='kbd-tag'>F3</span>):</strong> Aggancia con precisione matematica <em>Fine, Punto medio, Centro, Intersezione</em>."
+            ]
+          }
+        ],
+        tips: [
+          {
+            title: "Selezione Verde vs Selezione Blu",
+            items: [
+              "Trascinando da <strong>sinistra verso destra (Riquadro Blu)</strong> selezioni solo gli oggetti <em>completamente dentro</em> il rettangolo.",
+              "Trascinando da <strong>destra verso sinistra (Riquadro Verde)</strong> selezioni tutto ciò che viene anche solo <em>toccato</em>."
+            ]
+          },
+          {
+            title: "Lavora sempre con i Layer (Livelli)",
+            items: [
+              "Crea layer separati con colori diversi (es. <code>Contorni</code> bianco/nero spesso, <code>Assi</code> rosso tratteggiato, <code>Quote</code> verde) prima di iniziare la tavola."
+            ]
+          },
+          {
+            title: "Tasti salvavita in laboratorio CAD",
+            items: [
+              "<span class='kbd-tag'>ESC</span>: Premilo 2 volte per annullare qualsiasi comando bloccato.",
+              "<span class='kbd-tag'>Spazio</span>: Ripete immediatamente l'ultimo comando usato.",
+              "<span class='kbd-tag'>Z</span> + <span class='kbd-tag'>Invio</span> + <span class='kbd-tag'>E</span> + <span class='kbd-tag'>Invio</span>: Zoom Estensioni (ritrova subito il disegno se lo hai perso nello spazio)."
+            ]
+          }
+        ]
+      }
+    };
+
+    let currentApp = "word";
+    let currentTab = "guida";
+
+    function renderManual() {
+      const data = MANUALI_DATA[currentApp];
+      const titleEl = document.getElementById("viewerTitle");
+      const subEl = document.getElementById("viewerSubtitle");
+      const tabGuida = document.getElementById("tabGuida");
+      const tabTips = document.getElementById("tabTips");
+      const contentEl = document.getElementById("contentArea");
+
+      titleEl.textContent = data.name;
+      titleEl.style.color = data.color;
+      subEl.textContent = data.subtitle;
+
+      // Aggiorna colori tab attive
+      tabGuida.classList.toggle("active", currentTab === "guida");
+      tabTips.classList.toggle("active", currentTab === "tips");
+      tabGuida.style.background = currentTab === "guida" ? data.color : "transparent";
+      tabTips.style.background = currentTab === "tips" ? data.color : "transparent";
+
+      const list = data[currentTab];
+      contentEl.innerHTML = list.map((block, index) => `
+        <div class="lesson-card" style="border-left-color: ${data.color}; animation-delay: ${index * 0.05}s;">
+          <h4 style="color: ${data.color};">
+            <i data-lucide="${currentTab === 'guida' ? 'check-circle-2' : 'zap'}" style="width: 18px; height: 18px;"></i>
+            ${block.title}
+          </h4>
+          <ul>
+            ${block.items.map(li => `<li>${li}</li>`).join("")}
+          </ul>
+        </div>
+      `).join("");
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Click sulle 4 card dei programmi
+    document.querySelectorAll(".app-card").forEach(card => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".app-card").forEach(c => {
+          c.classList.remove("active");
+          c.style.borderColor = "var(--glass-border)";
+        });
+        card.classList.add("active");
+        currentApp = card.dataset.app;
+        card.style.borderColor = MANUALI_DATA[currentApp].color;
+        renderManual();
+      });
+    });
+
+    // Click sulle 2 sezioni (Guida Completa / Tips)
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentTab = btn.dataset.tab;
+        renderManual();
+      });
+    });
+
+    renderManual();
+  </script>
+</body>
+</html>

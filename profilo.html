@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Profilo Studente 1BI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/theme.js"></script>
+  <style>
+    .profile-hero {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--table-border);
+      margin-bottom: 24px;
+    }
+    .big-avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      font-size: 2.3rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+      flex-shrink: 0;
+    }
+    .big-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .bio-display {
+      margin-top: 8px;
+      font-size: 0.94rem;
+      color: var(--text-main);
+      background: var(--surface-sub);
+      border-left: 3px solid var(--primary);
+      padding: 8px 14px;
+      border-radius: 8px;
+      max-width: 560px;
+    }
+    .profile-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .tag-pill {
+      background: rgba(59, 130, 246, 0.14);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .tag-rep {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.2));
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .save-toast {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #10b981;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Profilo Studente</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="profilo.html" class="profile-pill" title="Vai al tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="profile-hero">
+        <div class="big-avatar" id="bigAvatar">S</div>
+        <div style="flex: 1;">
+          <h2 id="profileFullName" style="font-size: 1.6rem; font-weight: 800;">Caricamento...</h2>
+          <p id="profileEmail" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">...</p>
+
+          <!-- QUI APPARE SUBITO LA TUA DESCRIZIONE SALVATA -->
+          <div id="bioDisplayBox" class="bio-display">Nessuna descrizione impostata.</div>
+
+          <div class="profile-tags">
+            <span class="tag-pill">Classe 1BI • Informatica</span>
+            <span class="tag-pill" id="roleAutoBadge">Studente</span>
+            <span class="tag-pill" id="profileMethod">Account Verificato</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="sub-box">
+          <small style="color: var(--text-muted); font-weight: 700;">CLASSE E SEZIONE</small>
+          <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-top: 4px;">1BI</div>
+        </div>
+        <div class="sub-box">
+          <small style="color: var(--text-muted); font-weight: 700;">ISCRITTO DAL</small>
+          <div id="profileDate" style="font-size: 1.15rem; font-weight: 800; margin-top: 6px;">-</div>
+        </div>
+        <div class="sub-box">
+          <small style="color: var(--text-muted); font-weight: 700;">PERMESSI BACHECA</small>
+          <div id="boardPermText" style="font-size: 1.05rem; font-weight: 800; margin-top: 6px;">Solo lettura</div>
+        </div>
+      </div>
+
+      <div id="saveToast" class="save-toast">Profilo aggiornato con successo!</div>
+      <div id="profileErrorBox" class="error-msg"></div>
+
+      <form id="profileForm">
+        <div class="form-group">
+          <label>Nome Visualizzato in Classe</label>
+          <div class="input-box">
+            <i data-lucide="user-pen"></i>
+            <input type="text" id="editNameInput" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>La tua Descrizione</label>
+          <div class="input-box" style="align-items: flex-start; padding-top: 4px;">
+            <i data-lucide="file-text" style="margin-top: 10px;"></i>
+            <textarea id="editDescInput" rows="3" placeholder="Scrivi una breve descrizione su di te..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" id="saveProfileBtn" class="btn btn-primary" style="max-width: 240px;">SALVA MODIFICHE</button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "./js/firebase-config.js";
+    import { isRappresentante } from "./js/auth.js";
+    import { onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    function applyBioUI(descText) {
+      const clean = (descText || "").trim();
+      document.getElementById("editDescInput").value = clean;
+      document.getElementById("bioDisplayBox").textContent = clean || "Nessuna descrizione impostata.";
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      const name = user.displayName || user.email.split("@")[0];
+      const isRep = isRappresentante(user.email);
+
+      document.getElementById("profileFullName").textContent = name;
+      document.getElementById("profileEmail").textContent = user.email;
+      document.getElementById("editNameInput").value = name;
+
+      // Carica subito eventuale backup locale
+      const localBio = localStorage.getItem(`eduhub_bio_${user.uid}`);
+      if (localBio !== null) applyBioUI(localBio);
+
+      const roleBadge = document.getElementById("roleAutoBadge");
+      const permText = document.getElementById("boardPermText");
+      if (isRep) {
+        roleBadge.textContent = "★ Rappresentante di Classe";
+        roleBadge.classList.add("tag-rep");
+        permText.textContent = "Pubblicazione & Gestione";
+        permText.style.color = "#10b981";
+      } else {
+        roleBadge.textContent = "Studente 1BI";
+        permText.textContent = "Visualizzazione Annunci";
+      }
+
+      const bigAv = document.getElementById("bigAvatar");
+      if (user.photoURL) {
+        bigAv.innerHTML = `<img src="${user.photoURL}" alt="Foto Profilo" />`;
+      } else {
+        bigAv.textContent = name.charAt(0).toUpperCase();
+      }
+
+      const isGoogleUser = user.providerData.some(p => p.providerId === "google.com");
+      document.getElementById("profileMethod").textContent = isGoogleUser ? "Accesso Google" : "Accesso Email";
+      if (user.metadata?.creationTime) {
+        document.getElementById("profileDate").textContent = new Date(user.metadata.creationTime).toLocaleDateString("it-IT");
+      }
+
+      try {
+        const snap = await getDoc(doc(db, "utenti_registrati", user.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.descrizione !== undefined) {
+            applyBioUI(data.descrizione);
+            localStorage.setItem(`eduhub_bio_${user.uid}`, data.descrizione);
+          }
+          if (data.registratoIl) {
+            document.getElementById("profileDate").textContent = new Date(data.registratoIl).toLocaleDateString("it-IT");
+          }
+        }
+      } catch (err) {
+        console.warn("Lettura Firestore bloccata (controlla AdBlocker):", err);
+      }
+    });
+
+    document.getElementById("profileForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const saveBtn = document.getElementById("saveProfileBtn");
+      const errBox = document.getElementById("profileErrorBox");
+      errBox.style.display = "none";
+      saveBtn.disabled = true;
+      saveBtn.textContent = "SALVATAGGIO...";
+
+      const newName = document.getElementById("editNameInput").value.trim();
+      const newDesc = document.getElementById("editDescInput").value.trim();
+
+      try {
+        await updateProfile(user, { displayName: newName });
+        localStorage.setItem(`eduhub_bio_${user.uid}`, newDesc);
+
+        document.getElementById("profileFullName").textContent = newName;
+        document.getElementById("userDisplayName").textContent = newName.toUpperCase();
+        applyBioUI(newDesc);
+
+        await setDoc(doc(db, "utenti_registrati", user.uid), {
+          nome: newName,
+          descrizione: newDesc,
+          classe: "1BI"
+        }, { merge: true });
+
+        const toast = document.getElementById("saveToast");
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 3000);
+      } catch (err) {
+        errBox.textContent = "Salvato localmente, ma Firestore è bloccato (disattiva l'AdBlocker su questa pagina).";
+        errBox.style.display = "block";
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "SALVA MODIFICHE";
+      }
+    });
+  </script>
+</body>
+</html>

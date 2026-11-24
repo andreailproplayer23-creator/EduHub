@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Elenco Classe 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .appello-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .student-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .student-row:hover {
+      transform: translateX(6px);
+      border-color: var(--primary);
+    }
+    .student-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: rgba(59, 130, 246, 0.14);
+      color: var(--primary);
+      font-size: 0.84rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .student-name {
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+    .extract-modal {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(99, 102, 241, 0.16));
+      border: 1.5px solid var(--primary);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      animation: fadeSlideUp 0.3s ease-out;
+    }
+    .close-pill {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Appello di Classe</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <h2 class="section-title">Appello di Classe <span>1BI</span></h2>
+
+      <div class="appello-controls">
+        <div class="input-box" style="flex: 1; min-width: 240px;">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchStudent" placeholder="Cerca compagno o numero..." />
+        </div>
+
+        <button id="randomPickBtn" class="btn btn-primary" style="width: auto; margin-top: 0;">
+          <i data-lucide="shuffle" style="width:16px;height:16px;"></i> Estrai Casuale
+        </button>
+      </div>
+
+      <div id="extractResult" class="extract-modal">
+        <div>
+          <small style="color: var(--primary); font-weight: 800; text-transform: uppercase;">Estratto dalla 1BI:</small>
+          <div id="pickedName" style="font-size: 1.25rem; font-weight: 800; margin-top: 2px;"></div>
+        </div>
+        <button id="closeExtract" class="close-pill">Chiudi</button>
+      </div>
+
+      <div id="studentsList"></div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script>
+    const STUDENTI_1BI = [
+      "Bacchiocchi Alessio",
+      "Basile Christian",
+      "Bertuolo Gabriele",
+      "Brovedani Tiziano",
+      "Buenamira Lysander",
+      "Catani Andrea",
+      "D'Antimi Fabio",
+      "Dinku Tinsae Belete",
+      "Gugeshashvili Andria",
+      "Huang Matteo",
+      "Leo Valerio",
+      "Marcorin Andrea",
+      "Mastrodonato Hernan Luis",
+      "Maulini Edoardo",
+      "Melis Ithan",
+      "Mina Waheeb Riad Wahba Kirlos",
+      "Moreschi Alessandro",
+      "Mridha Tamim",
+      "Obasuyi Daniele Amuanmwosa",
+      "Panzironi Flavio",
+      "Ruggeri Cristian",
+      "Salazar Campos Iker Damian",
+      "Sedda Andrea",
+      "Soka Bakala Jeremie",
+      "Subasi Caner",
+      "Xu Matteo",
+      "Zayats Oleksandr"
+    ];
+
+    function renderList() {
+      const search = document.getElementById("searchStudent").value.toLowerCase().trim();
+      const container = document.getElementById("studentsList");
+      container.innerHTML = "";
+
+      STUDENTI_1BI.forEach((nome, idx) => {
+        const num = idx + 1;
+        if (search && !nome.toLowerCase().includes(search) && String(num) !== search) return;
+
+        const row = document.createElement("div");
+        row.className = "student-row";
+        row.innerHTML = `
+          <div class="student-num mono">${num}</div>
+          <div class="student-name">${nome}</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    document.getElementById("searchStudent").addEventListener("input", renderList);
+
+    document.getElementById("randomPickBtn").addEventListener("click", () => {
+      const idx = Math.floor(Math.random() * STUDENTI_1BI.length);
+      document.getElementById("pickedName").textContent = `#${idx + 1} • ${STUDENTI_1BI[idx]}`;
+      document.getElementById("extractResult").style.display = "flex";
+    });
+
+    document.getElementById("closeExtract").addEventListener("click", () => {
+      document.getElementById("extractResult").style.display = "none";
+    });
+
+    renderList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Simulatore Porte Logiche</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .circuit-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      padding: 28px;
+      border-radius: 14px;
+      margin: 20px 0;
+    }
+    .switch-btn {
+      padding: 14px 28px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      border-radius: 10px;
+      border: 2px solid var(--input-border);
+      cursor: pointer;
+      background: var(--input-bg);
+      color: var(--text-main);
+    }
+    .switch-btn.on {
+      background: #10b981;
+      color: white;
+      border-color: #059669;
+    }
+    .bulb {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.3rem;
+      transition: 0.25s;
+    }
+    .bulb.lit {
+      background: #facc15;
+      border-color: #eab308;
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.7);
+      color: #0f172a;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; background: var(--surface-sub); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 12px; text-align: center; border-bottom: 1px solid var(--table-border); }
+    tr.active-row { background: var(--table-active); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Porte Logiche</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+    <div class="module-panel">
+      <h2 class="section-title">Simulatore <span>Porte Logiche</span></h2>
+
+      <div class="form-group" style="max-width: 300px;">
+        <label>Seleziona Porta Logica</label>
+        <div class="input-box">
+          <select id="gateSelect">
+            <option value="AND">AND (Prodotto Logico)</option>
+            <option value="OR">OR (Somma Logica)</option>
+            <option value="NOT">NOT (Negazione - solo Ingresso A)</option>
+            <option value="XOR">XOR (OR Esclusivo)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="circuit-box">
+        <div>
+          <p style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">INGRESSO A</p>
+          <button id="btnA" class="switch-btn mono">0</button>
+        </div>
+
+        <div id="groupB">
+          <p style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">INGRESSO B</p>
+          <button id="btnB" class="switch-btn mono">0</button>
+        </div>
+
+        <div class="mono" style="font-size: 1.4rem; font-weight: 700; color: var(--primary);" id="gateLabel">→ [ AND ] →</div>
+
+        <div style="text-align: center;">
+          <p style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">USCITA Y</p>
+          <div id="bulbOut" class="bulb mono">0</div>
+        </div>
+      </div>
+
+      <h4>Tabella della Verità</h4>
+      <table id="truthTable" class="mono"></table>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script>
+    let inA = 0, inB = 0;
+    const btnA = document.getElementById("btnA");
+    const btnB = document.getElementById("btnB");
+    const gateSelect = document.getElementById("gateSelect");
+
+    function evalGate(gate, a, b) {
+      if (gate === "AND") return a & b;
+      if (gate === "OR") return a | b;
+      if (gate === "NOT") return a === 1 ? 0 : 1;
+      if (gate === "XOR") return a ^ b;
+    }
+
+    function render() {
+      const gate = gateSelect.value;
+      document.getElementById("gateLabel").textContent = `→ [ ${gate} ] →`;
+      document.getElementById("groupB").style.display = gate === "NOT" ? "none" : "block";
+
+      btnA.textContent = inA;
+      btnA.classList.toggle("on", inA === 1);
+      btnB.textContent = inB;
+      btnB.classList.toggle("on", inB === 1);
+
+      const out = evalGate(gate, inA, inB);
+      const bulb = document.getElementById("bulbOut");
+      bulb.textContent = out;
+      bulb.classList.toggle("lit", out === 1);
+
+      const table = document.getElementById("truthTable");
+      if (gate === "NOT") {
+        table.innerHTML = `<tr><th>A</th><th>Uscita Y (NOT A)</th></tr>` +
+          [0, 1].map(a => `<tr class="${a === inA ? 'active-row' : ''}"><td>${a}</td><td>${evalGate("NOT", a, 0)}</td></tr>`).join("");
+      } else {
+        const combos = [[0,0],[0,1],[1,0],[1,1]];
+        table.innerHTML = `<tr><th>A</th><th>B</th><th>Uscita Y (${gate})</th></tr>` +
+          combos.map(([a, b]) => `<tr class="${(a === inA && b === inB) ? 'active-row' : ''}"><td>${a}</td><td>${b}</td><td>${evalGate(gate, a, b)}</td></tr>`).join("");
+      }
+    }
+
+    btnA.addEventListener("click", () => { inA = inA ? 0 : 1; render(); });
+    btnB.addEventListener("click", () => { inB = inB ? 0 : 1; render(); });
+    gateSelect.addEventListener("change", render);
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Convertitore Basi</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Convertitore Basi</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+    <div class="module-panel">
+      <h2 class="section-title">Convertitore <span>Binario / Hex / Decimale</span></h2>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 18px;">
+        <div class="form-group">
+          <label>Numero da convertire</label>
+          <div class="input-box">
+            <i data-lucide="hash"></i>
+            <input type="text" id="numInput" class="mono" placeholder="Es. 42 oppure 101010 oppure 2A" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Base di partenza</label>
+          <div class="input-box">
+            <select id="baseSelect">
+              <option value="10">Decimale (Base 10)</option>
+              <option value="2">Binario (Base 2)</option>
+              <option value="16">Esadecimale (Base 16)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button id="convertBtn" class="btn btn-primary" style="max-width: 240px;">CONVERTI E SPIEGA</button>
+
+      <div id="resultsArea" style="margin-top: 24px; display: none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          <div class="sub-box">
+            <small style="color: var(--text-muted); font-weight: 700;">DECIMALE (10)</small>
+            <div id="resDec" class="mono" style="font-size: 1.35rem; font-weight: 700; color: var(--primary); margin-top: 4px;"></div>
+          </div>
+          <div class="sub-box">
+            <small style="color: var(--text-muted); font-weight: 700;">BINARIO (2)</small>
+            <div id="resBin" class="mono" style="font-size: 1.35rem; font-weight: 700; color: #10b981; margin-top: 4px;"></div>
+          </div>
+          <div class="sub-box">
+            <small style="color: var(--text-muted); font-weight: 700;">ESADECIMALE (16)</small>
+            <div id="resHex" class="mono" style="font-size: 1.35rem; font-weight: 700; color: #ef4444; margin-top: 4px;"></div>
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 10px;">Spiegazione passo-passo:</h4>
+        <pre id="stepsOutput" style="background: #090d16; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.12); padding: 18px; border-radius: 12px; overflow-x: auto; line-height: 1.65; font-size: 0.88rem;"></pre>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script>
+    document.getElementById("convertBtn").addEventListener("click", () => {
+      const raw = document.getElementById("numInput").value.trim().toUpperCase();
+      const base = parseInt(document.getElementById("baseSelect").value);
+      const decValue = parseInt(raw, base);
+
+      if (!raw || isNaN(decValue) || decValue < 0) {
+        alert("Inserisci un numero intero positivo valido per la base selezionata!");
+        return;
+      }
+
+      document.getElementById("resDec").textContent = decValue;
+      document.getElementById("resBin").textContent = decValue.toString(2);
+      document.getElementById("resHex").textContent = decValue.toString(16).toUpperCase();
+
+      let explanation = "";
+      if (base !== 10) {
+        explanation += `1) Conversione da Base ${base} a Decimale (metodo posizionale):\n`;
+        const digits = raw.split("").reverse();
+        const terms = digits.map((d, i) => `${parseInt(d, base)} × ${base}^${i}`);
+        explanation += `   ${terms.reverse().join(" + ")} = ${decValue}\n\n`;
+      }
+
+      explanation += `2) Conversione da Decimale (${decValue}) a Binario (divisioni successive per 2):\n`;
+      let temp = decValue;
+      if (temp === 0) explanation += "   0 : 2 = 0 (resto 0)\n";
+      while (temp > 0) {
+        const q = Math.floor(temp / 2);
+        const r = temp % 2;
+        explanation += `   ${temp} : 2 = ${q}  --> Resto: ${r}\n`;
+        temp = q;
+      }
+      explanation += `   Leggendo i resti dal basso verso l'alto: ${decValue.toString(2)}\n\n`;
+
+      explanation += `3) Conversione da Decimale (${decValue}) a Esadecimale (divisioni per 16):\n`;
+      let tempHex = decValue;
+      const hexChars = "0123456789ABCDEF";
+      if (tempHex === 0) explanation += "   0 : 16 = 0 (resto 0)\n";
+      while (tempHex > 0) {
+        const q = Math.floor(tempHex / 16);
+        const r = tempHex % 16;
+        explanation += `   ${tempHex} : 16 = ${q}  --> Resto: ${r} (${hexChars[r]})\n`;
+        tempHex = q;
+      }
+      explanation += `   Risultato Esadecimale: ${decValue.toString(16).toUpperCase()}`;
+
+      document.getElementById("stepsOutput").textContent = explanation;
+      document.getElementById("resultsArea").style.display = "block";
+    });
+  </script>
+</body>
+</html>

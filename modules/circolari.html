@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Circolari IIS Giorgi-Woolf</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .circ-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .circ-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid #0ea5e9;
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      transition: transform 0.22s ease, border-color 0.22s ease;
+      animation: fadeSlideUp 0.4s ease-out both;
+    }
+    .circ-card:hover {
+      transform: translateX(5px);
+      border-color: #38bdf8;
+    }
+    .circ-info {
+      flex: 1;
+      min-width: 240px;
+    }
+    .circ-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+    .circ-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .circ-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.83rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+    }
+    .circ-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(14, 165, 233, 0.45);
+    }
+    .count-pill {
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.35);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Circolari Istituto</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="circ-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Circolari <span style="color: #0ea5e9;">IIS Giorgi-Woolf</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Aggiornate automaticamente dal sito ufficiale dell'Istituto (A.S. 2026/2027)</p>
+        </div>
+        <span id="circCount" class="count-pill mono">Caricamento...</span>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 22px;">
+        <div class="input-box">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchCircInput" placeholder="Cerca circolare per numero, parola chiave o argomento..." />
+        </div>
+      </div>
+
+      <div id="circolariContainer">Sincronizzazione circolari da Firebase...</div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { db } from "../js/firebase-config.js";
+    import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let allCircolari = [];
+
+    function renderCircolari() {
+      const term = document.getElementById("searchCircInput").value.toLowerCase().trim();
+      const container = document.getElementById("circolariContainer");
+      const countEl = document.getElementById("circCount");
+
+      const filtered = allCircolari.filter(c =>
+        (c.titolo || "").toLowerCase().includes(term) ||
+        (c.descrizione || "").toLowerCase().includes(term)
+      );
+
+      countEl.textContent = `${filtered.length} Circolari`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted);">Nessuna circolare trovata.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      filtered.forEach((c, i) => {
+        const isPdf = (c.url || "").toLowerCase().endsWith(".pdf");
+        const card = document.createElement("div");
+        card.className = "circ-card";
+        card.style.animationDelay = `${Math.min(i * 0.03, 0.4)}s`;
+        card.innerHTML = `
+          <div class="circ-info">
+            <div class="circ-title">${c.titolo}</div>
+            ${c.descrizione ? `<div class="circ-desc">${c.descrizione}</div>` : ""}
+          </div>
+          <a href="${c.url}" target="_blank" rel="noopener noreferrer" class="circ-btn">
+            <i data-lucide="${isPdf ? 'file-down' : 'external-link'}" style="width:16px;height:16px;"></i>
+            <span>${isPdf ? 'Apri PDF' : 'Leggi Circolare'}</span>
+          </a>
+        `;
+        container.appendChild(card);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.getElementById("searchCircInput").addEventListener("input", renderCircolari);
+
+    const q = query(collection(db, "circolari_scuola"), orderBy("ordine", "asc"));
+    onSnapshot(q, (snapshot) => {
+      allCircolari = [];
+      snapshot.forEach((docSnap) => {
+        allCircolari.push(docSnap.data());
+      });
+      renderCircolari();
+    });
+  </script>
+</body>
+</html>

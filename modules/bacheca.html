@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Bacheca di Classe 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .notice-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid #dc2626;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 16px;
+      animation: fadeSlideUp 0.4s ease-out both;
+    }
+    .notice-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .notice-title {
+      font-size: 1.18rem;
+      font-weight: 800;
+    }
+    .notice-desc {
+      font-size: 0.94rem;
+      line-height: 1.55;
+      color: var(--text-main);
+      white-space: pre-wrap;
+      margin-bottom: 14px;
+    }
+    .attachment-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: var(--primary);
+      padding: 10px 14px;
+      border-radius: 11px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .attachment-box:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .notice-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--table-border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .author-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .rep-chip {
+      background: rgba(220, 38, 38, 0.14);
+      color: #ef4444;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .del-btn {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .del-btn:hover { background: #ef4444; color: #fff; }
+
+    /* POPUP MODALE NUOVO ANNUNCIO */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 9, 19, 0.65);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 300;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 500px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(22px);
+      border: 1px solid var(--glass-border);
+      border-top: 5px solid #dc2626;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      animation: fadeSlideUp 0.3s ease-out;
+    }
+    .file-drop {
+      display: block;
+      border: 1.5px dashed var(--input-border);
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      transition: 0.2s;
+    }
+    .file-drop:hover { border-color: var(--primary); color: var(--text-main); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Bacheca di Classe</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="board-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Bacheca Ufficiale <span style="color: #dc2626;">1BI</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Comunicazioni, circolari e file dei Rappresentanti di Classe</p>
+        </div>
+
+        <button id="openModalBtn" class="btn btn-primary" style="width: auto; margin-top: 0; display: none;">
+          <i data-lucide="plus-circle" style="width:17px;height:17px;"></i> Nuovo Annuncio
+        </button>
+      </div>
+
+      <div id="noticesContainer">Caricamento comunicazioni...</div>
+    </div>
+  </main>
+
+  <!-- POPUP NUOVO ANNUNCIO -->
+  <div id="noticeModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 style="font-size: 1.2rem; font-weight: 800;">Nuovo Annuncio di Classe</h3>
+        <button id="closeModalBtn" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="newNoticeForm">
+        <div class="form-group">
+          <label>Titolo Annuncio *</label>
+          <div class="input-box">
+            <i data-lucide="bell-ring"></i>
+            <input type="text" id="noticeTitleInput" placeholder="Es. Circolare Assemblea d'Istituto" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descrizione (Opzionale)</label>
+          <div class="input-box" style="align-items: flex-start; padding-top: 4px;">
+            <i data-lucide="align-left" style="margin-top: 10px;"></i>
+            <textarea id="noticeDescInput" rows="4" placeholder="Scrivi i dettagli dell'annuncio..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Allega qualsiasi file (PDF, Foto, Word, Zip - max 750 KB)</label>
+          <label class="file-drop" for="noticeFileInput">
+            <i data-lucide="paperclip" style="width:20px;height:20px;margin-bottom:4px;"></i>
+            <div id="fileLabelText">Clicca per scegliere un file dal dispositivo</div>
+          </label>
+          <input type="file" id="noticeFileInput" style="display: none;" />
+        </div>
+
+        <button type="submit" id="publishBtn" class="btn btn-primary">PUBBLICA IN BACHECA</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let userIsRep = false;
+    const openBtn = document.getElementById("openModalBtn");
+    const modal = document.getElementById("noticeModal");
+    const fileInput = document.getElementById("noticeFileInput");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      userIsRep = isRappresentante(user.email);
+      if (userIsRep) {
+        openBtn.style.display = "inline-flex";
+      }
+    });
+
+    openBtn.addEventListener("click", () => modal.classList.add("open"));
+    document.getElementById("closeModalBtn").addEventListener("click", () => modal.classList.remove("open"));
+
+    fileInput.addEventListener("change", () => {
+      const f = fileInput.files[0];
+      document.getElementById("fileLabelText").textContent = f ? `File selezionato: ${f.name}` : "Clicca per scegliere un file dal dispositivo";
+    });
+
+    // Converte il file in stringa Base64 per salvarlo direttamente su Firestore senza errori CORS
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("newNoticeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user || !userIsRep) return;
+
+      const title = document.getElementById("noticeTitleInput").value.trim();
+      const desc = document.getElementById("noticeDescInput").value.trim();
+      const file = fileInput.files[0];
+      const publishBtn = document.getElementById("publishBtn");
+
+      if (!title) return;
+
+      if (file && file.size > 750 * 1024) {
+        alert("Il file supera i 750 KB. Comprimilo oppure allega un file più leggero.");
+        return;
+      }
+
+      publishBtn.disabled = true;
+      publishBtn.textContent = "PUBBLICAZIONE IN CORSO...";
+
+      try {
+        let fileData = "";
+        let fileName = "";
+
+        if (file) {
+          fileData = await fileToBase64(file);
+          fileName = file.name;
+        }
+
+        await addDoc(collection(db, "bacheca_1bi"), {
+          titolo: title,
+          descrizione: desc,
+          fileData: fileData,
+          fileName: fileName,
+          autoreNome: user.displayName || user.email.split("@")[0],
+          autoreEmail: user.email,
+          creatoIl: Date.now()
+        });
+
+        document.getElementById("newNoticeForm").reset();
+        document.getElementById("fileLabelText").textContent = "Clicca per scegliere un file dal dispositivo";
+        modal.classList.remove("open");
+      } catch (err) {
+        alert("Errore nella pubblicazione: " + err.message);
+      } finally {
+        publishBtn.disabled = false;
+        publishBtn.textContent = "PUBBLICA IN BACHECA";
+      }
+    });
+
+    // Lettura annunci in tempo reale
+    const q = query(collection(db, "bacheca_1bi"), orderBy("creatoIl", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const container = document.getElementById("noticesContainer");
+      if (snapshot.empty) {
+        container.innerHTML = `<p style="color: var(--text-muted);">Nessun annuncio pubblicato in bacheca al momento.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        const dateStr = new Date(d.creatoIl).toLocaleString("it-IT", {
+          day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+        });
+
+        const fileLink = d.fileData || d.fileUrl || "";
+        const card = document.createElement("div");
+        card.className = "notice-card";
+        card.innerHTML = `
+          <div class="notice-top">
+            <div class="notice-title">${d.titolo}</div>
+            ${userIsRep ? `<button class="del-btn" data-id="${docSnap.id}">Elimina</button>` : ""}
+          </div>
+          ${d.descrizione ? `<div class="notice-desc">${d.descrizione}</div>` : ""}
+          ${fileLink ? `
+            <a href="${fileLink}" download="${d.fileName}" class="attachment-box">
+              <i data-lucide="file-down" style="width:18px;height:18px;"></i>
+              <span>Scarica Allegato: ${d.fileName}</span>
+            </a>
+          ` : ""}
+          <div class="notice-footer">
+            <div class="author-badge">
+              <i data-lucide="user-check" style="width:15px;height:15px;color:#ef4444;"></i>
+              <span>Pubblicato da: ${d.autoreNome}</span>
+              <span class="rep-chip">Rappresentante 1BI</span>
+            </div>
+            <div>${dateStr}</div>
+          </div>
+        `;
+
+        const delBtn = card.querySelector(".del-btn");
+        if (delBtn) {
+          delBtn.addEventListener("click", async () => {
+            if (confirm("Vuoi eliminare questo annuncio dalla bacheca?")) {
+              await deleteDoc(doc(db, "bacheca_1bi", docSnap.id));
+            }
+          });
+        }
+
+        container.appendChild(card);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

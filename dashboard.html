@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Cruscotto 1BI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Classe 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner">
+      <div>
+        <h2>Bentornato, <span id="welcomeUserName">Studente</span>!</h2>
+        <p>Strumenti digitali condivisi per la <strong>1BI Informatica</strong> • Clicca sul tuo nome in alto per il profilo</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span>Portale 1BI Online</span>
+      </div>
+    </div>
+
+    <!-- 1. CIRCOLARI ISTITUTO IN EVIDENZA (SOPRA LA BACHECA) -->
+    <a href="modules/circolari.html" class="featured-circolari">
+      <div class="featured-left">
+        <div class="icon-badge" style="background: rgba(14,165,233,0.18); color: #38bdf8; width: 64px; height: 64px;">
+          <i data-lucide="newspaper" style="width: 30px; height: 30px;"></i>
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; text-transform: uppercase;">Circolari IIS Giorgi-Woolf</h3>
+            <span class="featured-badge-cyan">Auto-Sync</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">Tutte le circolari ufficiali dell'istituto A.S. 2026/2027 aggiornate in automatico</p>
+        </div>
+      </div>
+      <div style="display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.88rem; color: #38bdf8;">
+        <span>Apri Circolari</span>
+        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+      </div>
+    </a>
+
+    <!-- 2. BACHECA DI CLASSE IN EVIDENZA -->
+    <a href="modules/bacheca.html" class="featured-bacheca">
+      <div class="featured-left">
+        <div class="icon-badge" style="background: rgba(220,38,38,0.18); color: #ef4444; width: 64px; height: 64px;">
+          <i data-lucide="bell-ring" style="width: 30px; height: 30px;"></i>
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; text-transform: uppercase;">Bacheca di Classe</h3>
+            <span class="featured-badge">1BI Ufficiale</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">Avvisi ufficiali, comunicazioni e allegati pubblicati dai Rappresentanti della 1BI</p>
+        </div>
+      </div>
+      <div style="display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.88rem; color: #ef4444;">
+        <span>Apri Bacheca</span>
+        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+      </div>
+    </a>
+
+    <!-- GRIGLIA STRUMENTI -->
+    <div class="cards-grid">
+      <a href="modules/appello.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #0ea5e9;">
+          <i data-lucide="users"></i>
+        </div>
+        <h3>Appello di Classe</h3>
+        <p>Elenco ufficiale numerato degli studenti della 1BI</p>
+      </a>
+
+      <a href="modules/convertitore-basi.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #3b82f6;">
+          <i data-lucide="binary"></i>
+        </div>
+        <h3>Convertitore Basi</h3>
+        <p>Binario, Esadecimale e Decimale con passaggi spiegati</p>
+      </a>
+
+      <a href="modules/porte-logiche.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
+          <i data-lucide="cpu"></i>
+        </div>
+        <h3>Porte Logiche</h3>
+        <p>Simulatore interattivo AND, OR, NOT, XOR e tabella verità</p>
+      </a>
+
+      <a href="modules/guida-laboratori.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
+          <i data-lucide="terminal"></i>
+        </div>
+        <h3>Manuali & Tips</h3>
+        <p>Guide complete e trucchetti per Word, Excel, PowerPoint e AutoCAD</p>
+      </a>
+
+      <a href="modules/assemblee.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(239,68,68,0.16); color: #ef4444;">
+          <i data-lucide="megaphone"></i>
+        </div>
+        <h3>Assemblee di Classe</h3>
+        <p>Calendario assemblee programmate, svolte e registro presenze</p>
+      </a>
+
+      <a href="modules/convertitore-unita.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(139,92,246,0.16); color: #8b5cf6;">
+          <i data-lucide="flask-conical"></i>
+        </div>
+        <h3>Fisica & Chimica</h3>
+        <p>Convertitore unità di misura e formule di 1ª superiore</p>
+      </a>
+    </div>
+  </main>
+
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

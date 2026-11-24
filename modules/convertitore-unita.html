@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Fisica & Chimica</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Fisica & Chimica</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+    <div class="module-panel">
+      <h2 class="section-title">Convertitore <span>Fisica e Chimica</span></h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+        <div class="form-group">
+          <label>Grandezza / Conversione</label>
+          <div class="input-box">
+            <select id="convType">
+              <option value="kmh_ms">Velocità: km/h → m/s (÷ 3,6)</option>
+              <option value="ms_kmh">Velocità: m/s → km/h (× 3,6)</option>
+              <option value="c_k">Temperatura: °C → Kelvin (+ 273,15)</option>
+              <option value="k_c">Temperatura: Kelvin → °C (- 273,15)</option>
+              <option value="atm_pa">Pressione: atm → Pascal (× 101325)</option>
+              <option value="gcm3_kgm3">Densità: g/cm³ → kg/m³ (× 1000)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Valore in ingresso</label>
+          <div class="input-box">
+            <i data-lucide="calculator"></i>
+            <input type="number" step="any" id="valInput" class="mono" placeholder="Es. 90" />
+          </div>
+        </div>
+      </div>
+
+      <button id="calcUnitBtn" class="btn btn-primary" style="max-width: 220px;">CALCOLA</button>
+
+      <div id="unitResultBox" class="sub-box" style="margin-top: 20px; display: none;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);" id="formulaUsed"></div>
+        <div class="mono" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-top: 6px;" id="unitResultText"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script>
+    document.getElementById("calcUnitBtn").addEventListener("click", () => {
+      const type = document.getElementById("convType").value;
+      const val = parseFloat(document.getElementById("valInput").value);
+      if (isNaN(val)) return;
+
+      let res = 0, unit = "", formula = "";
+      switch (type) {
+        case "kmh_ms":
+          res = val / 3.6; unit = "m/s"; formula = `${val} km/h ÷ 3,6`; break;
+        case "ms_kmh":
+          res = val * 3.6; unit = "km/h"; formula = `${val} m/s × 3,6`; break;
+        case "c_k":
+          res = val + 273.15; unit = "K"; formula = `${val} °C + 273,15`; break;
+        case "k_c":
+          res = val - 273.15; unit = "°C"; formula = `${val} K - 273,15`; break;
+        case "atm_pa":
+          res = val * 101325; unit = "Pa"; formula = `${val} atm × 101325`; break;
+        case "gcm3_kgm3":
+          res = val * 1000; unit = "kg/m³"; formula = `${val} g/cm³ × 1000`; break;
+      }
+
+      document.getElementById("formulaUsed").textContent = `Calcolo: ${formula}`;
+      document.getElementById("unitResultText").textContent = `${Number(res.toFixed(4))} ${unit}`;
+      document.getElementById("unitResultBox").style.display = "block";
+    });
+  </script>
+</body>
+</html>

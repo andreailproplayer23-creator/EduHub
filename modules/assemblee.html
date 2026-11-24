@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Assemblee di Classe 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .sub-heading {
+      font-size: 1.08rem;
+      font-weight: 800;
+      margin: 22px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .assembly-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid var(--primary);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      animation: fadeSlideUp 0.4s ease-out both;
+    }
+    .assembly-card.svolta {
+      border-left-color: #10b981;
+    }
+    .assembly-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .meta-pill.green {
+      background: rgba(16, 185, 129, 0.14);
+      color: #10b981;
+    }
+    .actions-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .action-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .action-btn.danger:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    /* MODALI */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 9, 19, 0.68);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 300;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 520px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-top: 5px solid var(--primary);
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+      animation: fadeSlideUp 0.3s ease-out;
+    }
+    .att-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-radius: 11px;
+      margin-bottom: 8px;
+    }
+    .att-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+    .att-btn:disabled {
+      cursor: default;
+      opacity: 0.9;
+    }
+    .att-btn.pres.active {
+      background: #10b981;
+      border-color: #059669;
+      color: #fff;
+    }
+    .att-btn.ass.active {
+      background: #ef4444;
+      border-color: #dc2626;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Assemblee di Classe</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="board-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Assemblee di Classe <span>1BI</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Calendario assemblee programmate, svolte e registro presenze</p>
+        </div>
+
+        <!-- VISIBILE SOLO AI RAPPRESENTANTI -->
+        <button id="openCreateModalBtn" class="btn btn-primary" style="width: auto; margin-top: 0; display: none;">
+          <i data-lucide="calendar-plus" style="width:17px;height:17px;"></i> Nuova Assemblea
+        </button>
+      </div>
+
+      <h3 class="sub-heading"><i data-lucide="clock" style="width:18px;height:18px;color:var(--primary);"></i> Assemblee da Svolgere</h3>
+      <div id="upcomingList">Caricamento...</div>
+
+      <h3 class="sub-heading" style="margin-top: 32px;"><i data-lucide="check-circle-2" style="width:18px;height:18px;color:#10b981;"></i> Assemblee Già Svolte</h3>
+      <div id="pastList">Caricamento...</div>
+    </div>
+  </main>
+
+  <!-- POPUP CREA ASSEMBLEA (SOLO RAPPRESENTANTI) -->
+  <div id="createModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 style="font-size: 1.18rem; font-weight: 800;">Registra Assemblea 1BI</h3>
+        <button id="closeCreateModal" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="assemblyForm">
+        <div class="form-group">
+          <label>Stato Assemblea</label>
+          <div class="input-box">
+            <select id="assemblyStatus">
+              <option value="da_fare">Da svolgere (Programmata)</option>
+              <option value="svolta">Già svolta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Data dell'Assemblea *</label>
+          <div class="input-box">
+            <i data-lucide="calendar"></i>
+            <input type="date" id="assemblyDate" required />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label>Dalle ore *</label>
+            <div class="input-box">
+              <i data-lucide="clock"></i>
+              <input type="time" id="timeStart" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Alle ore *</label>
+            <div class="input-box">
+              <i data-lucide="clock"></i>
+              <input type="time" id="timeEnd" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Note / Tipo (Opzionale)</label>
+          <div class="input-box">
+            <i data-lucide="file-text"></i>
+            <input type="text" id="assemblyNote" placeholder="Es. Assemblea di Classe Mensile" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">SALVA ASSEMBLEA</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- POPUP APPELLO PRESENZE ASSEMBLEA -->
+  <div id="attendanceModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 560px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800;">Appello Assemblea</h3>
+          <p id="attModalSubtitle" style="font-size: 0.82rem; color: var(--text-muted);"></p>
+        </div>
+        <button id="closeAttModal" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div id="attSummaryBar" style="display:flex; gap:10px; margin-bottom:14px; font-size:0.82rem; font-weight:800;"></div>
+      <div id="attendanceStudentsList"></div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const STUDENTI_1BI = [
+      "Bacchiocchi Alessio",
+      "Basile Christian",
+      "Bertuolo Gabriele",
+      "Brovedani Tiziano",
+      "Buenamira Lysander",
+      "Catani Andrea",
+      "D'Antimi Fabio",
+      "Dinku Tinsae Belete",
+      "Gugeshashvili Andria",
+      "Huang Matteo",
+      "Leo Valerio",
+      "Marcorin Andrea",
+      "Mastrodonato Hernan Luis",
+      "Maulini Edoardo",
+      "Melis Ithan",
+      "Mina Waheeb Riad Wahba Kirlos",
+      "Moreschi Alessandro",
+      "Mridha Tamim",
+      "Obasuyi Daniele Amuanmwosa",
+      "Panzironi Flavio",
+      "Ruggeri Cristian",
+      "Salazar Campos Iker Damian",
+      "Sedda Andrea",
+      "Soka Bakala Jeremie",
+      "Subasi Caner",
+      "Xu Matteo",
+      "Zayats Oleksandr"
+    ];
+
+    let userIsRep = false;
+    let assembliesCache = {};
+    let activeAssemblyId = null;
+
+    const createBtn = document.getElementById("openCreateModalBtn");
+    const createModal = document.getElementById("createModal");
+    const attModal = document.getElementById("attendanceModal");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      userIsRep = isRappresentante(user.email);
+      if (userIsRep) {
+        createBtn.style.display = "inline-flex";
+      }
+    });
+
+    createBtn.addEventListener("click", () => createModal.classList.add("open"));
+    document.getElementById("closeCreateModal").addEventListener("click", () => createModal.classList.remove("open"));
+    document.getElementById("closeAttModal").addEventListener("click", () => {
+      attModal.classList.remove("open");
+      activeAssemblyId = null;
+    });
+
+    // Salva nuova assemblea (solo rappresentanti)
+    document.getElementById("assemblyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!userIsRep) return;
+
+      const stato = document.getElementById("assemblyStatus").value;
+      const data = document.getElementById("assemblyDate").value;
+      const oraInizio = document.getElementById("timeStart").value;
+      const oraFine = document.getElementById("timeEnd").value;
+      const nota = document.getElementById("assemblyNote").value.trim();
+
+      // Di default tutti presenti, poi i rappresentanti segnano gli assenti
+      const presenzeIniziali = {};
+      STUDENTI_1BI.forEach((_, i) => presenzeIniziali[i] = "P");
+
+      await addDoc(collection(db, "assemblee_1bi"), {
+        stato,
+        data,
+        oraInizio,
+        oraFine,
+        nota: nota || "Assemblea di Classe 1BI",
+        presenze: presenzeIniziali,
+        creatoIl: Date.now()
+      });
+
+      document.getElementById("assemblyForm").reset();
+      createModal.classList.remove("open");
+    });
+
+    function formatDateIT(isoDate) {
+      if (!isoDate) return "";
+      const [y, m, d] = isoDate.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function openAttendanceModal(id) {
+      activeAssemblyId = id;
+      const item = assembliesCache[id];
+      if (!item) return;
+
+      document.getElementById("attModalSubtitle").textContent =
+        `${item.nota} • ${formatDateIT(item.data)} (${item.oraInizio} - ${item.oraFine})`;
+
+      renderAttendanceRows();
+      attModal.classList.add("open");
+    }
+
+    function renderAttendanceRows() {
+      if (!activeAssemblyId || !assembliesCache[activeAssemblyId]) return;
+      const item = assembliesCache[activeAssemblyId];
+      const presenze = item.presenze || {};
+      const listEl = document.getElementById("attendanceStudentsList");
+      listEl.innerHTML = "";
+
+      let countP = 0, countA = 0;
+
+      STUDENTI_1BI.forEach((nome, idx) => {
+        const st = presenze[idx] || "P";
+        if (st === "P") countP++;
+        else countA++;
+
+        const row = document.createElement("div");
+        row.className = "att-row";
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="mono" style="font-size:0.78rem; font-weight:800; color:var(--primary); width:22px;">${idx + 1}.</span>
+            <strong style="font-size:0.9rem;">${nome}</strong>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="att-btn pres ${st === 'P' ? 'active' : ''}" ${!userIsRep ? 'disabled' : ''}>Presente</button>
+            <button class="att-btn ass ${st === 'A' ? 'active' : ''}" ${!userIsRep ? 'disabled' : ''}>Assente</button>
+          </div>
+        `;
+
+        if (userIsRep) {
+          const [btnP, btnA] = row.querySelectorAll("button");
+          btnP.addEventListener("click", () => updateStudentAtt(activeAssemblyId, idx, "P"));
+          btnA.addEventListener("click", () => updateStudentAtt(activeAssemblyId, idx, "A"));
+        }
+
+        listEl.appendChild(row);
+      });
+
+      document.getElementById("attSummaryBar").innerHTML = `
+        <span style="color:#10b981;">Presenti: ${countP}</span>
+        <span>•</span>
+        <span style="color:#ef4444;">Assenti: ${countA}</span>
+        ${!userIsRep ? `<span style="margin-left:auto; color:var(--text-muted); font-weight:600;">(Sola lettura)</span>` : ""}
+      `;
+    }
+
+    async function updateStudentAtt(assemblyId, studentIdx, status) {
+      if (!userIsRep) return;
+      await updateDoc(doc(db, "assemblee_1bi", assemblyId), {
+        [`presenze.${studentIdx}`]: status
+      });
+    }
+
+    // Ascolto in tempo reale delle assemblee
+    const q = query(collection(db, "assemblee_1bi"), orderBy("data", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const upcomingEl = document.getElementById("upcomingList");
+      const pastEl = document.getElementById("pastList");
+      upcomingEl.innerHTML = "";
+      pastEl.innerHTML = "";
+      assembliesCache = {};
+
+      let hasUpcoming = false;
+      let hasPast = false;
+
+      snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        const id = docSnap.id;
+        assembliesCache[id] = d;
+
+        const pres = d.presenze || {};
+        let pCount = 0, aCount = 0;
+        STUDENTI_1BI.forEach((_, i) => {
+          if ((pres[i] || "P") === "P") pCount++;
+          else aCount++;
+        });
+
+        const isSvolta = d.stato === "svolta";
+        const card = document.createElement("div");
+        card.className = `assembly-card ${isSvolta ? "svolta" : ""}`;
+        card.innerHTML = `
+          <div>
+            <div style="font-size: 1.05rem; font-weight: 800;">${d.nota}</div>
+            <div class="assembly-meta">
+              <span class="meta-pill ${isSvolta ? 'green' : ''}">
+                <i data-lucide="calendar" style="width:14px;height:14px;"></i> ${formatDateIT(d.data)}
+              </span>
+              <span class="meta-pill ${isSvolta ? 'green' : ''}">
+                <i data-lucide="clock" style="width:14px;height:14px;"></i> Dalle ${d.oraInizio} alle ${d.oraFine}
+              </span>
+              <span><strong>${pCount}</strong> presenti • <strong>${aCount}</strong> assenti</span>
+            </div>
+          </div>
+
+          <div class="actions-wrap">
+            <button class="action-btn att-open-btn">
+              <i data-lucide="user-check" style="width:15px;height:15px;"></i> Appello Presenze
+            </button>
+            ${userIsRep && !isSvolta ? `
+              <button class="action-btn mark-done-btn" title="Segna come già svolta">
+                <i data-lucide="check" style="width:15px;height:15px;"></i> Segna Svolta
+              </button>
+            ` : ""}
+            ${userIsRep ? `
+              <button class="action-btn danger del-asm-btn" title="Elimina assemblea">
+                <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
+              </button>
+            ` : ""}
+          </div>
+        `;
+
+        card.querySelector(".att-open-btn").addEventListener("click", () => openAttendanceModal(id));
+
+        const doneBtn = card.querySelector(".mark-done-btn");
+        if (doneBtn) {
+          doneBtn.addEventListener("click", async () => {
+            await updateDoc(doc(db, "assemblee_1bi", id), { stato: "svolta" });
+          });
+        }
+
+        const delBtn = card.querySelector(".del-asm-btn");
+        if (delBtn) {
+          delBtn.addEventListener("click", async () => {
+            if (confirm("Eliminare questa assemblea?")) {
+              await deleteDoc(doc(db, "assemblee_1bi", id));
+            }
+          });
+        }
+
+        if (isSvolta) {
+          hasPast = true;
+          pastEl.appendChild(card);
+        } else {
+          hasUpcoming = true;
+          upcomingEl.appendChild(card);
+        }
+      });
+
+      if (!hasUpcoming) upcomingEl.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">Nessuna assemblea programmata al momento.</p>`;
+      if (!hasPast) pastEl.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">Nessuna assemblea svolta registrata.</p>`;
+
+      if (activeAssemblyId && assembliesCache[activeAssemblyId]) {
+        renderAttendanceRows();
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
