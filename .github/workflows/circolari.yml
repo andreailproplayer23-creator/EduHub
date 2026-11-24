@@ -2,8 +2,12 @@ name: Aggiorna Circolari IIS Giorgi-Woolf
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
+
+concurrency:
+  group: circolari-sync
+  cancel-in-progress: true
 
 jobs:
   scrape-circolari:
