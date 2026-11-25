@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Proposte & Idee 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .idea-form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+    .idea-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 680px) {
+      .idea-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .idea-input, .idea-select, .idea-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .idea-textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+    .idea-input:focus, .idea-select:focus, .idea-textarea:focus {
+      border-color: #f59e0b;
+    }
+    .idea-form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .anon-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn-submit-idea {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: none;
+      padding: 11px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .filter-chip {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .filter-chip.active {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+    .ideas-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .idea-card {
+      display: flex;
+      gap: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.08));
+      border-radius: 18px;
+      padding: 18px;
+      align-items: flex-start;
+    }
+    .upvote-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 62px;
+      padding: 10px 8px;
+      border-radius: 14px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .upvote-box:hover {
+      border-color: #f59e0b;
+      transform: translateY(-2px);
+    }
+    .upvote-box.voted {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+    .upvote-count {
+      font-size: 1.05rem;
+      font-weight: 900;
+      margin-top: 4px;
+    }
+    .idea-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .idea-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .cat-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.16);
+      color: #60a5fa;
+    }
+    .status-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .st-nuova { background: rgba(148, 163, 184, 0.16); color: #cbd5e1; }
+    .st-valutazione { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .st-approvata { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .st-scartata { background: rgba(239, 68, 68, 0.16); color: #f87171; }
+    .idea-title {
+      font-size: 1.06rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      color: var(--text-main);
+    }
+    .idea-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0 0 10px 0;
+      white-space: pre-line;
+      line-height: 1.45;
+    }
+    .rep-reply-box {
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 3px solid #f59e0b;
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+    .idea-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+    .idea-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .mini-btn {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+    }
+    .mini-btn-del {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Proposte 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner">
+      <div>
+        <h2>Proposte & Idee per i Rappresentanti</h2>
+        <p>Suggerisci temi per le assemblee, gite, tornei o funzioni del sito e vota le idee migliori!</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span>Voci della 1BI</span>
+      </div>
+    </div>
+
+    <!-- INVIA NUOVA PROPOSTA -->
+    <section class="idea-form-card">
+      <h3 style="margin:0 0 14px 0; font-size:1.05rem; font-weight:800;">Hai un'idea per la classe o per EduHub?</h3>
+      <div class="idea-form-grid">
+        <input type="text" id="ideaTitleInput" class="idea-input" placeholder="Titolo breve della proposta (es. Torneo di scacchi in assemblea)..." maxlength="100" />
+        <select id="ideaCategorySelect" class="idea-select">
+          <option value="Assemblea">Assemblea di Classe</option>
+          <option value="Gite & Eventi">Gite & Eventi</option>
+          <option value="Tornei & Svago">Tornei & Svago</option>
+          <option value="EduHub Sito">Nuova Funzione EduHub</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+      <textarea id="ideaDescInput" class="idea-textarea" placeholder="Spiega meglio la tua idea..."></textarea>
+
+      <div class="idea-form-footer">
+        <label class="anon-check">
+          <input type="checkbox" id="ideaAnonCheckbox" />
+          <span>Invia in modo anonimo (il tuo nome non sarà mostrato)</span>
+        </label>
+        <button type="button" id="submitIdeaBtn" class="btn-submit-idea">
+          <i data-lucide="lightbulb" style="width:16px;height:16px;"></i>
+          <span>Invia Proposta</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- FILTRI CATEGORIA -->
+    <div class="filter-bar" id="filterBar">
+      <button type="button" class="filter-chip active" data-cat="TUTTE">Tutte</button>
+      <button type="button" class="filter-chip" data-cat="Assemblea">Assemblea</button>
+      <button type="button" class="filter-chip" data-cat="Gite & Eventi">Gite & Eventi</button>
+      <button type="button" class="filter-chip" data-cat="Tornei & Svago">Tornei & Svago</button>
+      <button type="button" class="filter-chip" data-cat="EduHub Sito">EduHub Sito</button>
+      <button type="button" class="filter-chip" data-cat="Altro">Altro</button>
+    </div>
+
+    <!-- ELENCO PROPOSTE ORDINATE PER UPVOTE -->
+    <div id="ideasContainer" class="ideas-list">
+      <div style="text-align:center; color:var(--text-muted); padding:30px;">Caricamento proposte della 1BI...</div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      arrayUnion,
+      arrayRemove
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let userIsRep = false;
+    let currentFilter = "TUTTE";
+    let allIdeas = [];
+
+    const STATUS_LABELS = {
+      nuova: { label: "In attesa", cls: "st-nuova" },
+      valutazione: { label: "In valutazione", cls: "st-valutazione" },
+      approvata: { label: "Approvata ✓", cls: "st-approvata" },
+      scartata: { label: "Non fattibile", cls: "st-scartata" }
+    };
+
+    document.querySelectorAll(".filter-chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-chip").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.cat;
+        renderIdeas();
+      });
+    });
+
+    document.getElementById("submitIdeaBtn").addEventListener("click", async () => {
+      if (!currentUser) return;
+      const titolo = document.getElementById("ideaTitleInput").value.trim();
+      const categoria = document.getElementById("ideaCategorySelect").value;
+      const descrizione = document.getElementById("ideaDescInput").value.trim();
+      const anonima = document.getElementById("ideaAnonCheckbox").checked;
+
+      if (!titolo) {
+        alert("Inserisci un titolo per la tua proposta!");
+        return;
+      }
+
+      const btn = document.getElementById("submitIdeaBtn");
+      btn.disabled = true;
+      try {
+        await addDoc(collection(db, "proposte_1bi"), {
+          titolo,
+          categoria,
+          descrizione,
+          autore: anonima ? "Studente Anonimo" : (currentUser.displayName || "Studente 1BI"),
+          autoreUid: currentUser.uid,
+          upvotes: [currentUser.uid],
+          stato: "nuova",
+          rispostaRep: "",
+          creatoIl: Date.now()
+        });
+
+        document.getElementById("ideaTitleInput").value = "";
+        document.getElementById("ideaDescInput").value = "";
+        document.getElementById("ideaAnonCheckbox").checked = false;
+      } catch (err) {
+        alert("Errore nell'invio della proposta: " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function renderIdeas() {
+      const container = document.getElementById("ideasContainer");
+      const filtered = allIdeas.filter(item =>
+        currentFilter === "TUTTE" || item.categoria === currentFilter
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px;">Nessuna proposta in questa categoria. Sii il primo a scriverne una!</div>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      filtered.forEach(item => {
+        const upvotes = Array.isArray(item.upvotes) ? item.upvotes : [];
+        const hasVoted = currentUser && upvotes.includes(currentUser.uid);
+        const st = STATUS_LABELS[item.stato] || STATUS_LABELS.nuova;
+        const dataStr = item.creatoIl ? new Date(item.creatoIl).toLocaleDateString("it-IT") : "";
+        const canDelete = userIsRep || (currentUser && item.autoreUid === currentUser.uid);
+
+        const card = document.createElement("div");
+        card.className = "idea-card";
+        card.innerHTML = `
+          <button type="button" class="upvote-box ${hasVoted ? "voted" : ""}" title="${hasVoted ? "Togli il tuo voto" : "Supporta questa idea"}">
+            <i data-lucide="chevron-up" style="width:20px;height:20px;"></i>
+            <span class="upvote-count">${upvotes.length}</span>
+          </button>
+
+          <div class="idea-body">
+            <div class="idea-badges">
+              <span class="cat-tag">${escapeHtml(item.categoria || "Altro")}</span>
+              <span class="status-tag ${st.cls}">${st.label}</span>
+            </div>
+            <h3 class="idea-title">${escapeHtml(item.titolo)}</h3>
+            ${item.descrizione ? `<p class="idea-desc">${escapeHtml(item.descrizione)}</p>` : ""}
+
+            ${item.rispostaRep ? `
+              <div class="rep-reply-box">
+                <strong>★ Risposta Rappresentanti:</strong> ${escapeHtml(item.rispostaRep)}
+              </div>
+            ` : ""}
+
+            <div class="idea-footer">
+              <span>Proposta da <strong>${escapeHtml(item.autore || "Studente 1BI")}</strong> ${dataStr ? `il ${dataStr}` : ""}</span>
+              <div class="idea-actions">
+                ${userIsRep ? `
+                  <select class="mini-btn rep-status-select" title="Cambia stato">
+                    <option value="nuova" ${item.stato === "nuova" ? "selected" : ""}>In attesa</option>
+                    <option value="valutazione" ${item.stato === "valutazione" ? "selected" : ""}>In valutazione</option>
+                    <option value="approvata" ${item.stato === "approvata" ? "selected" : ""}>Approvata ✓</option>
+                    <option value="scartata" ${item.stato === "scartata" ? "selected" : ""}>Non fattibile</option>
+                  </select>
+                  <button type="button" class="mini-btn rep-reply-btn">Rispondi</button>
+                ` : ""}
+                ${canDelete ? `<button type="button" class="mini-btn mini-btn-del del-idea-btn">Elimina</button>` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Toggle Upvote
+        card.querySelector(".upvote-box").addEventListener("click", async () => {
+          if (!currentUser) return;
+          const ref = doc(db, "proposte_1bi", item.id);
+          await updateDoc(ref, {
+            upvotes: hasVoted ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
+          });
+        });
+
+        // Azioni Rappresentanti
+        if (userIsRep) {
+          card.querySelector(".rep-status-select")?.addEventListener("change", async (e) => {
+            await updateDoc(doc(db, "proposte_1bi", item.id), {
+              stato: e.target.value
+            });
+          });
+
+          card.querySelector(".rep-reply-btn")?.addEventListener("click", async () => {
+            const msg = prompt("Scrivi una risposta ufficiale dei Rappresentanti (lascia vuoto per rimuovere):", item.rispostaRep || "");
+            if (msg === null) return;
+            await updateDoc(doc(db, "proposte_1bi", item.id), {
+              rispostaRep: msg.trim()
+            });
+          });
+        }
+
+        // Eliminazione
+        if (canDelete) {
+          card.querySelector(".del-idea-btn")?.addEventListener("click", async () => {
+            if (confirm("Vuoi eliminare questa proposta?")) {
+              await deleteDoc(doc(db, "proposte_1bi", item.id));
+            }
+          });
+        }
+
+        container.appendChild(card);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      userIsRep = isRappresentante(user);
+
+      const qIdeas = query(collection(db, "proposte_1bi"), orderBy("creatoIl", "desc"));
+      onSnapshot(qIdeas, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        // Ordina per numero di upvote decrescente (e a parità per data più recente)
+        list.sort((a, b) => {
+          const upA = Array.isArray(a.upvotes) ? a.upvotes.length : 0;
+          const upB = Array.isArray(b.upvotes) ? b.upvotes.length : 0;
+          if (upB !== upA) return upB - upA;
+          return (b.creatoIl || 0) - (a.creatoIl || 0);
+        });
+        allIdeas = list;
+        renderIdeas();
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
