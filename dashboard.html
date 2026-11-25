@@ -216,7 +216,11 @@
   <script type="module" src="js/auth.js"></script>
   <script type="module">
     import { db } from "./js/firebase-config.js";
+    import { initCompagniWidget } from "./js/compagni-widget.js";
     import { collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Avvia widget flottante Rubrica Compagni 1BI (in basso a sinistra)
+    initCompagniWidget();
 
     // 1. Ultima Circolare Istituto
     const qCirc = query(collection(db, "circolari_scuola"), orderBy("ordine", "asc"), limit(1));

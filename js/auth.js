@@ -82,9 +82,15 @@ onAuthStateChanged(auth, async (user) => {
     const ruolo = isRappresentante(user) ? "rappresentante" : "studente";
 
     try {
-      await setDoc(doc(db, "utenti_registrati", user.uid), {
-        ruolo: ruolo
-      }, { merge: true });
+      const payload = {
+        ruolo: ruolo,
+        classe: "1BI"
+      };
+      if (user.displayName) payload.nome = user.displayName;
+      if (user.email) payload.email = user.email;
+      if (user.photoURL) payload.photoURL = user.photoURL;
+
+      await setDoc(doc(db, "utenti_registrati", user.uid), payload, { merge: true });
     } catch (e) {}
 
     const nameEl = document.getElementById("userDisplayName");
@@ -135,6 +141,7 @@ if (authForm) {
         await setDoc(doc(db, "utenti_registrati", cred.user.uid), {
           nome: fullName,
           email: email,
+          photoURL: "",
           classe: "1BI",
           ruolo: isRappresentante(email) ? "rappresentante" : "studente",
           descrizione: "Ciao! Sono nella 1BI Informatica.",
@@ -183,12 +190,18 @@ if (googleBtn) {
         await setDoc(userDocRef, {
           nome: user.displayName || user.email.split("@")[0],
           email: user.email,
+          photoURL: user.photoURL || "",
           classe: "1BI",
           ruolo: isRappresentante(user) ? "rappresentante" : "studente",
           descrizione: "Ciao! Sono nella 1BI Informatica.",
           metodo: "google",
           registratoIl: Date.now()
         });
+      } else if (user.photoURL) {
+        await setDoc(userDocRef, {
+          photoURL: user.photoURL,
+          nome: user.displayName || userDoc.data().nome || user.email.split("@")[0]
+        }, { merge: true });
       }
 
       checkingGoogleAuth = false;
