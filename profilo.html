@@ -158,12 +158,28 @@
     </div>
   </main>
 
-  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/auth.js?v=3"></script>
   <script type="module">
     import { auth, db } from "./js/firebase-config.js";
-    import { isRappresentante } from "./js/auth.js";
+    import { isRappresentante } from "./js/auth.js?v=3";
     import { onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const REP_EMAILS_DIRECT = [
+      "andrea.marcorin@cvv.org",
+      "andrea.ilproplayer23@gmail.com",
+      "alessandromoreschi712@gmail.com"
+    ];
+
+    function checkRepDirect(user, extraEmail = "") {
+      if (isRappresentante(user)) return true;
+      const allEmails = [
+        user?.email,
+        extraEmail,
+        ...(user?.providerData || []).map(p => p.email)
+      ].filter(Boolean).map(e => e.trim().toLowerCase());
+      return allEmails.some(em => REP_EMAILS_DIRECT.includes(em));
+    }
 
     function applyBioUI(descText) {
       const clean = (descText || "").trim();
@@ -191,7 +207,7 @@
 
       const displayEmail = user.email || user.providerData?.[0]?.email || "";
       const name = user.displayName || displayEmail.split("@")[0] || "Studente";
-      let isRep = isRappresentante(user);
+      let isRep = checkRepDirect(user);
 
       document.getElementById("profileFullName").textContent = name;
       document.getElementById("profileEmail").textContent = displayEmail;
@@ -228,9 +244,12 @@
         const snap = await getDoc(doc(db, "utenti_registrati", user.uid));
         if (snap.exists()) {
           const data = snap.data();
-          if (data.ruolo === "rappresentante" || isRappresentante(data.email)) {
+          if (data.ruolo === "rappresentante" || checkRepDirect(user, data.email)) {
             isRep = true;
             applyRoleBadge(true);
+            if (data.ruolo !== "rappresentante") {
+              await setDoc(doc(db, "utenti_registrati", user.uid), { ruolo: "rappresentante" }, { merge: true });
+            }
           }
           if (data.descrizione !== undefined) {
             applyBioUI(data.descrizione);
@@ -271,7 +290,7 @@
           nome: newName,
           descrizione: newDesc,
           classe: "1BI",
-          ruolo: isRappresentante(user) ? "rappresentante" : "studente"
+          ruolo: checkRepDirect(user) ? "rappresentante" : "studente"
         }, { merge: true });
 
         const toast = document.getElementById("saveToast");
