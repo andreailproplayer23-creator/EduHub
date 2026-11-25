@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Kahoot Arena 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    /* NAVIGAZIONE DUE SEZIONI */
+    .kahoot-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+    .k-tab-btn {
+      flex: 1;
+      min-width: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--card-bg);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .k-tab-btn.active {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(79, 70, 229, 0.25));
+      border-color: #8b5cf6;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.25);
+    }
+
+    .k-panel { display: none; }
+    .k-panel.active { display: block; }
+
+    /* STILI ARENA LIVE */
+    .arena-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 22px;
+    }
+    .k-input, .k-select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+    }
+    .k-input:focus, .k-select:focus { border-color: #8b5cf6; }
+
+    /* IMPOSTAZIONI PRE-PARTITA */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin: 14px 0 18px 0;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+    .setting-item label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #c4b5fd;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    /* TASTI KAHOOT 4 COLORI */
+    .kahoot-grid-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+    @media (max-width: 640px) {
+      .kahoot-grid-4 { grid-template-columns: 1fr; }
+    }
+    .k-ans-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      border: none;
+      color: #fff;
+      font-size: 1.02rem;
+      font-weight: 800;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.28);
+    }
+    .k-ans-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+    .k-ans-btn:active:not(:disabled) {
+      transform: translateY(2px);
+    }
+    .k-ans-btn:disabled {
+      cursor: default;
+    }
+    .k-ans-btn.dimmed {
+      opacity: 0.35;
+    }
+    .k-ans-btn.chosen {
+      outline: 4px solid #fff;
+      transform: scale(1.02);
+    }
+    .k-color-0 { background: #e21b3c; } /* Rosso */
+    .k-color-1 { background: #1368ce; } /* Blu */
+    .k-color-2 { background: #d89e00; } /* Giallo */
+    .k-color-3 { background: #26890c; } /* Verde */
+
+    .k-shape {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* TIMER E BARRA PROGRESSO */
+    .timer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .timer-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff;
+      font-size: 1.35rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.45);
+      flex-shrink: 0;
+    }
+    .timer-circle.urgent {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      animation: pulseUrgent 0.6s infinite alternate;
+    }
+    @keyframes pulseUrgent {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+
+    /* LOBBY GIOCATORI */
+    .lobby-players-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0;
+      min-height: 60px;
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      border: 1px dashed rgba(139, 92, 246, 0.4);
+    }
+    .lobby-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid rgba(139, 92, 246, 0.45);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      animation: popIn 0.25s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* PODIO FINALE */
+    .podium-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 14px;
+      margin: 26px 0;
+      text-align: center;
+    }
+    .podium-col {
+      flex: 1;
+      max-width: 170px;
+      border-radius: 16px 16px 8px 8px;
+      padding: 16px 10px;
+      color: #fff;
+      font-weight: 800;
+    }
+    .podium-1 {
+      background: linear-gradient(180deg, #f59e0b, #b45309);
+      min-height: 175px;
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.35);
+    }
+    .podium-2 {
+      background: linear-gradient(180deg, #94a3b8, #475569);
+      min-height: 140px;
+    }
+    .podium-3 {
+      background: linear-gradient(180deg, #d97706, #78350f);
+      min-height: 115px;
+    }
+
+    /* BUILDER DOMANDE */
+    .q-builder-box {
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+    }
+    .q-opts-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) { .q-opts-2x2 { grid-template-columns: 1fr; } }
+
+    .btn-k-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+    .btn-k-green {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 0.96rem;
+      cursor: pointer;
+    }
+    .btn-k-danger {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* SEZIONE 2: HUB KAHOOT UFFICIALE */
+    .pin-banner {
+      background: linear-gradient(135deg, #46178f, #7c3aed);
+      border-radius: 18px;
+      padding: 22px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .pin-code-box {
+      background: rgba(0,0,0,0.3);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      font-family: monospace;
+    }
+    .hub-2col {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+    @media (max-width: 780px) { .hub-2col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Kahoot Arena 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <button id="soundToggleBtn" class="btn-logout" title="Attiva/Disattiva Suoni">
+        <i data-lucide="volume-2" style="width:15px;height:15px;"></i> <span id="soundLabel">AUDIO ON</span>
+      </button>
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner">
+      <div>
+        <h2>Kahoot Arena & Hub 1BI</h2>
+        <p>Gioca in diretta con tutta la classe su EduHub oppure entra nei Kahoot ufficiali!</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span id="arenaStatusText">Pronto</span>
+      </div>
+    </div>
+
+    <!-- SELETTORE DELLE 2 SEZIONI -->
+    <div class="kahoot-tabs">
+      <button type="button" class="k-tab-btn active" data-tab="panelArena">
+        <i data-lucide="gamepad-2" style="width:20px;height:20px;"></i>
+        <span>1. Kahoot Arena Live (Gioca Qui)</span>
+      </button>
+      <button type="button" class="k-tab-btn" data-tab="panelOfficial">
+        <i data-lucide="trophy" style="width:20px;height:20px;"></i>
+        <span>2. PIN Kahoot Ufficiali & Albo d'Oro</span>
+      </button>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- SEZIONE 1: KAHOOT ARENA LIVE MULTIPLAYER                  -->
+    <!-- ========================================================= -->
+    <section id="panelArena" class="k-panel active">
+      <!-- SCHERMATA PARTITA LIVE (VISIBILE A TUTTI QUANDO C'È UNA STANZA APERTA) -->
+      <div id="liveGameContainer" style="display:none;"></div>
+
+      <!-- AREA RAPPRESENTANTI: IMPOSTAZIONI PRE-PARTITA & CREAZIONE QUIZ -->
+      <div id="repArenaControls" style="display:none;">
+        <!-- IMPOSTAZIONI E AVVIO PARTITA -->
+        <div class="arena-card" style="border-color: rgba(139, 92, 246, 0.45);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+            <div>
+              <h3 style="margin:0; font-size:1.1rem; font-weight:800;">Impostazioni Partita & Apertura Lobby</h3>
+              <small style="color:var(--text-muted);">Scegli il quiz, configura timer e punti, poi apri la lobby per far entrare la classe</small>
+            </div>
+            <span style="background:rgba(245,158,11,0.16); color:#fbbf24; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:800;">★ Area Rappresentanti</span>
+          </div>
+
+          <div class="settings-grid">
+            <div class="setting-item">
+              <label>Quiz da giocare</label>
+              <select id="selectQuizToHost" class="k-select">
+                <option value="">Caricamento quiz...</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Tempo per domanda</label>
+              <select id="settingTimePerQ" class="k-select">
+                <option value="10">10 Secondi (Fulmine)</option>
+                <option value="15" selected>15 Secondi (Standard)</option>
+                <option value="20">20 Secondi (Ragionato)</option>
+                <option value="30">30 Secondi (Difficile)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Punteggio & Velocità</label>
+              <select id="settingPointsMode" class="k-select">
+                <option value="1000" selected>Standard (fino a 1000 pt)</option>
+                <option value="2000">Doppi Punti (fino a 2000 pt)</option>
+                <option value="fixed">Fisso (1000 pt senza tempo)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Ordine Domande</label>
+              <select id="settingShuffle" class="k-select">
+                <option value="no" selected>Ordine originale</option>
+                <option value="yes">Mescola domande</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="button" id="openLobbyBtn" class="btn-k-green">
+            <i data-lucide="play-circle" style="width:18px;height:18px;"></i>
+            <span>Apri Lobby & Aspetta Compagni</span>
+          </button>
+        </div>
+
+        <!-- CREATORE NUOVO QUIZ KAHOOT -->
+        <div class="arena-card">
+          <h3 style="margin:0 0 6px 0; font-size:1.05rem; font-weight:800;">Crea un nuovo Quiz per l'Arena</h3>
+          <p style="margin:0 0 14px 0; font-size:0.84rem; color:var(--text-muted);">Inserisci titolo, materia e aggiungi tutte le domande che vuoi con le 4 risposte colorate</p>
+
+          <div style="display:grid; grid-template-columns: 1fr 200px; gap:10px; margin-bottom:14px;">
+            <input type="text" id="newQuizTitle" class="k-input" placeholder="Titolo del Quiz (es. Sfida Sistemi Binari & Hardware)..." />
+            <input type="text" id="newQuizSubject" class="k-input" placeholder="Materia (es. Informatica)" />
+          </div>
+
+          <div id="quizQuestionsBuilder"></div>
+
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:14px;">
+            <button type="button" id="addQuestionBtn" class="btn-logout" style="cursor:pointer;">
+              <i data-lucide="plus" style="width:16px;height:16px;"></i> Aggiungi Domanda
+            </button>
+            <button type="button" id="saveQuizBtn" class="btn-k-primary">
+              <i data-lucide="save" style="width:16px;height:16px;"></i> Salva Quiz nell'Archivio
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGGIO QUANDO NON C'È NESSUNA PARTITA IN CORSO (PER GLI STUDENTI) -->
+      <div id="noActiveGameBox" class="arena-card" style="text-align:center; padding:38px 20px;">
+        <div style="font-size:2.4rem; margin-bottom:10px;">🎮</div>
+        <h3 style="margin:0 0 6px 0; font-size:1.15rem; font-weight:800;">Nessuna partita Kahoot Arena attiva al momento</h3>
+        <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">Appena Andrea o Alessandro apriranno una lobby, comparirà qui automaticamente il pulsante <strong>Partecipa</strong>!</p>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SEZIONE 2: PIN KAHOOT UFFICIALI & ALBO D'ORO              -->
+    <!-- ========================================================= -->
+    <section id="panelOfficial" class="k-panel">
+      <!-- BANNER PIN LIVE KAHOOT.IT -->
+      <div class="pin-banner">
+        <div>
+          <div style="font-size:0.78rem; font-weight:800; text-transform:uppercase; opacity:0.85;">Partita su Kahoot.it</div>
+          <h3 id="officialGameTitle" style="margin:4px 0; font-size:1.25rem; font-weight:900;">Nessun PIN attivo al momento</h3>
+          <small id="officialGameSub" style="opacity:0.9;">Quando il prof o i rappresentanti avviano un Kahoot esterno, troverai qui il codice PIN</small>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div id="officialPinDisplay" class="pin-code-box">------</div>
+          <a href="https://kahoot.it" target="_blank" rel="noopener" class="btn-k-green" style="text-decoration:none;">
+            <span>Apri Kahoot.it</span>
+            <i data-lucide="external-link" style="width:16px;height:16px;"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- CONTROLLI RAPPRESENTANTI PER AGGIORNARE PIN E LINK KAHOOT -->
+      <div id="repOfficialControls" class="arena-card" style="display:none;">
+        <h3 style="margin:0 0 12px 0; font-size:1rem; font-weight:800;">★ Gestione PIN Live & Link Ripasso</h3>
+        <div style="display:grid; grid-template-columns: 1fr 180px auto; gap:10px; margin-bottom:16px;">
+          <input type="text" id="pinTitleInput" class="k-input" placeholder="Titolo partita (es. Kahoot Storia con il Prof)..." />
+          <input type="text" id="pinCodeInput" class="k-input" placeholder="PIN (es. 482910)" />
+          <button type="button" id="updatePinBtn" class="btn-k-primary">Pubblica PIN</button>
+        </div>
+        <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:14px 0;" />
+        <div style="display:grid; grid-template-columns: 1fr 160px 1fr auto; gap:10px;">
+          <input type="text" id="linkQuizTitle" class="k-input" placeholder="Titolo Kahoot di ripasso..." />
+          <input type="text" id="linkQuizMat" class="k-input" placeholder="Materia..." />
+          <input type="url" id="linkQuizUrl" class="k-input" placeholder="https://create.kahoot.it/..." />
+          <button type="button" id="addOfficialLinkBtn" class="btn-k-green">Aggiungi Link</button>
+        </div>
+      </div>
+
+      <div class="hub-2col">
+        <!-- ARCHIVIO KAHOOT DI RIPASSO -->
+        <div class="arena-card">
+          <h3 style="margin:0 0 14px 0; font-size:1.05rem; font-weight:800;">📚 Kahoot di Ripasso 1BI</h3>
+          <div id="officialLinksList" style="display:flex; flex-direction:column; gap:10px;">
+            <div style="color:var(--text-muted); font-size:0.88rem;">Nessun link Kahoot salvato.</div>
+          </div>
+        </div>
+
+        <!-- ALBO D'ORO CAMPIONI ARENA -->
+        <div class="arena-card">
+          <h3 style="margin:0 0 14px 0; font-size:1.05rem; font-weight:800;">🏆 Albo d'Oro Campioni 1BI</h3>
+          <div id="hallOfFameList" style="display:flex; flex-direction:column; gap:10px;">
+            <div style="color:var(--text-muted); font-size:0.88rem;">Gioca una partita nell'Arena per entrare nell'Albo d'Oro!</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      getDoc,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // =========================================================
+    // MOTORE AUDIO WEB AUDIO API (EFFETTI SONORI ZERO FILE)
+    // =========================================================
+    let soundEnabled = true;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playTone(freq, type = "sine", duration = 0.15, vol = 0.15, delay = 0) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + delay);
+        osc.stop(audioCtx.currentTime + delay + duration);
+      } catch (e) {}
+    }
+
+    const SFX = {
+      join: () => { playTone(523.25, "triangle", 0.12, 0.16, 0); playTone(659.25, "triangle", 0.18, 0.16, 0.1); },
+      start: () => { [440, 554, 659, 880].forEach((f, i) => playTone(f, "square", 0.14, 0.12, i * 0.09)); },
+      tick: () => { playTone(880, "sine", 0.06, 0.08, 0); },
+      urgentTick: () => { playTone(1174, "sawtooth", 0.09, 0.12, 0); },
+      click: () => { playTone(600, "triangle", 0.08, 0.14, 0); },
+      correct: () => { playTone(587.33, "triangle", 0.14, 0.18, 0); playTone(880, "triangle", 0.28, 0.2, 0.12); },
+      wrong: () => { playTone(220, "sawtooth", 0.22, 0.16, 0); playTone(175, "sawtooth", 0.3, 0.16, 0.16); },
+      podium: () => {
+        const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+        notes.forEach((f, i) => playTone(f, "triangle", 0.2, 0.18, i * 0.14));
+      }
+    };
+
+    document.getElementById("soundToggleBtn").addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById("soundLabel").textContent = soundEnabled ? "AUDIO ON" : "MUTO";
+      if (soundEnabled) SFX.click();
+    });
+
+    // =========================================================
+    // NAVIGAZIONE SCHEDE (TAB 1 / TAB 2)
+    // =========================================================
+    document.querySelectorAll(".k-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".k-tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".k-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+        SFX.click();
+      });
+    });
+
+    // =========================================================
+    // BUILDER DOMANDE QUIZ (PER I RAPPRESENTANTI)
+    // =========================================================
+    const SHAPES = ["▲", "◆", "●", "■"];
+    const COLORS_NAME = ["Rosso", "Blu", "Giallo", "Verde"];
+    const qBuilder = document.getElementById("quizQuestionsBuilder");
+
+    function addQuestionCard() {
+      const idx = qBuilder.children.length + 1;
+      const box = document.createElement("div");
+      box.className = "q-builder-box";
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <strong style="font-size:0.88rem; color:#c4b5fd;">Domanda #${idx}</strong>
+          <button type="button" class="btn-k-danger remove-q-btn" style="padding:4px 9px; font-size:0.75rem;">Rimuovi</button>
+        </div>
+        <input type="text" class="k-input q-text" placeholder="Scrivi il testo della domanda..." />
+        <div class="q-opts-2x2">
+          ${[0,1,2,3].map(i => `
+            <input type="text" class="k-input q-opt-${i}" placeholder="${SHAPES[i]} Risposta ${COLORS_NAME[i]}..." />
+          `).join("")}
+        </div>
+        <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+          <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted);">Risposta corretta:</label>
+          <select class="k-select q-correct" style="max-width:210px;">
+            <option value="0">▲ Rosso (Opzione 1)</option>
+            <option value="1">◆ Blu (Opzione 2)</option>
+            <option value="2">● Giallo (Opzione 3)</option>
+            <option value="3">■ Verde (Opzione 4)</option>
+          </select>
+        </div>
+      `;
+      box.querySelector(".remove-q-btn").addEventListener("click", () => {
+        if (qBuilder.children.length <= 1) return alert("Serve almeno 1 domanda!");
+        box.remove();
+      });
+      qBuilder.appendChild(box);
+    }
+
+    addQuestionCard();
+    document.getElementById("addQuestionBtn").addEventListener("click", () => {
+      addQuestionCard();
+      SFX.click();
+    });
+
+    let currentUser = null;
+    let userIsRep = false;
+    let savedQuizzes = [];
+    let localTimerInterval = null;
+    let lastRenderedKey = "";
+    let lastPlayedSoundKey = "";
+
+    // SALVA QUIZ SU FIRESTORE
+    document.getElementById("saveQuizBtn").addEventListener("click", async () => {
+      if (!userIsRep) return;
+      const titolo = document.getElementById("newQuizTitle").value.trim();
+      const materia = document.getElementById("newQuizSubject").value.trim() || "Generale";
+      if (!titolo) return alert("Inserisci il titolo del quiz!");
+
+      const domande = [];
+      for (const box of qBuilder.children) {
+        const testo = box.querySelector(".q-text").value.trim();
+        const opzioni = [0,1,2,3].map(i => box.querySelector(`.q-opt-${i}`).value.trim());
+        const corretta = Number(box.querySelector(".q-correct").value);
+        if (!testo || opzioni.some(o => !o)) {
+          return alert("Compila il testo e tutte e 4 le risposte per ogni domanda!");
+        }
+        domande.push({ testo, opzioni, corretta });
+      }
+
+      await addDoc(collection(db, "kahoot_quizzes_1bi"), {
+        titolo,
+        materia,
+        domande,
+        creatoDa: currentUser.displayName || "Rappresentanti 1BI",
+        creatoIl: Date.now()
+      });
+
+      document.getElementById("newQuizTitle").value = "";
+      document.getElementById("newQuizSubject").value = "";
+      qBuilder.innerHTML = "";
+      addQuestionCard();
+      SFX.correct();
+      alert("Quiz salvato! Ora puoi selezionarlo in alto e aprire la Lobby.");
+    });
+
+    // APRI LOBBY PARTITA LIVE
+    document.getElementById("openLobbyBtn").addEventListener("click", async () => {
+      if (!userIsRep) return;
+      const quizId = document.getElementById("selectQuizToHost").value;
+      const quizObj = savedQuizzes.find(q => q.id === quizId);
+      if (!quizObj) return alert("Seleziona prima un quiz da giocare!");
+
+      const timePerQ = Number(document.getElementById("settingTimePerQ").value) || 15;
+      const pointsMode = document.getElementById("settingPointsMode").value;
+      const shuffle = document.getElementById("settingShuffle").value === "yes";
+
+      let questions = [...quizObj.domande];
+      if (shuffle) {
+        questions.sort(() => Math.random() - 0.5);
+      }
+
+      await setDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+        status: "lobby", // lobby | question | leaderboard | podium
+        quizTitle: quizObj.titolo,
+        materia: quizObj.materia,
+        questions,
+        currentQIndex: 0,
+        questionStartTime: 0,
+        settings: { timePerQ, pointsMode },
+        players: {},
+        answers: {},
+        podiumSaved: false,
+        hostUid: currentUser.uid
+      });
+      SFX.join();
+    });
+
+    // =========================================================
+    // RENDER MOTORE PARTITA LIVE SINCRONIZZATO
+    // =========================================================
+    function renderLiveMatch(match) {
+      const container = document.getElementById("liveGameContainer");
+      const noGameBox = document.getElementById("noActiveGameBox");
+      const statusBadge = document.getElementById("arenaStatusText");
+
+      if (!match) {
+        clearInterval(localTimerInterval);
+        container.style.display = "none";
+        container.innerHTML = "";
+        noGameBox.style.display = "block";
+        statusBadge.textContent = "In attesa";
+        lastRenderedKey = "";
+        return;
+      }
+
+      noGameBox.style.display = "none";
+      container.style.display = "block";
+
+      const players = match.players || {};
+      const playerList = Object.entries(players).map(([uid, p]) => ({ uid, ...p }));
+      const amIJoined = Boolean(players[currentUser.uid]);
+
+      // 1. STATO: LOBBY DI ATTESA
+      if (match.status === "lobby") {
+        clearInterval(localTimerInterval);
+        statusBadge.textContent = `Lobby Aperta (${playerList.length} giocatori)`;
+
+        container.innerHTML = `
+          <div class="arena-card" style="border: 2px solid #8b5cf6; text-align:center;">
+            <span style="background:rgba(16,185,129,0.18); color:#34d399; padding:5px 12px; border-radius:999px; font-size:0.78rem; font-weight:800;">● LOBBY APERTA IN DIRETTA</span>
+            <h2 style="margin:12px 0 4px 0; font-size:1.5rem; font-weight:900;">${escapeHtml(match.quizTitle)}</h2>
+            <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">
+              ${match.questions.length} domande • ${match.settings.timePerQ}s a domanda • ${playerList.length} compagni connessi
+            </p>
+
+            <div style="margin:18px 0;">
+              ${!amIJoined ? `
+                <button type="button" id="joinLobbyBtn" class="btn-k-green" style="font-size:1.05rem; padding:14px 28px;">
+                  <i data-lucide="user-plus" style="width:20px;height:20px;"></i>
+                  <span>PARTECIPA ALLA PARTITA!</span>
+                </button>
+              ` : `
+                <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(16,185,129,0.18); color:#34d399; padding:10px 20px; border-radius:12px; font-weight:800;">
+                  ✓ Sei dentro! Aspetta che il Rappresentante avvii il quiz...
+                </div>
+              `}
+            </div>
+
+            <div class="lobby-players-grid">
+              ${playerList.length === 0
+                ? `<span style="color:var(--text-muted); margin:auto;">Nessun giocatore ancora entrato...</span>`
+                : playerList.map(p => `<div class="lobby-chip">🎮 ${escapeHtml(p.name)}</div>`).join("")}
+            </div>
+
+            ${userIsRep ? `
+              <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:16px;">
+                <button type="button" id="startMatchBtn" class="btn-k-green">
+                  <i data-lucide="play" style="width:18px;height:18px;"></i>
+                  <span>START QUIZ ADESSO! (${playerList.length})</span>
+                </button>
+                <button type="button" id="cancelMatchBtn" class="btn-k-danger">Chiudi Stanza</button>
+              </div>
+            ` : ""}
+          </div>
+        `;
+
+        document.getElementById("joinLobbyBtn")?.addEventListener("click", async () => {
+          SFX.join();
+          await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+            [`players.${currentUser.uid}`]: {
+              name: currentUser.displayName || currentUser.email.split("@")[0],
+              score: 0,
+              streak: 0
+            }
+          });
+        });
+
+        document.getElementById("startMatchBtn")?.addEventListener("click", async () => {
+          if (playerList.length === 0) return alert("Aspetta che almeno 1 giocatore entri nella lobby!");
+          await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+            status: "question",
+            currentQIndex: 0,
+            questionStartTime: Date.now(),
+            answers: {}
+          });
+        });
+
+        document.getElementById("cancelMatchBtn")?.addEventListener("click", async () => {
+          await deleteDoc(doc(db, "kahoot_live_1bi", "current_match"));
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      // 2. STATO: DOMANDA IN CORSO
+      if (match.status === "question") {
+        const qIdx = match.currentQIndex;
+        const qObj = match.questions[qIdx];
+        const totalTime = match.settings.timePerQ;
+        const myAns = (match.answers || {})[currentUser.uid];
+        const answeredCount = Object.keys(match.answers || {}).length;
+        statusBadge.textContent = `Domanda ${qIdx + 1}/${match.questions.length}`;
+
+        const soundKey = `q_${qIdx}_${match.questionStartTime}`;
+        if (lastPlayedSoundKey !== soundKey) {
+          lastPlayedSoundKey = soundKey;
+          SFX.start();
+        }
+
+        const renderKey = `question_${qIdx}_${myAns ? myAns.choice : "none"}`;
+        if (lastRenderedKey !== renderKey) {
+          lastRenderedKey = renderKey;
+          container.innerHTML = `
+            <div class="arena-card" style="border:2px solid #7c3aed;">
+              <div class="timer-header">
+                <div>
+                  <span style="font-size:0.78rem; font-weight:800; color:#c4b5fd; text-transform:uppercase;">
+                    Domanda ${qIdx + 1} di ${match.questions.length} • Risposte: ${answeredCount}/${playerList.length}
+                  </span>
+                  <h2 style="margin:6px 0 0 0; font-size:1.35rem; font-weight:900;">${escapeHtml(qObj.testo)}</h2>
+                </div>
+                <div id="liveTimerCircle" class="timer-circle">${totalTime}</div>
+              </div>
+
+              ${!amIJoined ? `
+                <div style="padding:14px; border-radius:12px; background:rgba(245,158,11,0.15); color:#fbbf24; font-weight:700; margin-top:12px;">
+                  Stai guardando la partita come spettatore (non sei entrato nella lobby iniziale).
+                </div>
+              ` : `
+                <div class="kahoot-grid-4">
+                  ${qObj.opzioni.map((opt, idx) => {
+                    const isChosen = myAns && myAns.choice === idx;
+                    const dimmed = myAns && !isChosen;
+                    return `
+                      <button type="button"
+                              class="k-ans-btn k-color-${idx} ${isChosen ? "chosen" : ""} ${dimmed ? "dimmed" : ""}"
+                              data-choice="${idx}"
+                              ${myAns ? "disabled" : ""}>
+                        <span class="k-shape">${SHAPES[idx]}</span>
+                        <span>${escapeHtml(opt)}</span>
+                      </button>
+                    `;
+                  }).join("")}
+                </div>
+              `}
+
+              ${myAns ? `
+                <div style="text-align:center; margin-top:16px; font-weight:800; color:#c4b5fd;">
+                  ⚡ Risposta inviata! Attendi lo scadere del tempo per vedere i risultati...
+                </div>
+              ` : ""}
+
+              ${userIsRep ? `
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
+                  <button type="button" id="forceShowResultsBtn" class="btn-k-primary">Mostra Risultati Domanda →</button>
+                </div>
+              ` : ""}
+            </div>
+          `;
+
+          btn.addEventListener("click", async () => {
+              const choice = Number(btn.dataset.choice);
+              const elapsedSec = Math.min(totalTime, Math.max(0, (Date.now() - match.questionStartTime) / 1000));
+              const isCorrect = choice === qObj.corretta;
+
+              const prevScore = (players[currentUser.uid]?.score) || 0;
+              const prevStreak = (players[currentUser.uid]?.streak) || 0;
+              const newStreak = isCorrect ? prevStreak + 1 : 0;
+
+              let earned = 0;
+              if (isCorrect) {
+                if (match.settings.pointsMode === "fixed") {
+                  earned = 1000;
+                } else {
+                  // Formula ufficiale Kahoot: da 50% a 100% dei punti base in base ai millisecondi + bonus streak
+                  const maxPts = Number(match.settings.pointsMode) || 1000;
+                  const baseScore = Math.round((1 - (elapsedSec / (2 * totalTime))) * maxPts);
+                  const streakBonus = newStreak >= 4 ? 300 : newStreak === 3 ? 200 : newStreak === 2 ? 100 : 0;
+                  earned = Math.max(Math.round(maxPts * 0.5), baseScore) + streakBonus;
+                }
+              }
+
+              SFX.click();
+
+              await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+                [`answers.${currentUser.uid}`]: { choice, isCorrect, earned },
+                [`players.${currentUser.uid}.score`]: prevScore + earned,
+                [`players.${currentUser.uid}.streak`]: newStreak
+              });
+            });
+
+          document.getElementById("forceShowResultsBtn")?.addEventListener("click", async () => {
+            await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+              status: "leaderboard"
+            });
+          });
+        }
+
+        // Aggiorna contatore risposte in live anche senza ridisegnare i bottoni
+        clearInterval(localTimerInterval);
+        localTimerInterval = setInterval(async () => {
+          const elapsed = Math.floor((Date.now() - match.questionStartTime) / 1000);
+          const rem = Math.max(0, totalTime - elapsed);
+          const circle = document.getElementById("liveTimerCircle");
+          if (circle) {
+            circle.textContent = rem;
+            if (rem <= 5 && rem > 0) {
+              circle.classList.add("urgent");
+              SFX.urgentTick();
+            } else if (rem > 5) {
+              SFX.tick();
+            }
+          }
+          if (rem === 0) {
+            clearInterval(localTimerInterval);
+            if (userIsRep) {
+              await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+                status: "leaderboard"
+              });
+            }
+          }
+        }, 1000);
+        return;
+      }
+
+      // 3. STATO: RISULTATI DOMANDA & CLASSIFICA INTERMEDIA
+      if (match.status === "leaderboard") {
+        clearInterval(localTimerInterval);
+        const qIdx = match.currentQIndex;
+        const qObj = match.questions[qIdx];
+        const myAns = (match.answers || {})[currentUser.uid];
+        const isLastQ = qIdx + 1 >= match.questions.length;
+        statusBadge.textContent = "Classifica Live";
+
+        const soundKey = `lb_${qIdx}`;
+        if (lastPlayedSoundKey !== soundKey) {
+          lastPlayedSoundKey = soundKey;
+          if (myAns) {
+            myAns.isCorrect ? SFX.correct() : SFX.wrong();
+          }
+        }
+
+        const sortedPlayers = [...playerList].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+        container.innerHTML = `
+          <div class="arena-card" style="border:2px solid #10b981;">
+            <div style="text-align:center; margin-bottom:18px;">
+              ${myAns ? (
+                myAns.isCorrect
+                  ? `<div style="font-size:1.3rem; font-weight:900; color:#34d399;">✅ RISPOSTA ESATTA! +${myAns.earned} punti</div>`
+                  : `<div style="font-size:1.3rem; font-weight:900; color:#f87171;">❌ RISPOSTA SBAGLIATA!</div>`
+              ) : `<div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);">Tempo scaduto!</div>`}
+              <p style="margin:6px 0 0 0; font-size:0.95rem;">
+                Risposta corretta: <strong>${SHAPES[qObj.corretta]} ${escapeHtml(qObj.opzioni[qObj.corretta])}</strong>
+              </p>
+            </div>
+
+            <h3 style="margin:0 0 10px 0; font-size:1rem; font-weight:800;">📊 Classifica Provvisoria</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${sortedPlayers.map((p, i) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,0.05); font-weight:800;">
+                  <span>#${i + 1} ${escapeHtml(p.name)} ${p.streak >= 2 ? `🔥${p.streak}` : ""}</span>
+                  <span style="color:#fbbf24;">${p.score || 0} pt</span>
+                </div>
+              `).join("")}
+            </div>
+
+            ${userIsRep ? `
+              <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
+                <button type="button" id="nextStepBtn" class="btn-k-green">
+                  <span>${isLastQ ? "🏆 Mostra Podio Finale!" : "Prossima Domanda →"}</span>
+                </button>
+              </div>
+            ` : `<div style="text-align:center; margin-top:16px; color:var(--text-muted); font-size:0.86rem;">In attesa che il Rappresentante avvii la prossima domanda...</div>`}
+          </div>
+        `;
+
+        document.getElementById("nextStepBtn")?.addEventListener("click", async () => {
+          if (isLastQ) {
+            await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+              status: "podium"
+            });
+          } else {
+            await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
+              status: "question",
+              currentQIndex: qIdx + 1,
+              questionStartTime: Date.now(),
+              answers: {}
+            });
+          }
+        });
+        return;
+      }
+
+      // 4. STATO: PODIO FINALE
+      if (match.status === "podium") {
+        clearInterval(localTimerInterval);
+        statusBadge.textContent = "Podio Finale 🏆";
+
+        if (lastPlayedSoundKey !== "podium_final") {
+          lastPlayedSoundKey = "podium_final";
+          SFX.podium();
+        }
+
+        const sorted = [...playerList].sort((a, b) => (b.score || 0) - (a.score || 0));
+        const p1 = sorted[0];
+        const p2 = sorted[1];
+        const p3 = sorted[2];
+
+        // Salva automaticamente nell'Albo d'Oro (una sola volta dal Rappresentante)
+        if (userIsRep && !match.podiumSaved && p1) {
+          saveToHallOfFame(sorted);
+          updateDoc(doc(db, "kahoot_live_1bi", "current_match"), { podiumSaved: true });
+        }
+
+        container.innerHTML = `
+          <div class="arena-card" style="border:2px solid #f59e0b; text-align:center;">
+            <h2 style="margin:0; font-size:1.6rem; font-weight:900;">🏆 PODIO FINALE — ${escapeHtml(match.quizTitle)}</h2>
+            <p style="margin:4px 0 0 0; color:var(--text-muted);">Complimenti ai campioni della 1BI!</p>
+
+            <div class="podium-wrap">
+              ${p2 ? `
+                <div class="podium-col podium-2">
+                  <div style="font-size:1.6rem;">🥈</div>
+                  <div style="margin:6px 0;">${escapeHtml(p2.name)}</div>
+                  <div style="font-size:0.85rem; opacity:0.9;">${p2.score} pt</div>
+                </div>
+              ` : ""}
+              ${p1 ? `
+                <div class="podium-col podium-1">
+                  <div style="font-size:2.1rem;">🥇</div>
+                  <div style="margin:6px 0; font-size:1.05rem;">${escapeHtml(p1.name)}</div>
+                  <div style="font-size:0.92rem;">${p1.score} pt</div>
+                </div>
+              ` : ""}
+              ${p3 ? `
+                <div class="podium-col podium-3">
+                  <div style="font-size:1.5rem;">🥉</div>
+                  <div style="margin:6px 0;">${escapeHtml(p3.name)}</div>
+                  <div style="font-size:0.85rem; opacity:0.9;">${p3.score} pt</div>
+                </div>
+              ` : ""}
+            </div>
+
+            ${userIsRep ? `
+              <button type="button" id="closeFinishedMatchBtn" class="btn-k-primary">
+                Termina & Chiudi Arena
+              </button>
+            ` : ""}
+          </div>
+        `;
+
+        document.getElementById("closeFinishedMatchBtn")?.addEventListener("click", async () => {
+          await deleteDoc(doc(db, "kahoot_live_1bi", "current_match"));
+        });
+      }
+    }
+
+    async function saveToHallOfFame(sortedPlayers) {
+      const hofRef = doc(db, "kahoot_hub_1bi", "hall_of_fame");
+      const snap = await getDoc(hofRef);
+      const data = snap.exists() ? (snap.data().records || {}) : {};
+
+      sortedPlayers.forEach((p, idx) => {
+        if (!data[p.uid]) {
+          data[p.uid] = { name: p.name, wins: 0, podiums: 0, totalPoints: 0 };
+        }
+        data[p.uid].name = p.name;
+        data[p.uid].totalPoints += (p.score || 0);
+        if (idx === 0) data[p.uid].wins += 1;
+        if (idx < 3) data[p.uid].podiums += 1;
+      });
+
+      await setDoc(hofRef, { records: data }, { merge: true });
+    }
+
+    // =========================================================
+    // SEZIONE 2: GESTIONE PIN UFFICIALE & ARCHIVIO LINK
+    // =========================================================
+    document.getElementById("updatePinBtn").addEventListener("click", async () => {
+      if (!userIsRep) return;
+      const title = document.getElementById("pinTitleInput").value.trim() || "Kahoot di Classe 1BI";
+      const pin = document.getElementById("pinCodeInput").value.trim() || "------";
+      await setDoc(doc(db, "kahoot_hub_1bi", "live_pin"), {
+        title,
+        pin,
+        updatedAt: Date.now()
+      });
+      SFX.correct();
+    });
+
+    document.getElementById("addOfficialLinkBtn").addEventListener("click", async () => {
+      if (!userIsRep) return;
+      const title = document.getElementById("linkQuizTitle").value.trim();
+      const materia = document.getElementById("linkQuizMat").value.trim() || "Generale";
+      const url = document.getElementById("linkQuizUrl").value.trim();
+      if (!title || !url) return alert("Inserisci titolo e link del Kahoot!");
+
+      const linksRef = doc(db, "kahoot_hub_1bi", "links_archive");
+      const snap = await getDoc(linksRef);
+      const list = snap.exists() ? (snap.data().items || []) : [];
+      list.unshift({ title, materia, url, addedAt: Date.now() });
+      await setDoc(linksRef, { items: list });
+
+      document.getElementById("linkQuizTitle").value = "";
+      document.getElementById("linkQuizMat").value = "";
+      document.getElementById("linkQuizUrl").value = "";
+      SFX.correct();
+    });
+
+    // =========================================================
+    // INIT AUTENTICAZIONE & LISTENER REALTIME
+    // =========================================================
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      userIsRep = isRappresentante(user);
+
+      if (userIsRep) {
+        document.getElementById("repArenaControls").style.display = "block";
+        document.getElementById("repOfficialControls").style.display = "block";
+      }
+
+      // 1. Lista Quiz Salvati
+      onSnapshot(query(collection(db, "kahoot_quizzes_1bi"), orderBy("creatoIl", "desc")), (snap) => {
+        savedQuizzes = [];
+        const select = document.getElementById("selectQuizToHost");
+        select.innerHTML = "";
+        snap.forEach(d => {
+          const item = { id: d.id, ...d.data() };
+          savedQuizzes.push(item);
+          const opt = document.createElement("option");
+          opt.value = item.id;
+          opt.textContent = `${item.titolo} (${item.domande.length} dom.)`;
+          select.appendChild(opt);
+        });
+        if (savedQuizzes.length === 0) {
+          select.innerHTML = `<option value="">Crea prima un quiz qui sotto...</option>`;
+        }
+      });
+
+      // 2. Listener Partita Live
+      onSnapshot(doc(db, "kahoot_live_1bi", "current_match"), (snap) => {
+        renderLiveMatch(snap.exists() ? snap.data() : null);
+      });
+
+      // 3. Listener PIN Kahoot Ufficiale
+      onSnapshot(doc(db, "kahoot_hub_1bi", "live_pin"), (snap) => {
+        if (!snap.exists()) return;
+        const d = snap.data();
+        document.getElementById("officialGameTitle").textContent = d.title || "Partita Kahoot";
+        document.getElementById("officialPinDisplay").textContent = d.pin || "------";
+        document.getElementById("officialGameSub").textContent = "Copia il PIN e clicca su Apri Kahoot.it per entrare subito!";
+      });
+
+      // 4. Listener Link Kahoot Ripasso
+      onSnapshot(doc(db, "kahoot_hub_1bi", "links_archive"), (snap) => {
+        const box = document.getElementById("officialLinksList");
+        const items = snap.exists() ? (snap.data().items || []) : [];
+        if (items.length === 0) {
+          box.innerHTML = `<div style="color:var(--text-muted); font-size:0.88rem;">Nessun link Kahoot salvato.</div>`;
+          return;
+        }
+        box.innerHTML = items.map(it => `
+          <a href="${escapeHtml(it.url)}" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); text-decoration:none; color:var(--text-main);">
+            <div>
+              <div style="font-weight:800; font-size:0.92rem;">${escapeHtml(it.title)}</div>
+              <small style="color:#a78bfa;">${escapeHtml(it.materia)}</small>
+            </div>
+            <span style="font-weight:800; font-size:0.8rem; color:#34d399;">Gioca →</span>
+          </a>
+        `).join("");
+      });
+
+      // 5. Listener Albo d'Oro
+      onSnapshot(doc(db, "kahoot_hub_1bi", "hall_of_fame"), (snap) => {
+        const box = document.getElementById("hallOfFameList");
+        const records = snap.exists() ? Object.values(snap.data().records || {}) : [];
+        if (records.length === 0) return;
+
+        records.sort((a, b) => (b.wins - a.wins) || (b.totalPoints - a.totalPoints));
+        box.innerHTML = records.map((r, i) => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,0.04);">
+            <div>
+              <strong>${i === 0 ? "👑" : `#${i+1}`} ${escapeHtml(r.name)}</strong>
+              <div style="font-size:0.76rem; color:var(--text-muted);">${r.wins} vittorie • ${r.podiums} podi</div>
+            </div>
+            <span style="font-weight:900; color:#fbbf24;">${r.totalPoints} pt</span>
+          </div>
+        `).join("");
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
