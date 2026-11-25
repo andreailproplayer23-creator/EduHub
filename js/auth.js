@@ -81,6 +81,9 @@ onAuthStateChanged(auth, async (user) => {
     const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Studente");
     const ruolo = isRappresentante(user) ? "rappresentante" : "studente";
 
+    // Pesca l'immagine profilo sia da user.photoURL che dal provider Google
+    const googlePhoto = user.photoURL || (user.providerData || []).find(p => p.photoURL)?.photoURL || "";
+
     try {
       const payload = {
         ruolo: ruolo,
@@ -88,7 +91,7 @@ onAuthStateChanged(auth, async (user) => {
       };
       if (user.displayName) payload.nome = user.displayName;
       if (user.email) payload.email = user.email;
-      if (user.photoURL) payload.photoURL = user.photoURL;
+      if (googlePhoto) payload.photoURL = googlePhoto;
 
       await setDoc(doc(db, "utenti_registrati", user.uid), payload, { merge: true });
     } catch (e) {}
@@ -101,8 +104,8 @@ onAuthStateChanged(auth, async (user) => {
     if (welcomeNameEl) welcomeNameEl.textContent = displayName.split(" ")[0];
 
     if (avatarEl) {
-      if (user.photoURL) {
-        avatarEl.innerHTML = `<img src="${user.photoURL}" alt="Avatar" />`;
+      if (googlePhoto) {
+        avatarEl.innerHTML = `<img src="${googlePhoto}" alt="Avatar" referrerpolicy="no-referrer" />`;
       } else {
         avatarEl.textContent = displayName.charAt(0).toUpperCase();
       }
