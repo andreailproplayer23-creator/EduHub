@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Sondaggi Rapidi 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .rep-create-box {
+      background: var(--card-bg);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 28px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    }
+    .rep-create-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .rep-pill {
+      background: rgba(245, 158, 11, 0.16);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .poll-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-main);
+      font-size: 0.94rem;
+      outline: none;
+    }
+    .poll-input:focus {
+      border-color: #3b82f6;
+    }
+    .options-builder {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-remove-opt {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 10px;
+      width: 38px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+    .btn-remove-opt:hover {
+      background: rgba(239, 68, 68, 0.28);
+    }
+    .builder-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .btn-add-opt {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.16);
+      color: #60a5fa;
+      border: 1px dashed rgba(59, 130, 246, 0.5);
+      padding: 9px 15px;
+      border-radius: 11px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .btn-add-opt:hover {
+      background: rgba(59, 130, 246, 0.26);
+    }
+    .btn-publish-poll {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      border: none;
+      padding: 11px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .polls-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .poll-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.08));
+      border-radius: 18px;
+      padding: 20px;
+    }
+    .poll-card.closed {
+      opacity: 0.85;
+      border-color: rgba(148, 163, 184, 0.25);
+    }
+    .poll-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .poll-question {
+      font-size: 1.12rem;
+      font-weight: 800;
+      margin: 0 0 4px 0;
+      color: var(--text-main);
+    }
+    .poll-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .poll-status-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .poll-status-open {
+      background: rgba(16, 185, 129, 0.16);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .poll-status-closed {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+    .poll-options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .vote-option-btn {
+      position: relative;
+      width: 100%;
+      text-align: left;
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      overflow: hidden;
+      color: var(--text-main);
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .vote-option-btn:hover:not(:disabled) {
+      border-color: #3b82f6;
+      transform: translateY(-1px);
+    }
+    .vote-option-btn.selected {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+    }
+    .vote-option-btn:disabled {
+      cursor: default;
+    }
+    .vote-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: rgba(59, 130, 246, 0.22);
+      z-index: 0;
+      transition: width 0.35s ease;
+    }
+    .vote-option-btn.selected .vote-bar-fill {
+      background: rgba(59, 130, 246, 0.34);
+    }
+    .vote-option-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .vote-stats {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-weight: 800;
+    }
+    .poll-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--table-border, rgba(255,255,255,0.07));
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .rep-poll-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-mini-ctrl {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+    }
+    .btn-mini-del {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Sondaggi 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner">
+      <div>
+        <h2>Sondaggi Rapidi 1BI</h2>
+        <p>Votazioni ufficiali della classe in tempo reale • Un voto a testa</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span>Voto Live</span>
+      </div>
+    </div>
+
+    <!-- PANNELLO CREAZIONE SONDAGGIO (VISIBILE SOLO AI RAPPRESENTANTI) -->
+    <section id="repCreateSection" class="rep-create-box" style="display:none;">
+      <div class="rep-create-header">
+        <div>
+          <h3 style="margin:0; font-size:1.05rem; font-weight:800;">Crea un nuovo sondaggio</h3>
+          <small style="color:var(--text-muted);">Aggiungi tutte le risposte che vuoi con il pulsante qui sotto</small>
+        </div>
+        <span class="rep-pill">★ Area Rappresentanti</span>
+      </div>
+
+      <input type="text" id="pollQuestionInput" class="poll-input" placeholder="Scrivi la domanda del sondaggio (es. Che colore facciamo le felpe della 1BI?)..." />
+
+      <div id="optionsBuilder" class="options-builder"></div>
+
+      <div class="builder-actions">
+        <button type="button" id="addOptionBtn" class="btn-add-opt">
+          <i data-lucide="plus" style="width:16px;height:16px;"></i>
+          <span>Aggiungi risposta</span>
+        </button>
+
+        <button type="button" id="publishPollBtn" class="btn-publish-poll">
+          <i data-lucide="send" style="width:16px;height:16px;"></i>
+          <span>Pubblica Sondaggio</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- LISTA SONDAGGI -->
+    <div id="pollsContainer" class="polls-list">
+      <div style="text-align:center; color:var(--text-muted); padding:30px;">Caricamento sondaggi della 1BI...</div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let userIsRep = false;
+
+    const optionsBuilder = document.getElementById("optionsBuilder");
+    const addOptionBtn = document.getElementById("addOptionBtn");
+    const publishPollBtn = document.getElementById("publishPollBtn");
+
+    function addOptionInput(placeholderText = "") {
+      const idx = optionsBuilder.children.length + 1;
+      const row = document.createElement("div");
+      row.className = "option-row";
+      row.innerHTML = `
+        <input type="text" class="poll-input option-field" placeholder="${placeholderText || `Risposta ${idx}...`}" />
+        <button type="button" class="btn-remove-opt" title="Rimuovi risposta">&times;</button>
+      `;
+
+      row.querySelector(".btn-remove-opt").addEventListener("click", () => {
+        if (optionsBuilder.children.length <= 2) {
+          alert("Un sondaggio deve avere almeno 2 risposte!");
+          return;
+        }
+        row.remove();
+        refreshPlaceholders();
+      });
+
+      optionsBuilder.appendChild(row);
+    }
+
+    function refreshPlaceholders() {
+      Array.from(optionsBuilder.querySelectorAll(".option-field")).forEach((inp, i) => {
+        inp.placeholder = `Risposta ${i + 1}...`;
+      });
+    }
+
+    // Inizializza con 2 campi risposta di base
+    addOptionInput("Risposta 1...");
+    addOptionInput("Risposta 2...");
+
+    addOptionBtn.addEventListener("click", () => {
+      addOptionInput();
+      const inputs = optionsBuilder.querySelectorAll(".option-field");
+      inputs[inputs.length - 1]?.focus();
+    });
+
+    publishPollBtn.addEventListener("click", async () => {
+      if (!userIsRep || !currentUser) return;
+
+      const domanda = document.getElementById("pollQuestionInput").value.trim();
+      const opzioni = Array.from(optionsBuilder.querySelectorAll(".option-field"))
+        .map(inp => inp.value.trim())
+        .filter(Boolean);
+
+      if (!domanda) {
+        alert("Inserisci la domanda del sondaggio!");
+        return;
+      }
+      if (opzioni.length < 2) {
+        alert("Inserisci almeno 2 risposte valide!");
+        return;
+      }
+
+      publishPollBtn.disabled = true;
+      try {
+        await addDoc(collection(db, "sondaggi_1bi"), {
+          domanda,
+          opzioni,
+          voti: {},
+          aperto: true,
+          autore: currentUser.displayName || "Rappresentanti 1BI",
+          creatoIl: Date.now()
+        });
+
+        document.getElementById("pollQuestionInput").value = "";
+        optionsBuilder.innerHTML = "";
+        addOptionInput("Risposta 1...");
+        addOptionInput("Risposta 2...");
+      } catch (err) {
+        alert("Errore nella pubblicazione del sondaggio: " + err.message);
+      } finally {
+        publishPollBtn.disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      userIsRep = isRappresentante(user);
+
+      if (userIsRep) {
+        document.getElementById("repCreateSection").style.display = "block";
+      }
+
+      const qPolls = query(collection(db, "sondaggi_1bi"), orderBy("creatoIl", "desc"));
+      onSnapshot(qPolls, (snap) => {
+        const container = document.getElementById("pollsContainer");
+        if (snap.empty) {
+          container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px;">Nessun sondaggio pubblicato al momento.</div>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const poll = docSnap.data();
+          const pollId = docSnap.id;
+          const votiMap = poll.voti || {};
+          const opzioni = poll.opzioni || [];
+          const totalVoti = Object.keys(votiMap).length;
+          const myVoteIndex = typeof votiMap[user.uid] === "number" ? votiMap[user.uid] : -1;
+
+          // Conta voti per ogni opzione
+          const counts = opzioni.map((_, idx) =>
+            Object.values(votiMap).filter(v => v === idx).length
+          );
+
+          const card = document.createElement("div");
+          card.className = `poll-card ${poll.aperto ? "" : "closed"}`;
+
+          const dataStr = poll.creatoIl ? new Date(poll.creatoIl).toLocaleDateString("it-IT") : "";
+
+          card.innerHTML = `
+            <div class="poll-card-top">
+              <div>
+                <h3 class="poll-question">${escapeHtml(poll.domanda)}</h3>
+                <div class="poll-meta">Creato da ${escapeHtml(poll.autore || "Rappresentanti")} ${dataStr ? `il ${dataStr}` : ""}</div>
+              </div>
+              <span class="poll-status-badge ${poll.aperto ? "poll-status-open" : "poll-status-closed"}">
+                ${poll.aperto ? "● Aperto" : "Chiuso"}
+              </span>
+            </div>
+
+            <div class="poll-options-stack">
+              ${opzioni.map((optText, idx) => {
+                const count = counts[idx] || 0;
+                const pct = totalVoti > 0 ? Math.round((count / totalVoti) * 100) : 0;
+                const isSelected = myVoteIndex === idx;
+                return `
+                  <button type="button"
+                          class="vote-option-btn ${isSelected ? "selected" : ""}"
+                          data-opt-idx="${idx}"
+                          ${poll.aperto ? "" : "disabled"}>
+                    <div class="vote-bar-fill" style="width: ${pct}%;"></div>
+                    <div class="vote-option-content">
+                      <span>${isSelected ? "✓ " : ""}${escapeHtml(optText)}</span>
+                      <span class="vote-stats">${pct}% (${count})</span>
+                    </div>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+
+            <div class="poll-footer">
+              <span>Totale voti: <strong>${totalVoti}</strong> ${myVoteIndex >= 0 ? "• Hai già votato (clicca un'altra opzione per cambiare)" : ""}</span>
+              ${userIsRep ? `
+                <div class="rep-poll-controls">
+                  <button type="button" class="btn-mini-ctrl toggle-status-btn">${poll.aperto ? "Chiudi votazioni" : "Riapri votazioni"}</button>
+                  <button type="button" class="btn-mini-ctrl btn-mini-del delete-poll-btn">Elimina</button>
+                </div>
+              ` : ""}
+            </div>
+          `;
+
+          // Gestione voto studente
+          if (poll.aperto) {
+            card.querySelectorAll(".vote-option-btn").forEach((btn) => {
+              btn.addEventListener("click", async () => {
+                const idx = Number(btn.dataset.optIdx);
+                try {
+                  await updateDoc(doc(db, "sondaggi_1bi", pollId), {
+                    [`voti.${user.uid}`]: idx
+                  });
+                } catch (err) {
+                  alert("Errore durante il voto: " + err.message);
+                }
+              });
+            });
+          }
+
+          // Gestione controlli Rappresentanti
+          if (userIsRep) {
+            card.querySelector(".toggle-status-btn")?.addEventListener("click", async () => {
+              await updateDoc(doc(db, "sondaggi_1bi", pollId), {
+                aperto: !poll.aperto
+              });
+            });
+
+            card.querySelector(".delete-poll-btn")?.addEventListener("click", async () => {
+              if (confirm("Vuoi davvero eliminare questo sondaggio?")) {
+                await deleteDoc(doc(db, "sondaggi_1bi", pollId));
+              }
+            });
+          }
+
+          container.appendChild(card);
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
