@@ -16,7 +16,7 @@ import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/
 export const RAPPRESENTANTI_EMAILS = [
   "andrea.marcorin@cvv.org",
   "andrea.ilproplayer23@gmail.com",
-  "alessandromoreschi712@gmail.com"
+  "alessandromoreschi.712@gmail.com"
 ];
 
 export function isRappresentante(userOrEmail) {
