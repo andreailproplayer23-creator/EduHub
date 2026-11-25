@@ -170,34 +170,38 @@ if (googleBtn) {
       const userDocRef = doc(db, "utenti_registrati", user.uid);
       const userDoc = await getDoc(userDocRef);
 
-      if (!isRegisterMode) {
-        if (!userDoc.exists()) {
-          await deleteUser(user);
-          checkingGoogleAuth = false;
-          setAuthMode(true);
-          showError("Account Google non registrato su EduHub! Completa la registrazione qui sotto.");
-          return;
-        }
+      if (!isRegisterMode && !userDoc.exists()) {
+        await deleteUser(user);
         checkingGoogleAuth = false;
-        window.location.href = "dashboard.html";
-      } else {
-        if (!userDoc.exists()) {
-          await setDoc(userDocRef, {
-            nome: user.displayName || user.email.split("@")[0],
-            email: user.email,
-            classe: "1BI",
-            ruolo: isRappresentante(user) ? "rappresentante" : "studente",
-            descrizione: "Ciao! Sono nella 1BI Informatica.",
-            metodo: "google",
-            registratoIl: Date.now()
-          });
-        }
-        checkingGoogleAuth = false;
-        window.location.href = "dashboard.html";
+        setAuthMode(true);
+        showError("Account Google non ancora registrato su EduHub! Clicca ora su 'Registrati con Google'.");
+        return;
       }
+
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          nome: user.displayName || user.email.split("@")[0],
+          email: user.email,
+          classe: "1BI",
+          ruolo: isRappresentante(user) ? "rappresentante" : "studente",
+          descrizione: "Ciao! Sono nella 1BI Informatica.",
+          metodo: "google",
+          registratoIl: Date.now()
+        });
+      }
+
+      checkingGoogleAuth = false;
+      window.location.href = "dashboard.html";
     } catch (err) {
       checkingGoogleAuth = false;
-      showError("Operazione con Google annullata o non riuscita.");
+      console.error("Errore Google Auth:", err.code, err.message);
+      if (err.code === "auth/unauthorized-domain") {
+        showError("Dominio GitHub Pages non autorizzato su Firebase Authentication!");
+      } else if (err.code === "auth/popup-closed-by-user") {
+        showError("Finestra di accesso Google chiusa prima di completare.");
+      } else {
+        showError("Errore Google (" + err.code + "): " + err.message);
+      }
     }
   });
 }
