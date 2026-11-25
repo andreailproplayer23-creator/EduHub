@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Verifiche & Interrogazioni 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .ver-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .rep-form-box {
+      background: var(--surface-sub);
+      border: 1px dashed rgba(245, 158, 11, 0.55);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .form-row-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .ver-select, .ver-date {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+    }
+    .ver-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid #3b82f6;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      transition: transform 0.22s ease;
+      animation: fadeSlideUp 0.35s ease-out both;
+    }
+    .ver-card:hover {
+      transform: translateX(4px);
+    }
+    .ver-card.past {
+      opacity: 0.6;
+      border-left-color: #64748b !important;
+    }
+    .date-box {
+      min-width: 72px;
+      text-align: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      flex-shrink: 0;
+    }
+    .date-box .day {
+      font-size: 1.45rem;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+    .date-box .month {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.8px;
+    }
+    .countdown-pill {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+    .cd-urgent {
+      background: rgba(239, 68, 68, 0.18);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+    }
+    .cd-soon {
+      background: rgba(245, 158, 11, 0.18);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+    .cd-normal {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    .cd-past {
+      background: rgba(100, 116, 139, 0.18);
+      color: #94a3b8;
+    }
+    .type-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-del-ver {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 9px;
+      padding: 7px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: 0.2s;
+    }
+    .btn-del-ver:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Verifiche & Interrogazioni</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="ver-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Calendario <span style="color: #f59e0b;">Verifiche & Interrogazioni</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Prove programmate della 1BI con conto alla rovescia automatico</p>
+        </div>
+
+        <select id="filterMateria" class="ver-select" style="width: auto; min-width: 190px;">
+          <option value="TUTTE">Tutte le materie</option>
+          <option value="Informatica">Informatica</option>
+          <option value="Matematica">Matematica</option>
+          <option value="Italiano">Italiano</option>
+          <option value="Storia">Storia</option>
+          <option value="Inglese">Inglese</option>
+          <option value="Fisica">Fisica</option>
+          <option value="Chimica">Chimica</option>
+          <option value="TTRG">TTRG / Disegno</option>
+          <option value="Diritto">Diritto ed Economia</option>
+          <option value="Scienze Motorie">Scienze Motorie</option>
+        </select>
+      </div>
+
+      <!-- MODULO AGGIUNTA RISERVATO AI RAPPRESENTANTI (ANDREA & ALE) -->
+      <div id="repVerBox" class="rep-form-box">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: #f59e0b; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="calendar-plus" style="width: 18px; height: 18px;"></i> Aggiungi Verifica o Interrogazione (Solo Rappresentanti)
+        </h4>
+        <form id="addVerForm">
+          <div class="form-row-grid">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Materia</label>
+              <select id="verMateria" class="ver-select" required>
+                <option value="Informatica">Informatica</option>
+                <option value="Matematica">Matematica</option>
+                <option value="Italiano">Italiano</option>
+                <option value="Storia">Storia</option>
+                <option value="Inglese">Inglese</option>
+                <option value="Fisica">Fisica</option>
+                <option value="Chimica">Chimica</option>
+                <option value="TTRG">TTRG / Disegno</option>
+                <option value="Diritto">Diritto ed Economia</option>
+                <option value="Scienze Motorie">Scienze Motorie</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Tipologia</label>
+              <select id="verTipo" class="ver-select" required>
+                <option value="Verifica Scritta">Verifica Scritta</option>
+                <option value="Interrogazione Orale">Interrogazione Orale</option>
+                <option value="Prova Pratica / Lab">Prova Pratica / Lab</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Data della Prova</label>
+              <input type="date" id="verData" class="ver-date" required />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Argomenti / Note per la classe</label>
+            <div class="input-box">
+              <i data-lucide="book-marked"></i>
+              <input type="text" id="verArgomenti" placeholder="Es. Cicli for/while in C++, Capitolo 3, Equazioni di 1° grado..." required />
+            </div>
+          </div>
+
+          <button type="submit" id="saveVerBtn" class="btn btn-primary" style="width: auto; padding: 10px 22px;">
+            AGGIUNGI AL CALENDARIO
+          </button>
+        </form>
+      </div>
+
+      <!-- PROSSIME PROVE -->
+      <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">Prossime Prove in Programma</h3>
+      <div id="upcomingVerContainer">Caricamento calendario...</div>
+
+      <!-- PROVE GIÀ SVOLTE -->
+      <div id="pastSection" style="margin-top: 30px; display: none;">
+        <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 12px; color: var(--text-muted);">Prove già Svolte</h3>
+        <div id="pastVerContainer"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const MATERIA_COLORS = {
+      "Informatica": "#0ea5e9",
+      "Matematica": "#3b82f6",
+      "Italiano": "#ef4444",
+      "Storia": "#f97316",
+      "Inglese": "#8b5cf6",
+      "Fisica": "#10b981",
+      "Chimica": "#14b8a6",
+      "TTRG": "#ec4899",
+      "Diritto": "#eab308",
+      "Scienze Motorie": "#22c55e"
+    };
+
+    const MESI_IT = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
+
+    let isRepUser = false;
+    let allVerifiche = [];
+
+    onAuthStateChanged(auth, (user) => {
+      if (user && isRappresentante(user.email)) {
+        isRepUser = true;
+        document.getElementById("repVerBox").style.display = "block";
+        renderVerifiche();
+      }
+    });
+
+    function getCountdownInfo(dateStr) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const target = new Date(y, m - 1, d);
+      const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) return { text: "Svolta", cls: "cd-past", isPast: true };
+      if (diffDays === 0) return { text: "OGGI!", cls: "cd-urgent", isPast: false };
+      if (diffDays === 1) return { text: "DOMANI", cls: "cd-urgent", isPast: false };
+      if (diffDays <= 4) return { text: `Tra ${diffDays} giorni`, cls: "cd-soon", isPast: false };
+      return { text: `Tra ${diffDays} giorni`, cls: "cd-normal", isPast: false };
+    }
+
+    function renderVerifiche() {
+      const filterMat = document.getElementById("filterMateria").value;
+      const upContainer = document.getElementById("upcomingVerContainer");
+      const pastContainer = document.getElementById("pastVerContainer");
+      const pastSection = document.getElementById("pastSection");
+
+      const filtered = allVerifiche.filter(v => filterMat === "TUTTE" || v.materia === filterMat);
+
+      const upcoming = [];
+      const past = [];
+
+      filtered.forEach(v => {
+        const info = getCountdownInfo(v.data);
+        if (info.isPast) past.push({ ...v, info });
+        else upcoming.push({ ...v, info });
+      });
+
+      if (upcoming.length === 0) {
+        upContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">Nessuna verifica o interrogazione in programma per questa selezione.</p>`;
+      } else {
+        upContainer.innerHTML = "";
+        upcoming.forEach(v => upContainer.appendChild(createVerCard(v)));
+      }
+
+      if (past.length > 0) {
+        pastSection.style.display = "block";
+        pastContainer.innerHTML = "";
+        past.reverse().forEach(v => pastContainer.appendChild(createVerCard(v)));
+      } else {
+        pastSection.style.display = "none";
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function createVerCard(v) {
+      const color = MATERIA_COLORS[v.materia] || "#3b82f6";
+      const [y, m, d] = v.data.split("-").map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const weekday = dateObj.toLocaleDateString("it-IT", { weekday: "short" }).toUpperCase();
+
+      const card = document.createElement("div");
+      card.className = `ver-card ${v.info.isPast ? "past" : ""}`;
+      card.style.borderLeftColor = color;
+
+      card.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 16px; flex: 1; min-width: 240px;">
+          <div class="date-box">
+            <div class="month">${weekday}</div>
+            <div class="day" style="color: ${color};">${String(d).padStart(2, "0")}</div>
+            <div class="month">${MESI_IT[m - 1]}</div>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px;">
+              <span style="font-size: 1.08rem; font-weight: 800; color: ${color};">${v.materia}</span>
+              <span class="type-badge" style="background: ${color}22; color: ${color}; border: 1px solid ${color}55;">${v.tipo}</span>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-main); line-height: 1.45;">${v.argomenti}</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="countdown-pill ${v.info.cls}">${v.info.text}</span>
+          ${isRepUser ? `<button class="btn-del-ver" data-id="${v.id}" title="Elimina prova"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>` : ""}
+        </div>
+      `;
+
+      const delBtn = card.querySelector(".btn-del-ver");
+      if (delBtn) {
+        delBtn.addEventListener("click", async () => {
+          if (confirm(`Vuoi rimuovere "${v.materia} - ${v.tipo}" dal calendario?`)) {
+            await deleteDoc(doc(db, "verifiche_1bi", v.id));
+          }
+        });
+      }
+
+      return card;
+    }
+
+    document.getElementById("filterMateria").addEventListener("change", renderVerifiche);
+
+    document.getElementById("addVerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("saveVerBtn");
+      btn.disabled = true;
+      btn.textContent = "SALVATAGGIO...";
+
+      try {
+        await addDoc(collection(db, "verifiche_1bi"), {
+          materia: document.getElementById("verMateria").value,
+          tipo: document.getElementById("verTipo").value,
+          data: document.getElementById("verData").value,
+          argomenti: document.getElementById("verArgomenti").value.trim(),
+          creatoIl: new Date().toISOString()
+        });
+        document.getElementById("verArgomenti").value = "";
+      } catch (err) {
+        alert("Errore nel salvataggio: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "AGGIUNGI AL CALENDARIO";
+      }
+    });
+
+    const q = query(collection(db, "verifiche_1bi"), orderBy("data", "asc"));
+    onSnapshot(q, (snapshot) => {
+      allVerifiche = [];
+      snapshot.forEach((docSnap) => {
+        allVerifiche.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      renderVerifiche();
+    });
+  </script>
+</body>
+</html>

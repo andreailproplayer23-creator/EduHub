@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Classifica Contributori 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .lb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+
+    /* CARD PERSONALE UTENTE LOGGATO */
+    .my-rank-banner {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(14, 165, 233, 0.12));
+      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      border-radius: 18px;
+      padding: 20px 24px;
+      margin-bottom: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .xp-progress-wrap {
+      flex: 1;
+      min-width: 240px;
+      max-width: 420px;
+    }
+    .xp-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: var(--input-bg);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--table-border);
+      margin-top: 7px;
+    }
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    /* PODIO TOP 3 */
+    .podium-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+      align-items: end;
+    }
+    .podium-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 22px 18px;
+      text-align: center;
+      position: relative;
+      transition: transform 0.25s ease;
+      animation: fadeSlideUp 0.4s ease-out both;
+    }
+    .podium-card:hover {
+      transform: translateY(-4px);
+    }
+    .podium-card.rank-1 {
+      border-color: rgba(251, 191, 36, 0.65);
+      background: linear-gradient(165deg, rgba(245, 158, 11, 0.16), var(--surface-sub));
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.18);
+      padding-top: 28px;
+      padding-bottom: 28px;
+    }
+    .podium-card.rank-2 {
+      border-color: rgba(148, 163, 184, 0.55);
+      background: linear-gradient(165deg, rgba(148, 163, 184, 0.14), var(--surface-sub));
+    }
+    .podium-card.rank-3 {
+      border-color: rgba(217, 119, 6, 0.55);
+      background: linear-gradient(165deg, rgba(180, 83, 9, 0.14), var(--surface-sub));
+    }
+    .medal-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 12px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.15rem;
+    }
+    .rank-1 .medal-badge {
+      background: rgba(251, 191, 36, 0.22);
+      color: #fbbf24;
+      border: 2px solid #fbbf24;
+    }
+    .rank-2 .medal-badge {
+      background: rgba(203, 213, 225, 0.2);
+      color: #cbd5e1;
+      border: 2px solid #94a3b8;
+    }
+    .rank-3 .medal-badge {
+      background: rgba(217, 119, 6, 0.22);
+      color: #f59e0b;
+      border: 2px solid #d97706;
+    }
+
+    /* LISTA COMPLETA CLASSIFICA */
+    .rank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .rank-row {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: transform 0.2s ease;
+    }
+    .rank-row:hover {
+      transform: translateX(4px);
+    }
+    .rank-row.is-me {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .rank-pos {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .lvl-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.3px;
+    }
+    .stats-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mini-stat {
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 7px;
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      color: var(--text-muted);
+    }
+
+    /* BOX REGOLE XP */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .rule-item {
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .xp-val {
+      color: #38bdf8;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Classifica 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1120px;">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="lb-header">
+        <div>
+          <h2 style="font-size: 1.45rem; font-weight: 800;">Classifica <span style="color: #fbbf24;">Contributori 1BI</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Punti XP calcolati in tempo reale in base ad appunti, file progetti e aiuto ai compagni</p>
+        </div>
+
+        <span style="font-size: 0.78rem; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="zap" style="width:14px;height:14px;"></i> Live Sync XP
+        </span>
+      </div>
+
+      <!-- BANNER PROFILO XP PERSONALE -->
+      <div class="my-rank-banner" id="myRankBanner">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #38bdf8;">Il tuo Stato Contributore</div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px; flex-wrap: wrap;">
+            <span id="myNameTitle" style="font-size: 1.2rem; font-weight: 900;">Studente 1BI</span>
+            <span id="myLevelBadge" class="lvl-pill" style="background: rgba(56,189,248,0.2); color: #38bdf8;">Novizio 1BI</span>
+          </div>
+          <div id="myRankPosText" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Calcolo posizione in corso...</div>
+        </div>
+
+        <div class="xp-progress-wrap">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 800;">
+            <span id="myXpTotal" style="color: #fbbf24;">0 XP</span>
+            <span id="myNextLvlText" style="color: var(--text-muted);">Prossimo livello: 100 XP</span>
+          </div>
+          <div class="xp-bar-bg">
+            <div class="xp-bar-fill" id="myXpBarFill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PODIO TOP 3 -->
+      <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+        <i data-lucide="trophy" style="width:18px;height:18px;color:#fbbf24;"></i> Podio della Classe 1BI
+      </h3>
+      <div id="podiumContainer" class="podium-grid">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Caricamento podio...</p>
+      </div>
+
+      <!-- CLASSIFICA GENERALE -->
+      <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 12px;">Classifica Generale</h3>
+      <div id="leaderboardList" class="rank-list"></div>
+
+      <!-- LEGENDA PUNTEGGI XP -->
+      <div style="background: var(--surface-sub); border: 1px solid var(--table-border); border-radius: 16px; padding: 18px 20px;">
+        <h4 style="font-size: 0.9rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 7px;">
+          <i data-lucide="info" style="width:16px;height:16px;"></i> Come si guadagnano punti XP su EduHub
+        </h4>
+        <div class="rules-grid">
+          <div class="rule-item"><span>Appunto / Schema</span><span class="xp-val">+50 XP</span></div>
+          <div class="rule-item"><span>Miglior Risposta Q&A</span><span class="xp-val">+50 XP</span></div>
+          <div class="rule-item"><span>File nei Progetti</span><span class="xp-val">+40 XP</span></div>
+          <div class="rule-item"><span>Risposta nel Forum Q&A</span><span class="xp-val">+30 XP</span></div>
+          <div class="rule-item"><span>Cartella Progetto</span><span class="xp-val">+20 XP</span></div>
+          <div class="rule-item"><span>Domanda nel Forum Q&A</span><span class="xp-val">+15 XP</span></div>
+          <div class="rule-item"><span>Messaggio Chat (max 100)</span><span class="xp-val">+2 XP</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let appuntiDocs = [];
+    let progettiDocs = [];
+    let qaDocs = [];
+    let chatDocs = [];
+
+    const LEVELS = [
+      { min: 0, max: 100, name: "Novizio 1BI", color: "#94a3b8" },
+      { min: 100, max: 250, name: "Junior Coder", color: "#38bdf8" },
+      { min: 250, max: 500, name: "Developer 1BI", color: "#10b981" },
+      { min: 500, max: 1000, name: "Tech Lead", color: "#a855f7" },
+      { min: 1000, max: Infinity, name: "Leggenda Giorgi-Woolf", color: "#fbbf24" }
+    ];
+
+    function getLevelInfo(xp) {
+      for (const lvl of LEVELS) {
+        if (xp >= lvl.min && xp < lvl.max) return lvl;
+      }
+      return LEVELS[LEVELS.length - 1];
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        recalculateLeaderboard();
+      }
+    });
+
+    function recalculateLeaderboard() {
+      // Mappa aggregata per nome normalizzato o UID
+      const usersMap = new Map();
+
+      function getOrCreateUser(uid, rawName) {
+        const cleanName = (rawName || "Studente 1BI").trim();
+        const key = uid || cleanName.toLowerCase();
+        if (!usersMap.has(key)) {
+          usersMap.set(key, {
+            uid: uid || "",
+            name: cleanName,
+            appunti: 0,
+            fileProgetti: 0,
+            cartelle: 0,
+            domande: 0,
+            risposte: 0,
+            miglioriRisposte: 0,
+            messaggiChat: 0,
+            xp: 0
+          });
+        } else if (cleanName && cleanName !== "Studente 1BI") {
+          usersMap.get(key).name = cleanName;
+        }
+        return usersMap.get(key);
+      }
+
+      // 1. Appunti (+50 XP ciascuno)
+      appuntiDocs.forEach(d => {
+        const u = getOrCreateUser(d.autoreUid, d.autore);
+        u.appunti += 1;
+        u.xp += 50;
+      });
+
+      // 2. Progetti: File (+40 XP) e Cartelle (+20 XP)
+      progettiDocs.forEach(d => {
+        const u = getOrCreateUser(d.autoreUid, d.autore);
+        if (d.type === "folder") {
+          u.cartelle += 1;
+          u.xp += 20;
+        } else {
+          u.fileProgetti += 1;
+          u.xp += 40;
+        }
+      });
+
+      // 3. Forum Q&A: Domande (+15 XP), Risposte (+30 XP), Miglior Risposta (+50 XP bonus)
+      qaDocs.forEach(d => {
+        const author = getOrCreateUser(d.autoreUid, d.autore);
+        author.domande += 1;
+        author.xp += 15;
+
+        const risposte = d.risposte || [];
+        risposte.forEach(r => {
+          const respUser = getOrCreateUser(null, r.autore);
+          respUser.risposte += 1;
+          respUser.xp += 30;
+          if (r.isBest) {
+            respUser.miglioriRisposte += 1;
+            respUser.xp += 50;
+          }
+        });
+      });
+
+      // 4. Chat Live (+2 XP a messaggio, max 100 XP)
+      chatDocs.forEach(d => {
+        const u = getOrCreateUser(d.autoreUid, d.autore);
+        u.messaggiChat += 1;
+      });
+
+      usersMap.forEach(u => {
+        u.xp += Math.min(100, u.messaggiChat * 2);
+      });
+
+      // Assicuriamoci che l'utente corrente compaia anche se ha 0 XP
+      if (currentUser) {
+        getOrCreateUser(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
+      }
+
+      // Ordina per XP decrescente
+      const sorted = Array.from(usersMap.values()).sort((a, b) => b.xp - a.xp);
+
+      renderMyBanner(sorted);
+      renderPodium(sorted);
+      renderFullList(sorted);
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function renderMyBanner(sorted) {
+      if (!currentUser) return;
+      const myName = currentUser.displayName || currentUser.email.split("@")[0];
+      const idx = sorted.findIndex(u => u.uid === currentUser.uid || u.name.toLowerCase() === myName.toLowerCase());
+      const me = idx >= 0 ? sorted[idx] : { name: myName, xp: 0 };
+      const lvl = getLevelInfo(me.xp);
+
+      document.getElementById("myNameTitle").textContent = me.name;
+      const badge = document.getElementById("myLevelBadge");
+      badge.textContent = lvl.name;
+      badge.style.background = `${lvl.color}25`;
+      badge.style.color = lvl.color;
+
+      document.getElementById("myRankPosText").textContent = idx >= 0
+        ? `Posizione attuale: #${idx + 1} su ${sorted.length} compagni attivi`
+        : "Condividi un appunto o rispondi in Q&A per salire in classifica!";
+
+      document.getElementById("myXpTotal").textContent = `${me.xp} XP`;
+
+      if (lvl.max === Infinity) {
+        document.getElementById("myNextLvlText").textContent = "Livello Massimo Raggiunto!";
+        document.getElementById("myXpBarFill").style.width = "100%";
+      } else {
+        const pct = Math.min(100, Math.round(((me.xp - lvl.min) / (lvl.max - lvl.min)) * 100));
+        document.getElementById("myNextLvlText").textContent = `Prossimo grado a ${lvl.max} XP`;
+        document.getElementById("myXpBarFill").style.width = `${pct}%`;
+      }
+    }
+
+    function renderPodium(sorted) {
+      const container = document.getElementById("podiumContainer");
+      const top3 = sorted.slice(0, 3);
+
+      if (top3.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted);">Nessun contributo registrato ancora.</p>`;
+        return;
+      }
+
+      // Ordine visivo podio su desktop: 2° - 1° - 3° se ci sono almeno 3 utenti
+      const displayOrder = top3.length === 3
+        ? [{ data: top3[1], rank: 2 }, { data: top3[0], rank: 1 }, { data: top3[2], rank: 3 }]
+        : top3.map((d, i) => ({ data: d, rank: i + 1 }));
+
+      container.innerHTML = "";
+      displayOrder.forEach(({ data, rank }) => {
+        const lvl = getLevelInfo(data.xp);
+        const card = document.createElement("div");
+        card.className = `podium-card rank-${rank}`;
+        card.innerHTML = `
+          <div class="medal-badge">#${rank}</div>
+          <div style="font-size: 1.08rem; font-weight: 900; margin-bottom: 5px;">${data.name}</div>
+          <span class="lvl-pill" style="background: ${lvl.color}22; color: ${lvl.color}; display: inline-block; margin-bottom: 10px;">${lvl.name}</span>
+          <div style="font-size: 1.35rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">${data.xp} XP</div>
+          <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px;">
+            ${data.appunti} appunti • ${data.fileProgetti} file • ${data.risposte} risposte
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderFullList(sorted) {
+      const container = document.getElementById("leaderboardList");
+      container.innerHTML = "";
+
+      const myName = currentUser ? (currentUser.displayName || currentUser.email.split("@")[0]).toLowerCase() : "";
+
+      sorted.forEach((u, idx) => {
+        const lvl = getLevelInfo(u.xp);
+        const isMe = currentUser && (u.uid === currentUser.uid || u.name.toLowerCase() === myName);
+
+        const row = document.createElement("div");
+        row.className = `rank-row ${isMe ? "is-me" : ""}`;
+        row.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="rank-pos">${idx + 1}</div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <strong style="font-size: 0.96rem;">${u.name} ${isMe ? "(Tu)" : ""}</strong>
+                <span class="lvl-pill" style="background: ${lvl.color}22; color: ${lvl.color};">${lvl.name}</span>
+              </div>
+              <div class="stats-chips" style="margin-top: 5px;">
+                <span class="mini-stat">📚 ${u.appunti} Appunti</span>
+                <span class="mini-stat">📁 ${u.fileProgetti} File Progetti</span>
+                <span class="mini-stat">💡 ${u.risposte} Risposte Q&A</span>
+                ${u.miglioriRisposte > 0 ? `<span class="mini-stat" style="color:#10b981;border-color:rgba(16,185,129,0.4);">★ ${u.miglioriRisposte} Migliori</span>` : ""}
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 1.08rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
+            ${u.xp} XP
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // Ascolto live sulle 4 collezioni di attività della 1BI
+    onSnapshot(collection(db, "appunti_1bi"), (snap) => {
+      appuntiDocs = snap.docs.map(d => d.data());
+      recalculateLeaderboard();
+    });
+
+    onSnapshot(collection(db, "progetti_items_1bi"), (snap) => {
+      progettiDocs = snap.docs.map(d => d.data());
+      recalculateLeaderboard();
+    });
+
+    onSnapshot(collection(db, "forum_qa_1bi"), (snap) => {
+      qaDocs = snap.docs.map(d => d.data());
+      recalculateLeaderboard();
+    });
+
+    onSnapshot(collection(db, "chat_1bi"), (snap) => {
+      chatDocs = snap.docs.map(d => d.data());
+      recalculateLeaderboard();
+    });
+  </script>
+</body>
+</html>

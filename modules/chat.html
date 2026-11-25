@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Chat Live & Forum Q&A 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .chat-hub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .mode-switch {
+      display: inline-flex;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 14px;
+      padding: 5px;
+      gap: 6px;
+    }
+    .mode-btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+    }
+
+    /* AREA CHAT LIVE */
+    .chat-box-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 62vh;
+      min-height: 420px;
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .chat-messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 78%;
+      animation: fadeSlideUp 0.25s ease-out both;
+    }
+    .msg-row.mine {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .msg-row.others {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+    .msg-sender {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rep-tag {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      padding: 1px 7px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+    .msg-bubble {
+      padding: 11px 15px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      word-break: break-word;
+      position: relative;
+    }
+    .msg-row.mine .msg-bubble {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-row.others .msg-bubble {
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+    }
+    .msg-time {
+      font-size: 0.68rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+      padding: 14px 16px;
+      background: var(--input-bg);
+      border-top: 1px solid var(--table-border);
+    }
+    .chat-input-bar input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--input-border);
+      background: var(--surface-sub);
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+    }
+    .chat-input-bar input:focus {
+      border-color: #38bdf8;
+    }
+
+    /* AREA FORUM Q&A */
+    .qa-form-card {
+      background: var(--surface-sub);
+      border: 1px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 22px;
+    }
+    .qa-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid #38bdf8;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      animation: fadeSlideUp 0.3s ease-out both;
+    }
+    .qa-card.solved {
+      border-left-color: #10b981;
+    }
+    .answers-list {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--table-border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .answer-item {
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+    }
+    .answer-item.best {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .btn-xs {
+      padding: 4px 9px;
+      border-radius: 7px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Chat & Forum Q&A</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1050px;">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="chat-hub-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Community <span style="color: #38bdf8;">Classe 1BI</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Chat in tempo reale e Forum Q&A per aiutarsi con compiti ed esercizi</p>
+        </div>
+
+        <div class="mode-switch">
+          <button class="mode-btn active" data-mode="chat">
+            <i data-lucide="messages-square" style="width:16px;height:16px;"></i> Chat Live 1BI
+          </button>
+          <button class="mode-btn" data-mode="qa">
+            <i data-lucide="help-circle" style="width:16px;height:16px;"></i> Forum Q&A Compiti
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- SEZIONE 1: CHAT LIVE DELLA CLASSE                     -->
+      <!-- ===================================================== -->
+      <div id="sectionChat">
+        <div class="chat-box-wrapper">
+          <div class="chat-messages-area" id="chatMessagesArea">
+            <p style="color: var(--text-muted); text-align: center; margin-top: 40px;">Connessione alla chat della 1BI...</p>
+          </div>
+          <form id="chatSendForm" class="chat-input-bar">
+            <input type="text" id="chatMsgInput" placeholder="Scrivi un messaggio alla 1BI..." maxlength="500" autocomplete="off" required />
+            <button type="submit" class="btn btn-primary" style="width: auto; padding: 10px 20px;">
+              <i data-lucide="send" style="width:16px;height:16px;"></i> Invia
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- SEZIONE 2: FORUM Q&A (AIUTO COMPITI & DUBBI)          -->
+      <!-- ===================================================== -->
+      <div id="sectionQA" style="display: none;">
+        <div class="qa-form-card">
+          <h4 style="font-size: 0.95rem; font-weight: 800; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="message-circle-question" style="width:18px;height:18px;"></i> Fai una Domanda alla Classe
+          </h4>
+          <form id="newQuestionForm">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
+              <select id="qaMateria" style="padding: 11px 14px; border-radius: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-weight: 600;">
+                <option value="Informatica">Informatica</option>
+                <option value="Matematica">Matematica</option>
+                <option value="Fisica">Fisica</option>
+                <option value="Chimica">Chimica</option>
+                <option value="Italiano">Italiano</option>
+                <option value="Storia">Storia</option>
+                <option value="Inglese">Inglese</option>
+                <option value="TTRG">TTRG / Disegno</option>
+                <option value="Altro">Altro / Organizzazione</option>
+              </select>
+              <div class="input-box">
+                <i data-lucide="help-circle"></i>
+                <input type="text" id="qaTitolo" placeholder="Titolo breve (es. Errore ciclo while in C++)" required />
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <div class="input-box">
+                <i data-lucide="align-left"></i>
+                <input type="text" id="qaTesto" placeholder="Spiega il tuo dubbio o incolla la traccia dell'esercizio..." required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: auto; padding: 10px 20px;">PUBBLICA DOMANDA</button>
+          </form>
+        </div>
+
+        <div id="qaListContainer">Caricamento domande...</div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot, query, orderBy, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let isRep = false;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        isRep = isRappresentante(user.email);
+        localStorage.setItem("eduhub_last_chat_seen", new Date().toISOString());
+      }
+    });
+
+    // Switch Chat / Forum Q&A
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const mode = btn.dataset.mode;
+        document.getElementById("sectionChat").style.display = mode === "chat" ? "block" : "none";
+        document.getElementById("sectionQA").style.display = mode === "qa" ? "block" : "none";
+      });
+    });
+
+    // =========================================================================
+    // 1. LOGICA CHAT LIVE 1BI
+    // =========================================================================
+    const chatArea = document.getElementById("chatMessagesArea");
+
+    document.getElementById("chatSendForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const input = document.getElementById("chatMsgInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+      await addDoc(collection(db, "chat_1bi"), {
+        testo: text,
+        autore: currentUser.displayName || currentUser.email.split("@")[0],
+        autoreUid: currentUser.uid,
+        isRep: isRep,
+        creatoIl: new Date().toISOString()
+      });
+      localStorage.setItem("eduhub_last_chat_seen", new Date().toISOString());
+    });
+
+    const qChat = query(collection(db, "chat_1bi"), orderBy("creatoIl", "asc"), limit(100));
+    onSnapshot(qChat, (snap) => {
+      chatArea.innerHTML = "";
+      if (snap.empty) {
+        chatArea.innerHTML = `<p style="color: var(--text-muted); text-align: center; margin-top: 40px;">Nessun messaggio ancora. Scrivi tu il primo saluto alla 1BI!</p>`;
+        return;
+      }
+
+      snap.forEach((docSnap) => {
+        const m = docSnap.data();
+        const isMine = currentUser && m.autoreUid === currentUser.uid;
+        const canDel = isMine || isRep;
+        const timeStr = m.creatoIl ? new Date(m.creatoIl).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) : "";
+
+        const row = document.createElement("div");
+        row.className = `msg-row ${isMine ? "mine" : "others"}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "msg-bubble";
+        bubble.textContent = m.testo;
+
+        row.innerHTML = `
+          <div class="msg-sender">
+            <span>${isMine ? "Tu" : m.autore}</span>
+            ${m.isRep ? `<span class="rep-tag">RAPPRESENTANTE</span>` : ""}
+          </div>
+        `;
+        row.appendChild(bubble);
+
+        const footer = document.createElement("div");
+        footer.className = "msg-time";
+        footer.innerHTML = `<span>${timeStr}</span>`;
+
+        if (canDel) {
+          const delBtn = document.createElement("span");
+          delBtn.style.cursor = "pointer";
+          delBtn.style.color = "#ef4444";
+          delBtn.textContent = "Elimina";
+          delBtn.addEventListener("click", async () => {
+            await deleteDoc(doc(db, "chat_1bi", docSnap.id));
+          });
+          footer.appendChild(delBtn);
+        }
+
+        row.appendChild(footer);
+        chatArea.appendChild(row);
+      });
+
+      chatArea.scrollTop = chatArea.scrollHeight;
+      localStorage.setItem("eduhub_last_chat_seen", new Date().toISOString());
+    });
+
+    // =========================================================================
+    // 2. LOGICA FORUM Q&A
+    // =========================================================================
+    document.getElementById("newQuestionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      await addDoc(collection(db, "forum_qa_1bi"), {
+        materia: document.getElementById("qaMateria").value,
+        titolo: document.getElementById("qaTitolo").value.trim(),
+        testo: document.getElementById("qaTesto").value.trim(),
+        autore: currentUser.displayName || currentUser.email.split("@")[0],
+        autoreUid: currentUser.uid,
+        risolta: false,
+        risposte: [],
+        creatoIl: new Date().toISOString()
+      });
+
+      document.getElementById("newQuestionForm").reset();
+    });
+
+    onSnapshot(query(collection(db, "forum_qa_1bi"), orderBy("creatoIl", "desc")), (snap) => {
+      const container = document.getElementById("qaListContainer");
+      if (snap.empty) {
+        container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">Nessuna domanda aperta. Hai un dubbio su un esercizio? Chiedi qui sopra!</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      snap.forEach((docSnap) => {
+        const qData = docSnap.data();
+        const isAuthor = currentUser && qData.autoreUid === currentUser.uid;
+        const canManage = isAuthor || isRep;
+        const risposte = qData.risposte || [];
+
+        const card = document.createElement("div");
+        card.className = `qa-card ${qData.risolta ? "solved" : ""}`;
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.75rem; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: rgba(56,189,248,0.16); color: #38bdf8;">${qData.materia}</span>
+              ${qData.risolta ? `<span style="font-size: 0.72rem; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: rgba(16,185,129,0.18); color: #10b981;">✓ RISOLTA</span>` : ""}
+            </div>
+            ${canManage ? `<button class="btn-xs del-qa-btn" style="background: rgba(239,68,68,0.15); color: #ef4444;">Elimina</button>` : ""}
+          </div>
+
+          <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 5px;">${qData.titolo}</h4>
+          <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 6px;">${qData.testo}</p>
+          <small style="color: var(--text-muted); font-size: 0.76rem;">Chiesto da <strong>${qData.autore}</strong> • ${new Date(qData.creatoIl).toLocaleDateString("it-IT")}</small>
+
+          <div class="answers-list">
+            <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted);">Risposte (${risposte.length})</div>
+            <div class="ans-items-wrap" style="display: flex; flex-direction: column; gap: 8px;"></div>
+
+            <form class="reply-form" style="display: flex; gap: 8px; margin-top: 6px;">
+              <input type="text" placeholder="Scrivi una risposta per aiutare..." required style="flex: 1; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-size: 0.85rem;" />
+              <button type="submit" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 0.8rem;">Rispondi</button>
+            </form>
+          </div>
+        `;
+
+        const ansWrap = card.querySelector(".ans-items-wrap");
+        risposte.forEach((ans, idx) => {
+          const aDiv = document.createElement("div");
+          aDiv.className = `answer-item ${ans.isBest ? "best" : ""}`;
+          aDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="font-size: 0.78rem; color: ${ans.isBest ? "#10b981" : "#38bdf8"};">
+                ${ans.autore} ${ans.isBest ? "★ MIGLIOR RISPOSTA" : ""}
+              </strong>
+              ${canManage && !ans.isBest ? `<button class="btn-xs best-btn" style="background: rgba(16,185,129,0.16); color: #10b981;">Segna Migliore</button>` : ""}
+            </div>
+            <div>${ans.testo}</div>
+          `;
+
+          const bestBtn = aDiv.querySelector(".best-btn");
+          if (bestBtn) {
+            bestBtn.addEventListener("click", async () => {
+              const updated = risposte.map((r, i) => ({ ...r, isBest: i === idx }));
+              await updateDoc(doc(db, "forum_qa_1bi", docSnap.id), {
+                risposte: updated,
+                risolta: true
+              });
+            });
+          }
+          ansWrap.appendChild(aDiv);
+        });
+
+        card.querySelector(".reply-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (!currentUser) return;
+          const inp = e.target.querySelector("input");
+          const val = inp.value.trim();
+          if (!val) return;
+
+          await updateDoc(doc(db, "forum_qa_1bi", docSnap.id), {
+            risposte: arrayUnion({
+              autore: currentUser.displayName || currentUser.email.split("@")[0],
+              testo: val,
+              isBest: false,
+              creatoIl: new Date().toISOString()
+            })
+          });
+        });
+
+        const delQaBtn = card.querySelector(".del-qa-btn");
+        if (delQaBtn) {
+          delQaBtn.addEventListener("click", async () => {
+            if (confirm("Eliminare questa domanda?")) {
+              await deleteDoc(doc(db, "forum_qa_1bi", docSnap.id));
+            }
+          });
+        }
+
+        container.appendChild(card);
+      });
+    });
+  </script>
+</body>
+</html>

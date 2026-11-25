@@ -31,10 +31,47 @@
         <h2>Bentornato, <span id="welcomeUserName">Studente</span>!</h2>
         <p>Strumenti digitali condivisi per la <strong>1BI Informatica</strong> • Clicca sul tuo nome in alto per il profilo</p>
       </div>
-      <div class="live-status">
-        <span class="live-dot"></span>
-        <span>Portale 1BI Online</span>
+      <div class="banner-actions-right">
+        <a href="modules/classifica.html" class="trophy-pill-btn" title="Apri la Classifica Contributori XP della 1BI">
+          <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
+          <span>Classifica 1BI</span>
+        </a>
+        <div class="live-status">
+          <span class="live-dot"></span>
+          <span>Portale 1BI Online</span>
+        </div>
       </div>
+    </div>
+
+    <!-- RIEPILOGO RAPIDO: ULTIMA CIRCOLARE + ULTIMO ANNUNCIO IN BACHECA -->
+    <div class="quick-recap-grid">
+      <!-- Box 1: Ultima Circolare Uscita -->
+      <a href="modules/circolari.html" id="latestCircBox" class="recap-box recap-circ">
+        <div>
+          <span class="recap-label" style="color: #38bdf8;">
+            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Ultima Circolare Istituto
+          </span>
+          <div id="latestCircTitle" class="recap-title" style="margin-top: 6px;">Caricamento ultima circolare...</div>
+        </div>
+        <div class="recap-meta">
+          <span id="latestCircSub">A.S. 2026/2027 • IIS Giorgi-Woolf</span>
+          <span style="color: #38bdf8; font-weight: 800;">Leggi →</span>
+        </div>
+      </a>
+
+      <!-- Box 2: Ultimo Annuncio in Bacheca -->
+      <a href="modules/bacheca.html" id="latestBachecaBox" class="recap-box recap-bacheca">
+        <div>
+          <span class="recap-label" style="color: #f87171;">
+            <i data-lucide="megaphone" style="width: 14px; height: 14px;"></i> Ultimo Annuncio Bacheca
+          </span>
+          <div id="latestBachecaTitle" class="recap-title" style="margin-top: 6px;">Caricamento ultimo avviso...</div>
+        </div>
+        <div class="recap-meta">
+          <span id="latestBachecaSub">Comunicazioni 1BI</span>
+          <span style="color: #f87171; font-weight: 800;">Apri →</span>
+        </div>
+      </a>
     </div>
 
     <!-- 1. CIRCOLARI ISTITUTO IN EVIDENZA (SOPRA LA BACHECA) -->
@@ -77,14 +114,54 @@
       </div>
     </a>
 
-    <!-- GRIGLIA STRUMENTI -->
+    <!-- GRIGLIA STRUMENTI (ORDINE ORIGINALE MANTENUTO) -->
     <div class="cards-grid">
+      <a href="modules/countdown.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
+          <i data-lucide="hourglass"></i>
+        </div>
+        <h3>Countdown & Ponti</h3>
+        <p>Conto alla rovescia per feste, ponti e fine anno scolastico</p>
+      </a>
+      
       <a href="modules/appello.html" class="hub-card">
         <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #0ea5e9;">
           <i data-lucide="users"></i>
         </div>
         <h3>Appello di Classe</h3>
         <p>Elenco ufficiale numerato degli studenti della 1BI</p>
+      </a>
+
+      <a href="modules/posti.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(56,189,248,0.16); color: #38bdf8;">
+          <i data-lucide="layout-grid"></i>
+        </div>
+        <h3>Mappa Posti Aula</h3>
+        <p>Piantina interattiva dei banchi e disposizione della 1BI</p>
+      </a>
+
+      <a href="modules/orario.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(56,189,248,0.16); color: #38bdf8;">
+          <i data-lucide="calendar-days"></i>
+        </div>
+        <h3>Orario Scolastico</h3>
+        <p>Tabella oraria ufficiale della 1BI ad alta risoluzione</p>
+      </a>
+
+      <a href="modules/verifiche.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
+          <i data-lucide="calendar-check"></i>
+        </div>
+        <h3>Verifiche & Interrogazioni</h3>
+        <p>Calendario condiviso delle prove 1BI con conto alla rovescia</p>
+      </a>
+
+      <a href="modules/appunti.html" class="hub-card">
+        <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
+          <i data-lucide="folder-git-2"></i>
+        </div>
+        <h3>Appunti & Progetti</h3>
+        <p>Schemi per materia e cartelle condivise con ogni tipo di file</p>
       </a>
 
       <a href="modules/convertitore-basi.html" class="hub-card">
@@ -127,8 +204,70 @@
         <p>Convertitore unità di misura e formule di 1ª superiore</p>
       </a>
     </div>
+
+    <!-- PULSANTE FLUTTUANTE CHAT & Q&A IN BASSO A DESTRA -->
+    <a href="modules/chat.html" class="floating-chat-btn" title="Apri Chat Live e Forum Q&A della 1BI">
+      <i data-lucide="messages-square" style="width: 20px; height: 20px;"></i>
+      <span>Chat & Q&A 1BI</span>
+      <span id="chatUnreadDot" class="chat-unread-dot"></span>
+    </a>
   </main>
 
   <script type="module" src="js/auth.js"></script>
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // 1. Ultima Circolare Istituto
+    const qCirc = query(collection(db, "circolari_scuola"), orderBy("ordine", "asc"), limit(1));
+    onSnapshot(qCirc, (snap) => {
+      const titleEl = document.getElementById("latestCircTitle");
+      const subEl = document.getElementById("latestCircSub");
+      const boxEl = document.getElementById("latestCircBox");
+
+      if (snap.empty) {
+        titleEl.textContent = "Nessuna circolare presente al momento";
+        return;
+      }
+
+      const data = snap.docs[0].data();
+      titleEl.textContent = data.titolo || "Nuova circolare pubblicata";
+      if (data.descrizione) subEl.textContent = data.descrizione;
+      if (data.url) {
+        boxEl.href = data.url;
+        boxEl.target = "_blank";
+        boxEl.rel = "noopener noreferrer";
+      }
+    });
+
+    // 2. Ultimo Annuncio in Bacheca
+    const qBach = query(collection(db, "bacheca_1bi"), orderBy("creatoIl", "desc"), limit(1));
+    onSnapshot(qBach, (snap) => {
+      const titleEl = document.getElementById("latestBachecaTitle");
+      const subEl = document.getElementById("latestBachecaSub");
+
+      if (snap.empty) {
+        titleEl.textContent = "Nessun annuncio pubblicato dai Rappresentanti";
+        return;
+      }
+
+      const data = snap.docs[0].data();
+      titleEl.textContent = data.titolo || data.testo || "Nuovo avviso in bacheca";
+      const autore = data.autore || "Rappresentanti 1BI";
+      const dataStr = data.creatoIl ? new Date(data.creatoIl).toLocaleDateString("it-IT") : "";
+      subEl.textContent = dataStr ? `Pubblicato da ${autore} il ${dataStr}` : `Pubblicato da ${autore}`;
+    });
+
+    // 3. Controllo nuovi messaggi non letti nella Chat 1BI
+    const qLastMsg = query(collection(db, "chat_1bi"), orderBy("creatoIl", "desc"), limit(1));
+    onSnapshot(qLastMsg, (snap) => {
+      if (snap.empty) return;
+      const lastMsgTime = snap.docs[0].data().creatoIl;
+      const lastSeen = localStorage.getItem("eduhub_last_chat_seen") || "";
+      if (lastMsgTime && lastMsgTime > lastSeen) {
+        document.getElementById("chatUnreadDot").style.display = "inline-block";
+      }
+    });
+  </script>
 </body>
 </html>

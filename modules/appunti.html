@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Appunti & Progetti 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .hub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--table-border);
+    }
+    .main-tabs {
+      display: inline-flex;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 14px;
+      padding: 5px;
+      gap: 6px;
+    }
+    .main-tab-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .main-tab-btn.active {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .action-panel {
+      background: var(--surface-sub);
+      border: 1px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 24px;
+      animation: fadeSlideUp 0.25s ease-out both;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .custom-select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 11px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    /* BREADCRUMB & BARRA CONTROLLI PROGETTI */
+    .explorer-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      padding: 10px 16px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+    }
+    .breadcrumb-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .crumb-item {
+      color: #38bdf8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      transition: 0.15s;
+    }
+    .crumb-item:hover {
+      background: rgba(56, 189, 248, 0.14);
+    }
+    .crumb-item.current {
+      color: var(--text-main);
+      cursor: default;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .toolbar-progetti {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .toolbar-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* SEZIONI INTERNE EXPLORER */
+    .section-divider-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .folders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    /* CARD CARTELLA MIGLIORATA */
+    .folder-card {
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.08), transparent), var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 4px solid #f59e0b;
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      animation: fadeSlideUp 0.3s ease-out both;
+    }
+    .folder-card:hover {
+      transform: translateY(-3px);
+      border-color: #fbbf24;
+      box-shadow: 0 10px 26px rgba(245, 158, 11, 0.14);
+    }
+    .folder-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+    .folder-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 13px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .folder-title {
+      font-weight: 800;
+      font-size: 1.02rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .folder-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .count-chip {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.72rem;
+    }
+
+    /* CARD FILE PROGETTI MIGLIORATA */
+    .file-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-top: 3px solid #38bdf8;
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      animation: fadeSlideUp 0.3s ease-out both;
+    }
+    .file-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 26px rgba(14, 165, 233, 0.14);
+    }
+
+    /* GRIGLIA & CARD APPUNTI MIGLIORATA */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    .note-card {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid #10b981;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      animation: fadeSlideUp 0.3s ease-out both;
+    }
+    .note-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 26px rgba(16, 185, 129, 0.12);
+    }
+    .ext-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .btn-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .btn-download {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+    }
+    .btn-download:hover {
+      filter: brightness(1.1);
+    }
+    .btn-danger-mini {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 8px 10px;
+    }
+    .btn-danger-mini:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+    .empty-state-box {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 46px 20px;
+      border: 1px dashed var(--table-border);
+      border-radius: 16px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Appunti & Progetti</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1180px;">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="hub-header">
+        <div>
+          <h2 style="font-size: 1.45rem; font-weight: 800;">Banca <span style="color: #38bdf8;">Appunti & Progetti</span></h2>
+          <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 3px;">Spazio condiviso della 1BI per schemi di studio, cartelle e file di progetto</p>
+        </div>
+
+        <div class="main-tabs">
+          <button class="main-tab-btn active" id="tabAppuntiBtn" data-section="appunti">
+            <i data-lucide="book-open" style="width:16px;height:16px;"></i> Appunti & Schemi
+          </button>
+          <button class="main-tab-btn" id="tabProgettiBtn" data-section="progetti">
+            <i data-lucide="folder-git-2" style="width:16px;height:16px;"></i> Cartelle Progetti
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- SEZIONE 1: APPUNTI & SCHEMI PER MATERIA                   -->
+      <!-- ========================================================= -->
+      <div id="sectionAppunti">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+          <button id="toggleAppuntoFormBtn" class="btn btn-primary" style="width: auto; padding: 10px 18px; background: linear-gradient(135deg, #059669, #10b981);">
+            <i data-lucide="plus-circle" style="width:17px;height:17px;"></i> Condividi Nuovo Appunto
+          </button>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; flex: 1; justify-content: flex-end; min-width: 260px;">
+            <div class="input-box" style="max-width: 280px; margin: 0;">
+              <i data-lucide="search"></i>
+              <input type="text" id="searchAppuntiInput" placeholder="Cerca titolo o argomento..." />
+            </div>
+            <select id="filterAppMateria" class="custom-select" style="width: auto; min-width: 180px;">
+              <option value="TUTTE">Tutte le materie</option>
+              <option value="Informatica">Informatica</option>
+              <option value="Matematica">Matematica</option>
+              <option value="Italiano">Italiano</option>
+              <option value="Storia">Storia</option>
+              <option value="Inglese">Inglese</option>
+              <option value="Fisica">Fisica</option>
+              <option value="Chimica">Chimica</option>
+              <option value="TTRG">TTRG / Disegno</option>
+              <option value="Diritto">Diritto ed Economia</option>
+              <option value="Scienze Motorie">Scienze Motorie</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="addAppuntoBox" class="action-panel" style="display: none; border-color: rgba(16, 185, 129, 0.5);">
+          <h4 style="font-size: 0.96rem; font-weight: 800; color: #10b981; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="file-plus-2" style="width:18px;height:18px;"></i> Pubblica un Appunto o Schema per la Classe
+          </h4>
+          <form id="addAppuntoForm">
+            <div class="grid-2col">
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Materia</label>
+                <select id="appMateria" class="custom-select" required>
+                  <option value="Informatica">Informatica</option>
+                  <option value="Matematica">Matematica</option>
+                  <option value="Italiano">Italiano</option>
+                  <option value="Storia">Storia</option>
+                  <option value="Inglese">Inglese</option>
+                  <option value="Fisica">Fisica</option>
+                  <option value="Chimica">Chimica</option>
+                  <option value="TTRG">TTRG / Disegno</option>
+                  <option value="Diritto">Diritto ed Economia</option>
+                  <option value="Scienze Motorie">Scienze Motorie</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Titolo Appunto</label>
+                <div class="input-box">
+                  <i data-lucide="type"></i>
+                  <input type="text" id="appTitolo" placeholder="Es. Schema Sistemi di Numerazione" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-2col">
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Allega File (qualsiasi formato, max 700KB)</label>
+                <input type="file" id="appFile" style="font-size: 0.84rem; color: var(--text-main); padding: 8px 0;" />
+              </div>
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Oppure Link Drive / OneDrive / Sito</label>
+                <div class="input-box">
+                  <i data-lucide="link"></i>
+                  <input type="url" id="appLink" placeholder="https://drive.google.com/..." />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <div class="input-box">
+                <i data-lucide="align-left"></i>
+                <input type="text" id="appDesc" placeholder="Breve descrizione o note sugli argomenti..." />
+              </div>
+            </div>
+
+            <button type="submit" id="saveAppuntoBtn" class="btn btn-primary" style="width: auto; padding: 10px 22px; background: #059669;">
+              PUBBLICA APPUNTO
+            </button>
+          </form>
+        </div>
+
+        <div id="appuntiListContainer" class="notes-grid">Caricamento appunti...</div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- SEZIONE 2: PROGETTI CON CARTELLE ANNIDATE E OGNI FILE     -->
+      <!-- ========================================================= -->
+      <div id="sectionProgetti" style="display: none;">
+        <!-- BREADCRUMB + CONTEGGIO -->
+        <div class="explorer-top-bar">
+          <div class="breadcrumb-bar" id="breadcrumbBar"></div>
+          <span id="folderStatsBadge" style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted);"></span>
+        </div>
+
+        <!-- TOOLBAR AZIONI + RICERCA -->
+        <div class="toolbar-progetti">
+          <div class="toolbar-btns">
+            <button id="toggleNewFolderBtn" class="btn btn-primary" style="width: auto; padding: 10px 18px; background: linear-gradient(135deg, #d97706, #f59e0b);">
+              <i data-lucide="folder-plus" style="width:17px;height:17px;"></i> Nuova Cartella Qui
+            </button>
+            <button id="toggleUploadFileBtn" class="btn btn-primary" style="width: auto; padding: 10px 18px;">
+              <i data-lucide="file-up" style="width:17px;height:17px;"></i> Aggiungi File Qui
+            </button>
+          </div>
+
+          <div class="input-box" style="max-width: 270px; margin: 0;">
+            <i data-lucide="search"></i>
+            <input type="text" id="searchExplorerInput" placeholder="Filtra in questa cartella..." />
+          </div>
+        </div>
+
+        <!-- BOX CREAZIONE CARTELLA -->
+        <div id="newFolderBox" class="action-panel" style="display: none; border-color: rgba(245, 158, 11, 0.55);">
+          <h4 style="font-size: 0.94rem; font-weight: 800; color: #f59e0b; margin-bottom: 12px;">Crea una nuova cartella in questa posizione</h4>
+          <form id="createFolderForm" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <div class="input-box" style="flex: 1; min-width: 240px;">
+              <i data-lucide="folder"></i>
+              <input type="text" id="folderNameInput" placeholder="Nome cartella (es. Progetto_HTML_1BI, Codice_CPP, Relazioni...)" required />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: auto; padding: 10px 22px; background: #d97706;">CREA CARTELLA</button>
+          </form>
+        </div>
+
+        <!-- BOX CARICAMENTO FILE (OGNI ESTENSIONE) -->
+        <div id="uploadFileBox" class="action-panel" style="display: none;">
+          <h4 style="font-size: 0.94rem; font-weight: 800; color: #38bdf8; margin-bottom: 12px;">Carica qualsiasi tipo di file o collega un link in questa cartella</h4>
+          <form id="uploadProjectFileForm">
+            <div class="grid-2col">
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Scegli File dal Dispositivo (ogni tipo, max 700KB)</label>
+                <input type="file" id="projFileInput" style="font-size: 0.84rem; color: var(--text-main); padding: 8px 0;" />
+              </div>
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Oppure Nome + Link Esterno (per file grandi/GitHub)</label>
+                <div class="input-box">
+                  <i data-lucide="link"></i>
+                  <input type="url" id="projLinkInput" placeholder="https://..." />
+                </div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 14px;">
+              <div class="input-box">
+                <i data-lucide="file-signature"></i>
+                <input type="text" id="projCustomName" placeholder="Nome personalizzato del file (opzionale se carichi dal PC)" />
+              </div>
+            </div>
+            <button type="submit" id="saveProjFileBtn" class="btn btn-primary" style="width: auto; padding: 10px 22px;">SALVA FILE NELLA CARTELLA</button>
+          </form>
+        </div>
+
+        <!-- CONTENUTO CARTELLA CORRENTE -->
+        <div id="explorerContainer">Caricamento cartelle e file...</div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const MATERIA_COLORS = {
+      "Informatica": "#0ea5e9",
+      "Matematica": "#3b82f6",
+      "Italiano": "#ef4444",
+      "Storia": "#f97316",
+      "Inglese": "#8b5cf6",
+      "Fisica": "#10b981",
+      "Chimica": "#14b8a6",
+      "TTRG": "#ec4899",
+      "Diritto": "#eab308",
+      "Scienze Motorie": "#22c55e"
+    };
+
+    let currentUser = null;
+    let isRep = false;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        isRep = isRappresentante(user.email);
+        renderAppunti();
+        renderExplorer();
+      }
+    });
+
+    // Switch tra Sezione 1 (Appunti) e Sezione 2 (Progetti)
+    document.querySelectorAll(".main-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".main-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const sec = btn.dataset.section;
+        document.getElementById("sectionAppunti").style.display = sec === "appunti" ? "block" : "none";
+        document.getElementById("sectionProgetti").style.display = sec === "progetti" ? "block" : "none";
+      });
+    });
+
+    function readAnyFileBase64(file) {
+      return new Promise((resolve, reject) => {
+        if (file.size > 720 * 1024) {
+          reject(new Error("Il file supera i 700 KB! Caricalo su Google Drive / GitHub e incolla il link qui accanto."));
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Errore durante la lettura del file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getFileExtension(filename) {
+      if (!filename || !filename.includes(".")) return "FILE";
+      return filename.split(".").pop().toUpperCase();
+    }
+
+    function getExtStyle(ext) {
+      const e = (ext || "").toUpperCase();
+      if (["CPP", "C", "H", "PY", "JAVA", "CS"].includes(e)) return { color: "#38bdf8", icon: "file-code-2" };
+      if (["HTML", "CSS", "JS", "TS", "JSON"].includes(e)) return { color: "#a855f7", icon: "code" };
+      if (["PDF", "DOC", "DOCX", "TXT", "MD"].includes(e)) return { color: "#f43f5e", icon: "file-text" };
+      if (["ZIP", "RAR", "7Z"].includes(e)) return { color: "#f59e0b", icon: "file-archive" };
+      if (["PNG", "JPG", "JPEG", "WEBP", "SVG"].includes(e)) return { color: "#10b981", icon: "image" };
+      if (["DWG", "DXF"].includes(e)) return { color: "#ec4899", icon: "ruler" };
+      return { color: "#0ea5e9", icon: "file" };
+    }
+
+    // =========================================================================
+    // LOGICA SEZIONE 1: APPUNTI & SCHEMI
+    // =========================================================================
+    let allAppunti = [];
+
+    document.getElementById("toggleAppuntoFormBtn").addEventListener("click", () => {
+      const box = document.getElementById("addAppuntoBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    });
+
+    document.getElementById("addAppuntoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const btn = document.getElementById("saveAppuntoBtn");
+      const fileInput = document.getElementById("appFile");
+      const linkVal = document.getElementById("appLink").value.trim();
+
+      if ((!fileInput.files || !fileInput.files[0]) && !linkVal) {
+        alert("Allega un file oppure inserisci un link!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "CARICAMENTO...";
+
+      try {
+        let fileData = "";
+        let fileName = "";
+
+        if (fileInput.files && fileInput.files[0]) {
+          const f = fileInput.files[0];
+          fileData = await readAnyFileBase64(f);
+          fileName = f.name;
+        }
+
+        await addDoc(collection(db, "appunti_1bi"), {
+          materia: document.getElementById("appMateria").value,
+          titolo: document.getElementById("appTitolo").value.trim(),
+          descrizione: document.getElementById("appDesc").value.trim(),
+          link: linkVal,
+          fileData,
+          fileName,
+          autore: currentUser.displayName || currentUser.email.split("@")[0],
+          autoreUid: currentUser.uid,
+          creatoIl: new Date().toISOString()
+        });
+
+        document.getElementById("addAppuntoForm").reset();
+        document.getElementById("addAppuntoBox").style.display = "none";
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "PUBBLICA APPUNTO";
+      }
+    });
+
+    function renderAppunti() {
+      const filter = document.getElementById("filterAppMateria").value;
+      const search = document.getElementById("searchAppuntiInput").value.toLowerCase().trim();
+      const container = document.getElementById("appuntiListContainer");
+
+      const list = allAppunti.filter(a => {
+        const matchMat = filter === "TUTTE" || a.materia === filter;
+        const matchTxt = !search ||
+          (a.titolo || "").toLowerCase().includes(search) ||
+          (a.descrizione || "").toLowerCase().includes(search) ||
+          (a.autore || "").toLowerCase().includes(search);
+        return matchMat && matchTxt;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box">
+            <i data-lucide="book-open" style="width:36px;height:36px;opacity:0.55;margin-bottom:8px;"></i>
+            <p>Nessun appunto trovato per questa ricerca. Clicca su <strong>Condividi Nuovo Appunto</strong> per aggiungerne uno!</p>
+          </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = "";
+      list.forEach(item => {
+        const canDelete = isRep || (currentUser && item.autoreUid === currentUser.uid);
+        const ext = item.fileName ? getFileExtension(item.fileName) : "LINK";
+        const matColor = MATERIA_COLORS[item.materia] || "#10b981";
+        const extStyle = getExtStyle(ext);
+
+        const card = document.createElement("div");
+        card.className = "note-card";
+        card.style.borderLeftColor = matColor;
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 0.76rem; font-weight: 800; color: ${matColor}; background: ${matColor}22; border: 1px solid ${matColor}44; padding: 3px 10px; border-radius: 7px;">${item.materia}</span>
+                <span class="ext-pill" style="background: ${extStyle.color}20; color: ${extStyle.color};">${ext}</span>
+              </div>
+              ${canDelete ? `<button class="btn-mini btn-danger-mini del-app-btn" data-id="${item.id}" title="Elimina"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>` : ""}
+            </div>
+            <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; line-height: 1.35;">${item.titolo}</h4>
+            ${item.descrizione ? `<p style="font-size: 0.87rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px;">${item.descrizione}</p>` : ""}
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-top: 10px; border-top: 1px solid var(--table-border);">
+            <small style="color: var(--text-muted); font-size: 0.76rem; display: inline-flex; align-items: center; gap: 5px;">
+              <i data-lucide="user" style="width:13px;height:13px;"></i> <strong>${item.autore}</strong> • ${new Date(item.creatoIl).toLocaleDateString("it-IT")}
+            </small>
+
+            <div style="display: flex; gap: 8px;">
+              ${item.fileData ? `<a href="${item.fileData}" download="${item.fileName || 'appunto'}" class="btn-mini btn-download"><i data-lucide="download" style="width:14px;height:14px;"></i> Scarica</a>` : ""}
+              ${item.link ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-download"><i data-lucide="external-link" style="width:14px;height:14px;"></i> Apri Link</a>` : ""}
+            </div>
+          </div>
+        `;
+
+        const delBtn = card.querySelector(".del-app-btn");
+        if (delBtn) {
+          delBtn.addEventListener("click", async () => {
+            if (confirm(`Vuoi eliminare l'appunto "${item.titolo}"?`)) {
+              await deleteDoc(doc(db, "appunti_1bi", item.id));
+            }
+          });
+        }
+        container.appendChild(card);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.getElementById("filterAppMateria").addEventListener("change", renderAppunti);
+    document.getElementById("searchAppuntiInput").addEventListener("input", renderAppunti);
+
+    onSnapshot(query(collection(db, "appunti_1bi"), orderBy("creatoIl", "desc")), (snap) => {
+      allAppunti = [];
+      snap.forEach(d => allAppunti.push({ id: d.id, ...d.data() }));
+      renderAppunti();
+    });
+
+    // =========================================================================
+    // LOGICA SEZIONE 2: PROGETTI (CARTELLE ANNIDATE + QUALSIASI TIPO DI FILE)
+    // =========================================================================
+    let allProjectItems = [];
+    let folderPath = [{ id: "root", name: "Progetti 1BI" }];
+
+    function getCurrentFolderId() {
+      return folderPath[folderPath.length - 1].id;
+    }
+
+    document.getElementById("toggleNewFolderBtn").addEventListener("click", () => {
+      const box = document.getElementById("newFolderBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+      document.getElementById("uploadFileBox").style.display = "none";
+    });
+
+    document.getElementById("toggleUploadFileBtn").addEventListener("click", () => {
+      const box = document.getElementById("uploadFileBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+      document.getElementById("newFolderBox").style.display = "none";
+    });
+
+    document.getElementById("createFolderForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const name = document.getElementById("folderNameInput").value.trim();
+      if (!name) return;
+
+      await addDoc(collection(db, "progetti_items_1bi"), {
+        type: "folder",
+        name,
+        parentId: getCurrentFolderId(),
+        autore: currentUser.displayName || currentUser.email.split("@")[0],
+        autoreUid: currentUser.uid,
+        creatoIl: new Date().toISOString()
+      });
+
+      document.getElementById("folderNameInput").value = "";
+      document.getElementById("newFolderBox").style.display = "none";
+    });
+
+    document.getElementById("uploadProjectFileForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const fileInput = document.getElementById("projFileInput");
+      const linkVal = document.getElementById("projLinkInput").value.trim();
+      const customName = document.getElementById("projCustomName").value.trim();
+      const btn = document.getElementById("saveProjFileBtn");
+
+      if ((!fileInput.files || !fileInput.files[0]) && !linkVal) {
+        alert("Seleziona un file dal dispositivo oppure incolla un link!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "SALVATAGGIO...";
+
+      try {
+        let fileData = "";
+        let finalName = customName;
+        let extension = "LINK";
+
+        if (fileInput.files && fileInput.files[0]) {
+          const f = fileInput.files[0];
+          fileData = await readAnyFileBase64(f);
+          finalName = customName || f.name;
+          extension = getFileExtension(f.name);
+        } else if (!finalName) {
+          finalName = "Collegamento Progetto";
+        }
+
+        await addDoc(collection(db, "progetti_items_1bi"), {
+          type: "file",
+          name: finalName,
+          extension,
+          fileData,
+          link: linkVal,
+          parentId: getCurrentFolderId(),
+          autore: currentUser.displayName || currentUser.email.split("@")[0],
+          autoreUid: currentUser.uid,
+          creatoIl: new Date().toISOString()
+        });
+
+        document.getElementById("uploadProjectFileForm").reset();
+        document.getElementById("uploadFileBox").style.display = "none";
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "SALVA FILE NELLA CARTELLA";
+      }
+    });
+
+    function renderBreadcrumb() {
+      const bar = document.getElementById("breadcrumbBar");
+      bar.innerHTML = "";
+
+      folderPath.forEach((step, idx) => {
+        const isLast = idx === folderPath.length - 1;
+        const span = document.createElement("span");
+        span.className = `crumb-item ${isLast ? "current" : ""}`;
+        span.innerHTML = `${idx === 0 ? '<i data-lucide="hard-drive" style="width:15px;height:15px;"></i>' : '<i data-lucide="folder-open" style="width:15px;height:15px;"></i>'} ${step.name}`;
+
+        if (!isLast) {
+          span.addEventListener("click", () => {
+            folderPath = folderPath.slice(0, idx + 1);
+            document.getElementById("searchExplorerInput").value = "";
+            renderExplorer();
+          });
+        }
+        bar.appendChild(span);
+
+        if (!isLast) {
+          const sep = document.createElement("i");
+          sep.setAttribute("data-lucide", "chevron-right");
+          sep.style.width = "15px";
+          sep.style.height = "15px";
+          sep.style.color = "var(--text-muted)";
+          bar.appendChild(sep);
+        }
+      });
+    }
+
+    async function deleteFolderRecursive(folderId) {
+      const children = allProjectItems.filter(it => it.parentId === folderId);
+      for (const child of children) {
+        if (child.type === "folder") {
+          await deleteFolderRecursive(child.id);
+        } else {
+          await deleteDoc(doc(db, "progetti_items_1bi", child.id));
+        }
+      }
+      await deleteDoc(doc(db, "progetti_items_1bi", folderId));
+    }
+
+    function renderExplorer() {
+      renderBreadcrumb();
+      const container = document.getElementById("explorerContainer");
+      const statsBadge = document.getElementById("folderStatsBadge");
+      const search = document.getElementById("searchExplorerInput").value.toLowerCase().trim();
+      const curId = getCurrentFolderId();
+
+      const itemsHere = allProjectItems.filter(it =>
+        it.parentId === curId &&
+        (!search || (it.name || "").toLowerCase().includes(search))
+      );
+
+      const folders = itemsHere.filter(it => it.type === "folder");
+      const files = itemsHere.filter(it => it.type === "file");
+
+      statsBadge.textContent = `${folders.length} cartelle • ${files.length} file`;
+
+      if (folders.length === 0 && files.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box">
+            <i data-lucide="folder-open" style="width:40px;height:40px;opacity:0.55;margin-bottom:8px;"></i>
+            <p>Questa cartella è vuota. Usa i pulsanti <strong>Nuova Cartella Qui</strong> o <strong>Aggiungi File Qui</strong> qui sopra!</p>
+          </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = "";
+
+      // SEZIONE CARTELLE
+      if (folders.length > 0) {
+        const fTitle = document.createElement("div");
+        fTitle.className = "section-divider-title";
+        fTitle.innerHTML = `<i data-lucide="folder" style="width:15px;height:15px;color:#f59e0b;"></i> Cartelle (${folders.length})`;
+        container.appendChild(fTitle);
+
+        const fGrid = document.createElement("div");
+        fGrid.className = "folders-grid";
+
+        folders.forEach(folder => {
+          const canDelete = isRep || (currentUser && folder.autoreUid === currentUser.uid);
+          const subCount = allProjectItems.filter(it => it.parentId === folder.id).length;
+
+          const card = document.createElement("div");
+          card.className = "folder-card";
+          card.innerHTML = `
+            <div class="folder-left">
+              <div class="folder-icon-wrap">
+                <i data-lucide="folder" style="width:24px;height:24px;"></i>
+              </div>
+              <div style="min-width: 0; flex: 1;">
+                <div class="folder-title" title="${folder.name}">${folder.name}</div>
+                <div class="folder-meta">
+                  <span class="count-chip">${subCount} elementi</span>
+                  <span>di ${folder.autore}</span>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+              ${canDelete ? `<button class="btn-mini btn-danger-mini del-folder-btn" title="Elimina cartella"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>` : ""}
+              <i data-lucide="chevron-right" style="width:18px;height:18px;color:#f59e0b;"></i>
+            </div>
+          `;
+
+          card.addEventListener("click", (e) => {
+            if (e.target.closest(".del-folder-btn")) return;
+            folderPath.push({ id: folder.id, name: folder.name });
+            document.getElementById("searchExplorerInput").value = "";
+            renderExplorer();
+          });
+
+          const delBtn = card.querySelector(".del-folder-btn");
+          if (delBtn) {
+            delBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              if (confirm(`Vuoi eliminare la cartella "${folder.name}" e tutto il suo contenuto?`)) {
+                await deleteFolderRecursive(folder.id);
+              }
+            });
+          }
+
+          fGrid.appendChild(card);
+        });
+
+        container.appendChild(fGrid);
+      }
+
+      // SEZIONE FILE
+      if (files.length > 0) {
+        const fileTitle = document.createElement("div");
+        fileTitle.className = "section-divider-title";
+        fileTitle.innerHTML = `<i data-lucide="files" style="width:15px;height:15px;color:#38bdf8;"></i> File (${files.length})`;
+        container.appendChild(fileTitle);
+
+        const filesGrid = document.createElement("div");
+        filesGrid.className = "files-grid";
+
+        files.forEach(file => {
+          const canDelete = isRep || (currentUser && file.autoreUid === currentUser.uid);
+          const extStyle = getExtStyle(file.extension);
+
+          const card = document.createElement("div");
+          card.className = "file-card";
+          card.style.borderTopColor = extStyle.color;
+          card.innerHTML = `
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 40px; height: 40px; border-radius: 11px; background: ${extStyle.color}20; color: ${extStyle.color}; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="${extStyle.icon}" style="width:20px;height:20px;"></i>
+                  </div>
+                  <span class="ext-pill" style="background: ${extStyle.color}20; color: ${extStyle.color};">${file.extension || "FILE"}</span>
+                </div>
+                ${canDelete ? `<button class="btn-mini btn-danger-mini del-file-btn" title="Elimina file"><i data-lucide="trash-2" style="width:15px;height:15px;"></i></button>` : ""}
+              </div>
+              <div style="font-weight: 800; font-size: 0.98rem; word-break: break-word; margin-bottom: 5px;">${file.name}</div>
+              <small style="color: var(--text-muted); font-size: 0.77rem;">Caricato da <strong>${file.autore}</strong> • ${new Date(file.creatoIl).toLocaleDateString("it-IT")}</small>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              ${file.fileData ? `<a href="${file.fileData}" download="${file.name}" class="btn-mini btn-download" style="width:100%; justify-content:center;"><i data-lucide="download" style="width:15px;height:15px;"></i> Scarica File</a>` : ""}
+              ${file.link ? `<a href="${file.link}" target="_blank" rel="noopener noreferrer" class="btn-mini btn-download" style="width:100%; justify-content:center;"><i data-lucide="external-link" style="width:15px;height:15px;"></i> Apri Link</a>` : ""}
+            </div>
+          `;
+
+          const delBtn = card.querySelector(".del-file-btn");
+          if (delBtn) {
+            delBtn.addEventListener("click", async () => {
+              if (confirm(`Vuoi eliminare il file "${file.name}"?`)) {
+                await deleteDoc(doc(db, "progetti_items_1bi", file.id));
+              }
+            });
+          }
+
+          filesGrid.appendChild(card);
+        });
+
+        container.appendChild(filesGrid);
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.getElementById("searchExplorerInput").addEventListener("input", renderExplorer);
+
+    onSnapshot(query(collection(db, "progetti_items_1bi"), orderBy("creatoIl", "asc")), (snap) => {
+      allProjectItems = [];
+      snap.forEach(d => allProjectItems.push({ id: d.id, ...d.data() }));
+      renderExplorer();
+    });
+  </script>
+</body>
+</html>

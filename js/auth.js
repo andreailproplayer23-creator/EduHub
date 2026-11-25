@@ -1,5 +1,6 @@
 // js/auth.js
 import { auth, googleProvider, db } from "./firebase-config.js";
+import { initNotificationCenter } from "./notifications.js";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -15,7 +16,7 @@ import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/
 export const RAPPRESENTANTI_EMAILS = [
   "andrea.marcorin@cvv.org",
   "andrea.ilproplayer23@gmail.com",
-  "alessandromoreschi712@gmail.com@"
+  "alessandromoreschi712@gmail.com"
 ];
 
 export function isRappresentante(email) {
@@ -82,6 +83,9 @@ onAuthStateChanged(auth, async (user) => {
         avatarEl.textContent = displayName.charAt(0).toUpperCase();
       }
     }
+
+    // Inizializza la campanellina notifiche live nella topbar
+    initNotificationCenter(user);
   }
 });
 

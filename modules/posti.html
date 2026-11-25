@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Mappa Posti Libera 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .posti-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+
+    .rep-controls {
+      background: var(--surface-sub);
+      border: 1px dashed rgba(56, 189, 248, 0.5);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* CONTENITORE AUTO-ADATTANTE */
+    .classroom-viewport {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow: hidden;
+      padding: 4px 0 8px 0;
+    }
+
+    .classroom-scale-holder {
+      transform-origin: top center;
+      transition: transform 0.15s ease-out;
+    }
+
+    .classroom-box {
+      display: inline-flex;
+      flex-direction: column;
+      border-radius: 20px;
+      border: 1.5px solid var(--glass-border);
+      background: var(--surface-sub);
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+    }
+
+    .classroom-middle {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .classroom-canvas {
+      position: relative;
+      width: 1080px;
+      height: 360px;
+      background-image: radial-gradient(rgba(148, 163, 184, 0.16) 1.5px, transparent 1.5px);
+      background-size: 20px 20px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    /* MANIGLIE LATERALI (SINISTRA & DESTRA) */
+    .canvas-resize-side {
+      width: 22px;
+      background: rgba(56, 189, 248, 0.08);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: ew-resize;
+      color: #38bdf8;
+      user-select: none;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .canvas-resize-left {
+      border-right: 1px dashed rgba(56, 189, 248, 0.4);
+    }
+    .canvas-resize-right {
+      border-left: 1px dashed rgba(56, 189, 248, 0.4);
+    }
+    .canvas-resize-side:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+
+    /* MANIGLIA INFERIORE (ALTEZZA) */
+    .canvas-resize-bar {
+      height: 22px;
+      background: rgba(56, 189, 248, 0.08);
+      border-top: 1px dashed rgba(56, 189, 248, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: ns-resize;
+      color: #38bdf8;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .canvas-resize-bar:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+
+    .room-landmarks {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .landmark-tag {
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .cattedra-box {
+      padding: 10px 28px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(37, 99, 235, 0.25));
+      border: 1.5px solid rgba(56, 189, 248, 0.55);
+      color: #38bdf8;
+      font-weight: 900;
+      font-size: 0.84rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.16);
+      white-space: nowrap;
+    }
+
+    /* SINGOLO BANCO TRASCINABILE */
+    .free-desk {
+      position: absolute;
+      width: 124px;
+      height: 64px;
+      background: var(--input-bg);
+      border: 1.5px solid var(--input-border);
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .free-desk.occupied {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: linear-gradient(145deg, rgba(56, 189, 248, 0.12), var(--input-bg));
+    }
+    .free-desk.highlighted {
+      border-color: #fbbf24 !important;
+      background: rgba(245, 158, 11, 0.25) !important;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+      z-index: 20;
+    }
+    .free-desk.rep-editable {
+      cursor: grab;
+    }
+    .free-desk.dragging {
+      cursor: grabbing;
+      z-index: 50;
+      border-color: #38bdf8;
+      box-shadow: 0 14px 30px rgba(14, 165, 233, 0.4);
+      transform: scale(1.04);
+    }
+    .desk-del-btn {
+      position: absolute;
+      top: 3px;
+      right: 6px;
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-size: 0.82rem;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 0 3px;
+      opacity: 0.65;
+    }
+    .desk-del-btn:hover {
+      opacity: 1;
+    }
+    .desk-student-name {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .desk-empty-txt {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* MODAL ASSEGNAZIONE */
+    .seat-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .seat-modal.open {
+      display: flex;
+    }
+    .seat-modal-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Mappa Posti 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1380px;">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="posti-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Piantina <span style="color: #38bdf8;">Posti in Classe 1BI</span></h2>
+          <p id="postiSubText" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Disposizione dei banchi nell'aula della 1BI</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span id="deskCounterBadge" style="font-size: 0.8rem; font-weight: 800; color: #38bdf8; background: rgba(56,189,248,0.14); padding: 7px 12px; border-radius: 10px;">0 Banchi</span>
+          <div class="input-box" style="max-width: 240px; margin: 0;">
+            <i data-lucide="search"></i>
+            <input type="text" id="searchSeatInput" placeholder="Trova compagno..." />
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLLI RISERVATI AI RAPPRESENTANTI -->
+      <div id="repControls" class="rep-controls">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h4 style="font-size: 0.94rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 7px;">
+              <i data-lucide="move" style="width:17px;height:17px;"></i> Modalità Costruttore Aula (Solo Rappresentanti)
+            </h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+              <strong>Trascina</strong> i banchi • <strong>Clicca</strong> su un banco per scrivere chi ci siede • <strong>Trascina i bordi sinistro, destro o inferiore</strong> per ridimensionare l'aula.
+            </p>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <button id="addDeskBtn" class="btn btn-primary" style="width: auto; padding: 9px 15px; font-size: 0.83rem; background: linear-gradient(135deg, #059669, #10b981);">
+              <i data-lucide="plus-square" style="width:16px;height:16px;"></i> + Aggiungi Banco
+            </button>
+            <button id="fitSizeBtn" class="btn btn-primary" style="width: auto; padding: 9px 15px; font-size: 0.83rem; background: linear-gradient(135deg, #0284c7, #3b82f6);" title="Adatta larghezza e altezza eliminando gli spazi vuoti su tutti i lati">
+              <i data-lucide="minimize-2" style="width:15px;height:15px;"></i> Adatta Dimensioni
+            </button>
+            <button id="shuffleSeatsBtn" class="btn btn-primary" style="width: auto; padding: 9px 15px; font-size: 0.83rem; background: linear-gradient(135deg, #d97706, #f59e0b);">
+              <i data-lucide="shuffle" style="width:15px;height:15px;"></i> Mescola Nomi
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AREA PIANTINA AUTO-ADATTANTE -->
+      <div class="classroom-viewport" id="classroomViewport">
+        <div class="classroom-scale-holder" id="classroomScaleHolder">
+          <div class="classroom-box" id="classroomBox">
+            <div class="classroom-middle">
+              <!-- MANIGLIA LATERALE SINISTRA -->
+              <div id="canvasResizeLeft" class="canvas-resize-side canvas-resize-left" title="Trascina a destra o sinistra per ridimensionare il lato sinistro">
+                <i data-lucide="grip-vertical" style="width:15px;height:15px;"></i>
+              </div>
+
+              <div class="classroom-canvas" id="classroomCanvas">
+                <div class="room-landmarks">
+                  <span class="landmark-tag"><i data-lucide="sun" style="width:14px;height:14px;color:#fbbf24;"></i> Finestre</span>
+                  <div class="cattedra-box">CATTEDRA / LAVAGNA</div>
+                  <span class="landmark-tag"><i data-lucide="door-open" style="width:14px;height:14px;color:#38bdf8;"></i> Porta</span>
+                </div>
+                <div id="desksLayer"></div>
+              </div>
+
+              <!-- MANIGLIA LATERALE DESTRA -->
+              <div id="canvasResizeRight" class="canvas-resize-side canvas-resize-right" title="Trascina a destra o sinistra per ridimensionare il lato destro">
+                <i data-lucide="grip-vertical" style="width:15px;height:15px;"></i>
+              </div>
+            </div>
+
+            <!-- MANIGLIA INFERIORE -->
+            <div id="canvasResizeBar" class="canvas-resize-bar" title="Trascina su o giù per ridimensionare l'altezza dell'aula">
+              <i data-lucide="grip-horizontal" style="width:16px;height:16px;"></i> TRASCINA PER RIDIMENSIONARE L'ALTEZZA
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL ASSEGNAZIONE NOME AL BANCO -->
+  <div id="seatModal" class="seat-modal">
+    <div class="seat-modal-card">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; color: #38bdf8;">Assegna Posto</h3>
+
+      <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Scegli dall'elenco 1BI</label>
+      <select id="studentPresetSelect" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; font-weight: 600; margin-bottom: 12px;">
+        <option value="">-- Banco Libero --</option>
+      </select>
+
+      <label style="font-size: 0.78rem; font-weight: 700; display: block; margin-bottom: 5px;">Oppure scrivi Nome / Soprannome</label>
+      <div class="input-box" style="margin-bottom: 16px;">
+        <i data-lucide="user"></i>
+        <input type="text" id="customSeatNameInput" placeholder="Es. Andrea M." />
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="cancelSeatBtn" class="btn-logout" style="padding: 9px 15px;">Annulla</button>
+        <button id="saveSeatBtn" class="btn btn-primary" style="width: auto; padding: 9px 18px;">Salva Posto</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, onSnapshot, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let isRep = false;
+    let desks = [];
+    let canvasWidth = 1080;
+    let canvasHeight = 360;
+    let currentScale = 1;
+    let editingDeskId = null;
+    let classRoster = [];
+
+    function fitClassroomToScreen() {
+      const viewport = document.getElementById("classroomViewport");
+      const holder = document.getElementById("classroomScaleHolder");
+      const box = document.getElementById("classroomBox");
+      if (!viewport || !holder || !box) return;
+
+      const availableWidth = viewport.clientWidth - 4;
+      const boxWidth = box.offsetWidth;
+      const boxHeight = box.offsetHeight;
+
+      if (boxWidth > availableWidth && availableWidth > 0) {
+        currentScale = availableWidth / boxWidth;
+        holder.style.transform = `scale(${currentScale})`;
+        viewport.style.height = Math.ceil(boxHeight * currentScale) + 12 + "px";
+      } else {
+        currentScale = 1;
+        holder.style.transform = "scale(1)";
+        viewport.style.height = "auto";
+      }
+    }
+
+    window.addEventListener("resize", fitClassroomToScreen);
+
+    function createDefault27Desks() {
+      const list = [];
+      for (let i = 0; i < 27; i++) {
+        const colGroup = i % 3;
+        const row = Math.floor(i / 6);
+        const isRightOfPair = Math.floor((i % 6) / 3) === 1;
+        const x = 50 + colGroup * 330 + (isRightOfPair ? 130 : 0);
+        const y = 85 + row * 85;
+        list.push({
+          id: "desk_" + (i + 1),
+          x,
+          y,
+          name: ""
+        });
+      }
+      return list;
+    }
+
+    function computeMinRequiredBounds() {
+      let maxRight = 460;
+      let maxBottom = 220;
+      desks.forEach(d => {
+        if (d.x + 144 > maxRight) maxRight = d.x + 144;
+        if (d.y + 84 > maxBottom) maxBottom = d.y + 84;
+      });
+      return {
+        minW: Math.ceil(maxRight / 10) * 10,
+        minH: Math.ceil(maxBottom / 10) * 10
+      };
+    }
+
+    async function loadClassRoster() {
+      try {
+        const snap = await getDocs(collection(db, "studenti_1bi"));
+        const names = [];
+        snap.forEach(d => {
+          const data = d.data();
+          const fullName = data.nomeCompleto || `${data.cognome || ""} ${data.nome || ""}`.trim();
+          if (fullName) names.push(fullName);
+        });
+        names.sort((a, b) => a.localeCompare(b));
+        classRoster = names;
+
+        const sel = document.getElementById("studentPresetSelect");
+        sel.innerHTML = `<option value="">-- Banco Libero --</option>`;
+        names.forEach(n => {
+          const opt = document.createElement("option");
+          opt.value = n;
+          opt.textContent = n;
+          sel.appendChild(opt);
+        });
+      } catch (e) {}
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user && isRappresentante(user.email)) {
+        isRep = true;
+        document.getElementById("repControls").style.display = "block";
+        document.getElementById("canvasResizeBar").style.display = "flex";
+        document.getElementById("canvasResizeLeft").style.display = "flex";
+        document.getElementById("canvasResizeRight").style.display = "flex";
+        loadClassRoster();
+        renderDesks();
+      }
+    });
+
+    function renderDesks() {
+      const layer = document.getElementById("desksLayer");
+      const canvas = document.getElementById("classroomCanvas");
+      const search = document.getElementById("searchSeatInput").value.toLowerCase().trim();
+      const occupiedCount = desks.filter(d => d.name && d.name.trim() !== "").length;
+
+      document.getElementById("deskCounterBadge").textContent = `${desks.length} Banchi (${occupiedCount} occupati)`;
+      layer.innerHTML = "";
+
+      const { minW, minH } = computeMinRequiredBounds();
+      canvas.style.width = Math.max(canvasWidth, minW) + "px";
+      canvas.style.height = Math.max(canvasHeight, minH) + "px";
+
+      desks.forEach((desk) => {
+        const name = (desk.name || "").trim();
+        const isMatch = search && name && name.toLowerCase().includes(search);
+
+        const el = document.createElement("div");
+        el.className = `free-desk ${name ? "occupied" : ""} ${isMatch ? "highlighted" : ""} ${isRep ? "rep-editable" : ""}`;
+        el.style.left = desk.x + "px";
+        el.style.top = desk.y + "px";
+
+        el.innerHTML = `
+          ${isRep ? `<button class="desk-del-btn" title="Rimuovi questo banco">×</button>` : ""}
+          ${name
+            ? `<div class="desk-student-name">${name}</div>`
+            : `<div class="desk-empty-txt">Libero</div>`
+          }
+        `;
+
+        if (isRep) {
+          const delBtn = el.querySelector(".desk-del-btn");
+          delBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            if (confirm("Vuoi rimuovere questo banco?")) {
+              const updated = desks.filter(d => d.id !== desk.id);
+              await saveDesksToFirestore(updated, canvasWidth, canvasHeight);
+            }
+          });
+
+          let startX = 0, startY = 0, origX = desk.x, origY = desk.y, moved = false;
+
+          const onPointerDown = (e) => {
+            if (e.target.closest(".desk-del-btn")) return;
+            moved = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            origX = desk.x;
+            origY = desk.y;
+            el.classList.add("dragging");
+
+            const onPointerMove = (ev) => {
+              const dx = (ev.clientX - startX) / currentScale;
+              const dy = (ev.clientY - startY) / currentScale;
+              if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+
+              let newX = Math.round((origX + dx) / 10) * 10;
+              let newY = Math.round((origY + dy) / 10) * 10;
+
+              newX = Math.max(10, newX);
+              newY = Math.max(66, newY);
+
+              el.style.left = newX + "px";
+              el.style.top = newY + "px";
+              desk.x = newX;
+              desk.y = newY;
+
+              if (newX + 144 > canvas.offsetWidth) {
+                canvas.style.width = (newX + 144) + "px";
+              }
+              if (newY + 84 > canvas.offsetHeight) {
+                canvas.style.height = (newY + 84) + "px";
+              }
+            };
+
+            const onPointerUp = async () => {
+              window.removeEventListener("pointermove", onPointerMove);
+              window.removeEventListener("pointerup", onPointerUp);
+              el.classList.remove("dragging");
+
+              if (moved) {
+                const { minW, minH } = computeMinRequiredBounds();
+                const nextW = Math.max(canvasWidth, minW);
+                const nextH = Math.max(canvasHeight, minH);
+                await saveDesksToFirestore(desks, nextW, nextH);
+              } else {
+                openSeatModal(desk);
+              }
+            };
+
+            window.addEventListener("pointermove", onPointerMove);
+            window.addEventListener("pointerup", onPointerUp);
+          };
+
+          el.addEventListener("pointerdown", onPointerDown);
+        }
+
+        layer.appendChild(el);
+      });
+
+      requestAnimationFrame(fitClassroomToScreen);
+    }
+
+    // Ridimensionamento manuale LATO SINISTRO
+    const resizeLeft = document.getElementById("canvasResizeLeft");
+    resizeLeft.addEventListener("pointerdown", (e) => {
+      if (!isRep) return;
+      const canvas = document.getElementById("classroomCanvas");
+      const startX = e.clientX;
+      const startW = canvas.offsetWidth;
+      const origDesks = desks.map(d => ({ ...d }));
+
+      let minDeskX = Infinity;
+      origDesks.forEach(d => { if (d.x < minDeskX) minDeskX = d.x; });
+      if (!isFinite(minDeskX)) minDeskX = 20;
+
+      const onMove = (ev) => {
+        const deltaX = Math.round(((ev.clientX - startX) / currentScale) / 10) * 10;
+        // Se trascino a destra (deltaX > 0), riduco lo spazio vuoto a sinistra spostando i banchi a sinistra
+        const maxShiftLeft = minDeskX - 16;
+        const clampedDelta = Math.min(maxShiftLeft, Math.max(-(1800 - startW), deltaX));
+
+        const nextW = Math.max(460, startW - clampedDelta);
+        canvas.style.width = nextW + "px";
+        canvasWidth = nextW;
+
+        const deskEls = document.querySelectorAll(".free-desk");
+        origDesks.forEach((od, idx) => {
+          const newX = od.x - clampedDelta;
+          desks[idx].x = newX;
+          if (deskEls[idx]) deskEls[idx].style.left = newX + "px";
+        });
+
+        fitClassroomToScreen();
+      };
+
+      const onUp = async () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        await saveDesksToFirestore(desks, canvasWidth, canvasHeight);
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    });
+
+    // Ridimensionamento manuale LATO DESTRO
+    const resizeRight = document.getElementById("canvasResizeRight");
+    resizeRight.addEventListener("pointerdown", (e) => {
+      if (!isRep) return;
+      const canvas = document.getElementById("classroomCanvas");
+      const startX = e.clientX;
+      const startW = canvas.offsetWidth;
+
+      const onMove = (ev) => {
+        const { minW } = computeMinRequiredBounds();
+        const deltaX = (ev.clientX - startX) / currentScale;
+        const nextW = Math.max(minW, Math.min(1800, Math.round((startW + deltaX) / 10) * 10));
+        canvas.style.width = nextW + "px";
+        canvasWidth = nextW;
+        fitClassroomToScreen();
+      };
+
+      const onUp = async () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        await saveDesksToFirestore(desks, canvasWidth, canvasHeight);
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    });
+
+    // Ridimensionamento manuale ALTEZZA (maniglia inferiore)
+    const resizeBar = document.getElementById("canvasResizeBar");
+    resizeBar.addEventListener("pointerdown", (e) => {
+      if (!isRep) return;
+      const canvas = document.getElementById("classroomCanvas");
+      const startY = e.clientY;
+      const startH = canvas.offsetHeight;
+
+      const onMove = (ev) => {
+        const { minH } = computeMinRequiredBounds();
+        const deltaY = (ev.clientY - startY) / currentScale;
+        const nextH = Math.max(minH, Math.min(1200, Math.round((startH + deltaY) / 10) * 10));
+        canvas.style.height = nextH + "px";
+        canvasHeight = nextH;
+        fitClassroomToScreen();
+      };
+
+      const onUp = async () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        await saveDesksToFirestore(desks, canvasWidth, canvasHeight);
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    });
+
+    // Pulsante "Adatta Dimensioni" (taglia margini sia a sinistra, sia a destra, sia in basso)
+    document.getElementById("fitSizeBtn").addEventListener("click", async () => {
+      if (desks.length === 0) return;
+      let minX = Infinity;
+      desks.forEach(d => { if (d.x < minX) minX = d.x; });
+      const shiftLeft = Math.max(0, minX - 20);
+      const shiftedDesks = desks.map(d => ({ ...d, x: d.x - shiftLeft }));
+
+      desks = shiftedDesks;
+      const { minW, minH } = computeMinRequiredBounds();
+      canvasWidth = minW;
+      canvasHeight = minH;
+      await saveDesksToFirestore(shiftedDesks, minW, minH);
+    });
+
+    function openSeatModal(desk) {
+      editingDeskId = desk.id;
+      const sel = document.getElementById("studentPresetSelect");
+      const inp = document.getElementById("customSeatNameInput");
+
+      sel.value = classRoster.includes(desk.name) ? desk.name : "";
+      inp.value = desk.name || "";
+      document.getElementById("seatModal").classList.add("open");
+    }
+
+    document.getElementById("studentPresetSelect").addEventListener("change", (e) => {
+      document.getElementById("customSeatNameInput").value = e.target.value;
+    });
+
+    document.getElementById("cancelSeatBtn").addEventListener("click", () => {
+      document.getElementById("seatModal").classList.remove("open");
+    });
+
+    document.getElementById("saveSeatBtn").addEventListener("click", async () => {
+      if (!editingDeskId) return;
+      const newName = document.getElementById("customSeatNameInput").value.trim();
+      const updated = desks.map(d => d.id === editingDeskId ? { ...d, name: newName } : d);
+      await saveDesksToFirestore(updated, canvasWidth, canvasHeight);
+      document.getElementById("seatModal").classList.remove("open");
+    });
+
+    document.getElementById("addDeskBtn").addEventListener("click", async () => {
+      const newDesk = {
+        id: "desk_" + Date.now(),
+        x: 30 + ((desks.length * 25) % Math.max(300, canvasWidth - 160)),
+        y: 80,
+        name: ""
+      };
+      await saveDesksToFirestore([...desks, newDesk], canvasWidth, canvasHeight);
+    });
+
+    document.getElementById("shuffleSeatsBtn").addEventListener("click", async () => {
+      const occupiedIndices = [];
+      const names = [];
+      desks.forEach((d, i) => {
+        if (d.name && d.name.trim() !== "") {
+          occupiedIndices.push(i);
+          names.push(d.name.trim());
+        }
+      });
+
+      if (names.length < 2) {
+        alert("Inserisci almeno 2 studenti nei banchi prima di mescolare!");
+        return;
+      }
+      if (!confirm("Vuoi rimescolare casualmente i nomi tra i banchi occupati?")) return;
+
+      for (let i = names.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [names[i], names[j]] = [names[j], names[i]];
+      }
+
+      const updated = desks.map(d => ({ ...d }));
+      occupiedIndices.forEach((deskIdx, idx) => {
+        updated[deskIdx].name = names[idx];
+      });
+
+      await saveDesksToFirestore(updated, canvasWidth, canvasHeight);
+    });
+
+    async function saveDesksToFirestore(updatedDesks, widthVal, heightVal) {
+      const user = auth.currentUser;
+      await setDoc(doc(db, "config_classe", "mappa_posti_libera_1bi"), {
+        desks: updatedDesks,
+        canvasWidth: widthVal,
+        canvasHeight: heightVal,
+        aggiornatoDa: user?.displayName || "Rappresentante 1BI",
+        aggiornatoIl: new Date().toISOString()
+      });
+    }
+
+    document.getElementById("searchSeatInput").addEventListener("input", renderDesks);
+
+    onSnapshot(doc(db, "config_classe", "mappa_posti_libera_1bi"), (snap) => {
+      if (!snap.exists() || !snap.data().desks) {
+        desks = createDefault27Desks();
+      } else {
+        const data = snap.data();
+        desks = data.desks;
+        if (data.canvasWidth) canvasWidth = data.canvasWidth;
+        if (data.canvasHeight) canvasHeight = data.canvasHeight;
+        if (data.aggiornatoIl) {
+          const d = new Date(data.aggiornatoIl).toLocaleDateString("it-IT");
+          document.getElementById("postiSubText").textContent = `Aggiornata il ${d} da ${data.aggiornatoDa || "Rappresentanti 1BI"}`;
+        }
+      }
+      renderDesks();
+    });
+  </script>
+</body>
+</html>

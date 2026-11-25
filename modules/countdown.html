@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Countdown Feste, Ponti & Fine Scuola 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .cd-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--table-border);
+    }
+
+    /* HERO COUNTDOWN DOPPIO (PROSSIMA FESTA/PONTE + FINE SCUOLA) */
+    .hero-timers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .hero-timer-card {
+      background: linear-gradient(145deg, rgba(37, 99, 235, 0.16), rgba(14, 165, 233, 0.08));
+      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      border-radius: 20px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(14, 165, 233, 0.14);
+    }
+
+    .hero-timer-card.school-end {
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.16), rgba(217, 119, 6, 0.08));
+      border-color: rgba(251, 191, 36, 0.5);
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.14);
+    }
+
+    .timer-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .digits-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .digit-box {
+      background: var(--input-bg);
+      border: 1px solid var(--table-border);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .digit-num {
+      font-size: 1.55rem;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .digit-lbl {
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    /* FORM RAPPRESENTANTI */
+    .rep-cd-form {
+      background: var(--surface-sub);
+      border: 1px dashed rgba(56, 189, 248, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 26px;
+      display: none;
+    }
+
+    /* LISTA EVENTI / FESTE / PONTI */
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .event-row {
+      background: var(--surface-sub);
+      border: 1px solid var(--glass-border);
+      border-left: 5px solid #38bdf8;
+      border-radius: 15px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      transition: transform 0.2s ease;
+      animation: fadeSlideUp 0.3s ease-out both;
+    }
+
+    .event-row:hover {
+      transform: translateX(4px);
+    }
+
+    .event-row.past {
+      opacity: 0.55;
+      border-left-color: #64748b;
+    }
+
+    .days-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+      font-weight: 900;
+      padding: 8px 14px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.14);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Countdown 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <span class="badge-role">1BI</span>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+      <button id="logoutBtn" class="btn-logout"><i data-lucide="log-out" style="width:15px;height:15px;"></i> ESCI</button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1080px;">
+    <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
+
+    <div class="module-panel">
+      <div class="cd-header">
+        <div>
+          <h2 style="font-size: 1.45rem; font-weight: 800;">Countdown <span style="color: #38bdf8;">Feste, Ponti & Fine Scuola</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Calendario A.S. 2026/2027 della 1BI gestito dai Rappresentanti</p>
+        </div>
+        <span style="font-size: 0.78rem; font-weight: 800; color: #fbbf24; background: rgba(245,158,11,0.14); border: 1px solid rgba(251,191,36,0.35); padding: 6px 12px; border-radius: 999px;">
+          A.S. 2026 / 2027
+        </span>
+      </div>
+
+      <!-- DUE TIMER PRINCIPALI IN EVIDENZA -->
+      <div class="hero-timers-grid">
+        <!-- Box 1: Prossimo Ponte / Festa in arrivo -->
+        <div class="hero-timer-card" id="nextHolidayCard">
+          <span class="timer-tag" style="background: rgba(56,189,248,0.18); color: #38bdf8;">
+            <i data-lucide="party-popper" style="width:14px;height:14px;"></i> Prossima Pausa / Ponte
+          </span>
+          <h3 id="nextHolidayTitle" style="font-size: 1.2rem; font-weight: 900;">Nessun ponte o festa inserito</h3>
+          <p id="nextHolidaySub" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">I rappresentanti inseriranno a breve i prossimi ponti</p>
+
+          <div class="digits-row">
+            <div class="digit-box"><div class="digit-num" id="nhDays">--</div><div class="digit-lbl">Giorni</div></div>
+            <div class="digit-box"><div class="digit-num" id="nhHours">--</div><div class="digit-lbl">Ore</div></div>
+            <div class="digit-box"><div class="digit-num" id="nhMins">--</div><div class="digit-lbl">Min</div></div>
+            <div class="digit-box"><div class="digit-num" id="nhSecs" style="color:#38bdf8;">--</div><div class="digit-lbl">Sec</div></div>
+          </div>
+        </div>
+
+        <!-- Box 2: Traguardo Principale / Fine Scuola -->
+        <div class="hero-timer-card school-end" id="mainGoalCard">
+          <span class="timer-tag" style="background: rgba(245,158,11,0.2); color: #fbbf24;">
+            <i data-lucide="flag" style="width:14px;height:14px;"></i> Traguardo / Fine Scuola
+          </span>
+          <h3 id="mainGoalTitle" style="font-size: 1.2rem; font-weight: 900;">Fine scuola non impostata</h3>
+          <p id="mainGoalSub" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">Imposta una data come "Traguardo Principale" qui sotto</p>
+
+          <div class="digits-row">
+            <div class="digit-box"><div class="digit-num" id="mgDays">--</div><div class="digit-lbl">Giorni</div></div>
+            <div class="digit-box"><div class="digit-num" id="mgHours">--</div><div class="digit-lbl">Ore</div></div>
+            <div class="digit-box"><div class="digit-num" id="mgMins">--</div><div class="digit-lbl">Min</div></div>
+            <div class="digit-box"><div class="digit-num" id="mgSecs" style="color:#fbbf24;">--</div><div class="digit-lbl">Sec</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANNELLO RAPPRESENTANTI PER AGGIUNGERE FESTE, PONTI E FINE SCUOLA -->
+      <div id="repCountdownFormWrap" class="rep-cd-form">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="calendar-plus" style="width:18px;height:18px;"></i> Aggiungi Festa, Ponte o Data Importante (Solo Rappresentanti)
+        </h4>
+        <form id="addCountdownForm">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div class="input-box">
+              <i data-lucide="sparkles"></i>
+              <input type="text" id="cdTitolo" placeholder="Titolo (es. Ponte 8 Dicembre)" required />
+            </div>
+
+            <select id="cdCategoria" style="padding: 11px 14px; border-radius: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-weight: 700;">
+              <option value="Ponte / Festa">🎉 Ponte / Festa Nazionale</option>
+              <option value="Vacanze Scolastiche">🌴 Vacanze (Natale / Pasqua)</option>
+              <option value="Fine Quadrimestre / Scuola">🎓 Fine Quadrimestre / Fine Scuola</option>
+              <option value="Gita / Evento 1BI">🚌 Gita / Evento Speciale</option>
+            </select>
+
+            <div class="input-box">
+              <i data-lucide="calendar"></i>
+              <input type="date" id="cdData" required />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-bottom: 14px;">
+            <div class="input-box" style="margin: 0;">
+              <i data-lucide="align-left"></i>
+              <input type="text" id="cdNote" placeholder="Dettagli (es. Da sabato 6 a martedì 8 dicembre - 3 giorni a casa!)" />
+            </div>
+
+            <label style="display: inline-flex; align-items: center; gap: 7px; font-size: 0.82rem; font-weight: 800; color: #fbbf24; cursor: pointer; white-space: nowrap;">
+              <input type="checkbox" id="cdIsMainGoal" style="width: 16px; height: 16px;" />
+              Fissa come Traguardo / Fine Scuola
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: auto; padding: 10px 22px;">AGGIUNGI AL COUNTDOWN</button>
+        </form>
+      </div>
+
+      <!-- ELENCO COMPLETO FESTE, PONTI E DATE -->
+      <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 14px;">Tutte le Date & Ponti 1BI</h3>
+      <div id="countdownListContainer" class="events-list">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Caricamento date...</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let isRep = false;
+    let eventsList = [];
+
+    const CAT_STYLES = {
+      "Ponte / Festa": { color: "#38bdf8", emoji: "🎉" },
+      "Vacanze Scolastiche": { color: "#10b981", emoji: "🌴" },
+      "Fine Quadrimestre / Scuola": { color: "#fbbf24", emoji: "🎓" },
+      "Gita / Evento 1BI": { color: "#a855f7", emoji: "🚌" }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user && isRappresentante(user.email)) {
+        isRep = true;
+        document.getElementById("repCountdownFormWrap").style.display = "block";
+        renderEventsList();
+      }
+    });
+
+    document.getElementById("addCountdownForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!isRep) return;
+
+      await addDoc(collection(db, "countdown_1bi"), {
+        titolo: document.getElementById("cdTitolo").value.trim(),
+        categoria: document.getElementById("cdCategoria").value,
+        data: document.getElementById("cdData").value,
+        note: document.getElementById("cdNote").value.trim(),
+        isMainGoal: document.getElementById("cdIsMainGoal").checked,
+        creatoDa: auth.currentUser?.displayName || "Rappresentante 1BI",
+        creatoIl: new Date().toISOString()
+      });
+
+      document.getElementById("addCountdownForm").reset();
+    });
+
+    function getTargetDate(dateStr) {
+      return new Date(`${dateStr}T08:00:00`);
+    }
+
+    function updateLiveHeroTimers() {
+      const now = new Date();
+
+      // 1. SOLO feste, ponti, vacanze o eventi NON fissati come Fine Scuola / Traguardo Principale
+      const futureHolidays = eventsList.filter(ev => !ev.isMainGoal && getTargetDate(ev.data) > now);
+      const nextHol = futureHolidays[0];
+
+      if (nextHol) {
+        const diff = getTargetDate(nextHol.data) - now;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+
+        document.getElementById("nextHolidayTitle").textContent = nextHol.titolo;
+        document.getElementById("nextHolidaySub").textContent = `${new Date(nextHol.data).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}${nextHol.note ? " • " + nextHol.note : ""}`;
+        document.getElementById("nhDays").textContent = String(d).padStart(2, "0");
+        document.getElementById("nhHours").textContent = String(h).padStart(2, "0");
+        document.getElementById("nhMins").textContent = String(m).padStart(2, "0");
+        document.getElementById("nhSecs").textContent = String(s).padStart(2, "0");
+      } else {
+        document.getElementById("nextHolidayTitle").textContent = "Nessun ponte o festa inserito";
+        document.getElementById("nextHolidaySub").textContent = "Aggiungi una festa o un ponte dal modulo qui sotto";
+        ["nhDays", "nhHours", "nhMins", "nhSecs"].forEach(id => document.getElementById(id).textContent = "--");
+      }
+
+      // 2. SOLO Traguardo Principale / Fine Scuola (spunta "Fissa come Traguardo / Fine Scuola")
+      const mainGoals = eventsList.filter(ev => ev.isMainGoal && getTargetDate(ev.data) > now);
+      const goal = mainGoals[0];
+
+      if (goal) {
+        const diff = getTargetDate(goal.data) - now;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+
+        document.getElementById("mainGoalTitle").textContent = goal.titolo;
+        document.getElementById("mainGoalSub").textContent = `${new Date(goal.data).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}${goal.note ? " • " + goal.note : ""}`;
+        document.getElementById("mgDays").textContent = String(d).padStart(2, "0");
+        document.getElementById("mgHours").textContent = String(h).padStart(2, "0");
+        document.getElementById("mgMins").textContent = String(m).padStart(2, "0");
+        document.getElementById("mgSecs").textContent = String(s).padStart(2, "0");
+      } else {
+        document.getElementById("mainGoalTitle").textContent = "Fine scuola non impostata";
+        document.getElementById("mainGoalSub").textContent = "Spunta 'Fissa come Traguardo / Fine Scuola' per attivarla";
+        ["mgDays", "mgHours", "mgMins", "mgSecs"].forEach(id => document.getElementById(id).textContent = "--");
+      }
+    }
+
+    setInterval(updateLiveHeroTimers, 1000);
+
+    function renderEventsList() {
+      const container = document.getElementById("countdownListContainer");
+      if (eventsList.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">Nessuna festa o ponte inserito ancora. I Rappresentanti possono aggiungere tutte le date qui sopra!</p>`;
+        return;
+      }
+
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      container.innerHTML = "";
+      eventsList.forEach(ev => {
+        const style = CAT_STYLES[ev.categoria] || { color: "#38bdf8", emoji: "📅" };
+        const evDate = new Date(`${ev.data}T00:00:00`);
+        const diffDays = Math.round((evDate - todayStart) / (1000 * 60 * 60 * 24));
+        const isPast = diffDays < 0;
+
+        let badgeText = "";
+        if (diffDays === 0) badgeText = "OGGI! 🎉";
+        else if (diffDays === 1) badgeText = "Domani!";
+        else if (diffDays > 1) badgeText = `Tra ${diffDays} giorni`;
+        else badgeText = "Passato";
+
+        const row = document.createElement("div");
+        row.className = `event-row ${isPast ? "past" : ""}`;
+        row.style.borderLeftColor = style.color;
+
+        row.innerHTML = `
+          <div style="flex: 1; min-width: 220px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px;">
+              <span style="font-size: 0.74rem; font-weight: 800; padding: 3px 9px; border-radius: 7px; background: ${style.color}22; color: ${style.color};">
+                ${style.emoji} ${ev.categoria}
+              </span>
+              ${ev.isMainGoal ? `<span style="font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-radius: 7px; background: rgba(245,158,11,0.2); color: #fbbf24;">★ TRAGUARDO PRINCIPALE</span>` : ""}
+              <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">
+                ${evDate.toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}
+              </span>
+            </div>
+            <h4 style="font-size: 1.05rem; font-weight: 800;">${ev.titolo}</h4>
+            ${ev.note ? `<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">${ev.note}</p>` : ""}
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="days-pill" style="color: ${isPast ? "#94a3b8" : style.color}; border-color: ${isPast ? "var(--table-border)" : style.color + "55"}; background: ${isPast ? "var(--input-bg)" : style.color + "18"};">
+              ${badgeText}
+            </span>
+            ${isRep ? `<button class="btn-logout del-cd-btn" style="padding: 7px 10px;" title="Elimina data"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>` : ""}
+          </div>
+        `;
+
+        const delBtn = row.querySelector(".del-cd-btn");
+        if (delBtn) {
+          delBtn.addEventListener("click", async () => {
+            if (confirm(`Eliminare "${ev.titolo}" dal countdown?`)) {
+              await deleteDoc(doc(db, "countdown_1bi", ev.id));
+            }
+          });
+        }
+
+        container.appendChild(row);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    onSnapshot(query(collection(db, "countdown_1bi"), orderBy("data", "asc")), (snap) => {
+      eventsList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateLiveHeroTimers();
+      renderEventsList();
+    });
+  </script>
+</body>
+</html>
