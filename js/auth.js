@@ -23,12 +23,10 @@ export function isRappresentante(userOrEmail) {
   if (!userOrEmail) return false;
   const whitelist = RAPPRESENTANTI_EMAILS.map(e => e.trim().toLowerCase());
 
-  // Se viene passata una stringa email
   if (typeof userOrEmail === "string") {
     return whitelist.includes(userOrEmail.trim().toLowerCase());
   }
 
-  // Se viene passato l'intero oggetto user di Firebase (controlla sia user.email che i provider Google/Email)
   const emailsToCheck = [
     userOrEmail.email,
     ...(userOrEmail.providerData || []).map(p => p.email)
@@ -37,15 +35,39 @@ export function isRappresentante(userOrEmail) {
   return emailsToCheck.some(em => whitelist.includes(em.trim().toLowerCase()));
 }
 
+const isLoginPage = window.location.pathname.endsWith("index.html") ||
+                    window.location.pathname.endsWith("/EduHub/") ||
+                    window.location.pathname === "/";
+const isModulePage = window.location.pathname.includes("/modules/");
+
+const authForm = document.getElementById("authForm");
+const toggleModeBtn = document.getElementById("toggleModeBtn");
+const googleBtn = document.getElementById("googleBtn");
+const googleBtnText = document.getElementById("googleBtnText");
+const errorBox = document.getElementById("errorBox");
+
+let isRegisterMode = false;
+let checkingGoogleAuth = false;
+
+function showError(msg) {
+  if (!errorBox) return;
+  errorBox.textContent = msg;
+  errorBox.style.display = "block";
+}
+
 function setAuthMode(register) {
   isRegisterMode = register;
   if (!authForm) return;
-  document.getElementById("nameGroup").style.display = isRegisterMode ? "block" : "none";
-  document.getElementById("submitBtn").textContent = isRegisterMode ? "REGISTRATI" : "ACCEDI";
+  const nameGroup = document.getElementById("nameGroup");
+  const submitBtn = document.getElementById("submitBtn");
+  if (nameGroup) nameGroup.style.display = isRegisterMode ? "block" : "none";
+  if (submitBtn) submitBtn.textContent = isRegisterMode ? "REGISTRATI" : "ACCEDI";
   if (googleBtnText) {
     googleBtnText.textContent = isRegisterMode ? "Registrati con Google" : "Accedi con Google";
   }
-  toggleModeBtn.textContent = isRegisterMode ? "Hai già un account? Accedi" : "Nuovo compagno? Registrati";
+  if (toggleModeBtn) {
+    toggleModeBtn.textContent = isRegisterMode ? "Hai già un account? Accedi" : "Nuovo compagno? Registrati";
+  }
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -56,13 +78,14 @@ onAuthStateChanged(auth, async (user) => {
   } else if (!user && !isLoginPage) {
     window.location.href = isModulePage ? "../index.html" : "index.html";
   } else if (user && !isLoginPage) {
-    const displayName = user.displayName || user.email.split("@")[0];
-    const ruolo = isRappresentante(user.email) ? "rappresentante" : "studente";
+    const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Studente");
+    const ruolo = isRappresentante(user) ? "rappresentante" : "studente";
 
-    // Sincronizza il ruolo su Firestore automaticamente
-    await setDoc(doc(db, "utenti_registrati", user.uid), {
-      ruolo: ruolo
-    }, { merge: true });
+    try {
+      await setDoc(doc(db, "utenti_registrati", user.uid), {
+        ruolo: ruolo
+      }, { merge: true });
+    } catch (e) {}
 
     const nameEl = document.getElementById("userDisplayName");
     const welcomeNameEl = document.getElementById("welcomeUserName");
@@ -79,7 +102,6 @@ onAuthStateChanged(auth, async (user) => {
       }
     }
 
-    // Inizializza la campanellina notifiche live nella topbar
     initNotificationCenter(user);
   }
 });
@@ -94,7 +116,7 @@ if (toggleModeBtn) {
 if (authForm) {
   authForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    errorBox.style.display = "none";
+    if (errorBox) errorBox.style.display = "none";
 
     const email = document.getElementById("emailInput").value.trim();
     const password = document.getElementById("passwordInput").value;
@@ -139,7 +161,7 @@ if (authForm) {
 
 if (googleBtn) {
   googleBtn.addEventListener("click", async () => {
-    errorBox.style.display = "none";
+    if (errorBox) errorBox.style.display = "none";
     checkingGoogleAuth = true;
 
     try {
@@ -164,7 +186,7 @@ if (googleBtn) {
             nome: user.displayName || user.email.split("@")[0],
             email: user.email,
             classe: "1BI",
-            ruolo: isRappresentante(user.email) ? "rappresentante" : "studente",
+            ruolo: isRappresentante(user) ? "rappresentante" : "studente",
             descrizione: "Ciao! Sono nella 1BI Informatica.",
             metodo: "google",
             registratoIl: Date.now()
