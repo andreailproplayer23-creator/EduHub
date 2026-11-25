@@ -41,8 +41,8 @@ const isLoginPage = window.location.pathname.endsWith("index.html") ||
 const isModulePage = window.location.pathname.includes("/modules/");
 
 const authForm = document.getElementById("authForm");
-const toggleModeBtn = document.getElementById("toggleModeBtn");
-const googleBtn = document.getElementById("googleBtn");
+const toggleModeBtn = document.getElementById("toggleMode") || document.getElementById("toggleModeBtn");
+const googleBtn = document.getElementById("googleLoginBtn") || document.getElementById("googleBtn");
 const googleBtnText = document.getElementById("googleBtnText");
 const errorBox = document.getElementById("errorBox");
 
@@ -107,7 +107,8 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 if (toggleModeBtn) {
-  toggleModeBtn.addEventListener("click", () => {
+  toggleModeBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     setAuthMode(!isRegisterMode);
     if (errorBox) errorBox.style.display = "none";
   });
