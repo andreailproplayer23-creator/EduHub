@@ -101,58 +101,79 @@
       gap: 14px;
     }
     .idea-card {
-      display: flex;
-      gap: 16px;
       background: var(--card-bg);
       border: 1px solid var(--table-border, rgba(255,255,255,0.08));
       border-radius: 18px;
-      padding: 18px;
-      align-items: flex-start;
+      padding: 20px;
+      transition: border-color 0.2s ease;
     }
-    .upvote-box {
+    .idea-card:hover {
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .idea-top-row {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-width: 62px;
-      padding: 10px 8px;
-      border-radius: 14px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
-      background: var(--surface-sub, rgba(255,255,255,0.04));
-      color: var(--text-main);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
-    }
-    .upvote-box:hover {
-      border-color: #f59e0b;
-      transform: translateY(-2px);
-    }
-    .upvote-box.voted {
-      background: rgba(245, 158, 11, 0.2);
-      border-color: #f59e0b;
-      color: #fbbf24;
-    }
-    .upvote-count {
-      font-size: 1.05rem;
-      font-weight: 900;
-      margin-top: 4px;
-    }
-    .idea-body {
-      flex: 1;
-      min-width: 0;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
     .idea-badges {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 6px;
     }
+    /* NUOVO BOTTONE LIKE MODERNO A PILLOLA */
+    .like-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 15px;
+      border-radius: 999px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      user-select: none;
+    }
+    .like-pill-btn:hover {
+      border-color: rgba(59, 130, 246, 0.6);
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.12);
+      transform: translateY(-1px);
+    }
+    .like-pill-btn:active {
+      transform: scale(0.95);
+    }
+    .like-pill-btn.liked {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.28), rgba(79, 70, 229, 0.28));
+      border-color: #3b82f6;
+      color: #60a5fa;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+    .like-pill-btn.liked svg {
+      fill: rgba(96, 165, 250, 0.3);
+    }
+    .like-badge-num {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+    }
+    .like-pill-btn.liked .like-badge-num {
+      background: #3b82f6;
+      color: #fff;
+    }
+
     .cat-tag {
       font-size: 0.72rem;
       font-weight: 800;
-      padding: 3px 9px;
+      padding: 4px 10px;
       border-radius: 999px;
       background: rgba(59, 130, 246, 0.16);
       color: #60a5fa;
@@ -160,7 +181,7 @@
     .status-tag {
       font-size: 0.72rem;
       font-weight: 800;
-      padding: 3px 9px;
+      padding: 4px 10px;
       border-radius: 999px;
     }
     .st-nuova { background: rgba(148, 163, 184, 0.16); color: #cbd5e1; }
@@ -168,17 +189,17 @@
     .st-approvata { background: rgba(16, 185, 129, 0.18); color: #34d399; }
     .st-scartata { background: rgba(239, 68, 68, 0.16); color: #f87171; }
     .idea-title {
-      font-size: 1.06rem;
+      font-size: 1.08rem;
       font-weight: 800;
       margin: 0 0 6px 0;
       color: var(--text-main);
     }
     .idea-desc {
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
-      margin: 0 0 10px 0;
+      margin: 0 0 12px 0;
       white-space: pre-line;
-      line-height: 1.45;
+      line-height: 1.48;
     }
     .rep-reply-box {
       margin-top: 10px;
@@ -197,7 +218,9 @@
       gap: 10px;
       font-size: 0.78rem;
       color: var(--text-muted);
-      margin-top: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--table-border, rgba(255,255,255,0.07));
     }
     .idea-actions {
       display: flex;
@@ -205,7 +228,7 @@
       flex-wrap: wrap;
     }
     .mini-btn {
-      padding: 4px 10px;
+      padding: 5px 10px;
       border-radius: 8px;
       font-size: 0.75rem;
       font-weight: 700;
@@ -242,7 +265,7 @@
     <div class="welcome-banner">
       <div>
         <h2>Proposte & Idee per i Rappresentanti</h2>
-        <p>Suggerisci temi per le assemblee, gite, tornei o funzioni del sito e vota le idee migliori!</p>
+        <p>Suggerisci temi per le assemblee, gite, tornei o funzioni del sito e metti Like alle idee migliori!</p>
       </div>
       <div class="live-status">
         <span class="live-dot"></span>
@@ -287,7 +310,7 @@
       <button type="button" class="filter-chip" data-cat="Altro">Altro</button>
     </div>
 
-    <!-- ELENCO PROPOSTE ORDINATE PER UPVOTE -->
+    <!-- ELENCO PROPOSTE ORDINATE PER LIKE -->
     <div id="ideasContainer" class="ideas-list">
       <div style="text-align:center; color:var(--text-muted); padding:30px;">Caricamento proposte della 1BI...</div>
     </div>
@@ -391,45 +414,47 @@
         const card = document.createElement("div");
         card.className = "idea-card";
         card.innerHTML = `
-          <button type="button" class="upvote-box ${hasVoted ? "voted" : ""}" title="${hasVoted ? "Togli il tuo voto" : "Supporta questa idea"}">
-            <i data-lucide="chevron-up" style="width:20px;height:20px;"></i>
-            <span class="upvote-count">${upvotes.length}</span>
-          </button>
-
-          <div class="idea-body">
+          <div class="idea-top-row">
             <div class="idea-badges">
               <span class="cat-tag">${escapeHtml(item.categoria || "Altro")}</span>
               <span class="status-tag ${st.cls}">${st.label}</span>
             </div>
-            <h3 class="idea-title">${escapeHtml(item.titolo)}</h3>
-            ${item.descrizione ? `<p class="idea-desc">${escapeHtml(item.descrizione)}</p>` : ""}
 
-            ${item.rispostaRep ? `
-              <div class="rep-reply-box">
-                <strong>★ Risposta Rappresentanti:</strong> ${escapeHtml(item.rispostaRep)}
-              </div>
-            ` : ""}
+            <button type="button" class="like-pill-btn ${hasVoted ? "liked" : ""}" title="${hasVoted ? "Togli Mi piace" : "Metti Mi piace"}">
+              <i data-lucide="thumbs-up" style="width:15px;height:15px;"></i>
+              <span>${hasVoted ? "Piaciuto" : "Mi piace"}</span>
+              <span class="like-badge-num">${upvotes.length}</span>
+            </button>
+          </div>
 
-            <div class="idea-footer">
-              <span>Proposta da <strong>${escapeHtml(item.autore || "Studente 1BI")}</strong> ${dataStr ? `il ${dataStr}` : ""}</span>
-              <div class="idea-actions">
-                ${userIsRep ? `
-                  <select class="mini-btn rep-status-select" title="Cambia stato">
-                    <option value="nuova" ${item.stato === "nuova" ? "selected" : ""}>In attesa</option>
-                    <option value="valutazione" ${item.stato === "valutazione" ? "selected" : ""}>In valutazione</option>
-                    <option value="approvata" ${item.stato === "approvata" ? "selected" : ""}>Approvata ✓</option>
-                    <option value="scartata" ${item.stato === "scartata" ? "selected" : ""}>Non fattibile</option>
-                  </select>
-                  <button type="button" class="mini-btn rep-reply-btn">Rispondi</button>
-                ` : ""}
-                ${canDelete ? `<button type="button" class="mini-btn mini-btn-del del-idea-btn">Elimina</button>` : ""}
-              </div>
+          <h3 class="idea-title">${escapeHtml(item.titolo)}</h3>
+          ${item.descrizione ? `<p class="idea-desc">${escapeHtml(item.descrizione)}</p>` : ""}
+
+          ${item.rispostaRep ? `
+            <div class="rep-reply-box">
+              <strong>★ Risposta Rappresentanti:</strong> ${escapeHtml(item.rispostaRep)}
+            </div>
+          ` : ""}
+
+          <div class="idea-footer">
+            <span>Proposta da <strong>${escapeHtml(item.autore || "Studente 1BI")}</strong> ${dataStr ? `il ${dataStr}` : ""}</span>
+            <div class="idea-actions">
+              ${userIsRep ? `
+                <select class="mini-btn rep-status-select" title="Cambia stato">
+                  <option value="nuova" ${item.stato === "nuova" ? "selected" : ""}>In attesa</option>
+                  <option value="valutazione" ${item.stato === "valutazione" ? "selected" : ""}>In valutazione</option>
+                  <option value="approvata" ${item.stato === "approvata" ? "selected" : ""}>Approvata ✓</option>
+                  <option value="scartata" ${item.stato === "scartata" ? "selected" : ""}>Non fattibile</option>
+                </select>
+                <button type="button" class="mini-btn rep-reply-btn">Rispondi</button>
+              ` : ""}
+              ${canDelete ? `<button type="button" class="mini-btn mini-btn-del del-idea-btn">Elimina</button>` : ""}
             </div>
           </div>
         `;
 
-        // Toggle Upvote
-        card.querySelector(".upvote-box").addEventListener("click", async () => {
+        // Toggle Like
+        card.querySelector(".like-pill-btn").addEventListener("click", async () => {
           if (!currentUser) return;
           const ref = doc(db, "proposte_1bi", item.id);
           await updateDoc(ref, {
@@ -478,7 +503,6 @@
       onSnapshot(qIdeas, (snap) => {
         const list = [];
         snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-        // Ordina per numero di upvote decrescente (e a parità per data più recente)
         list.sort((a, b) => {
           const upA = Array.isArray(a.upvotes) ? a.upvotes.length : 0;
           const upB = Array.isArray(b.upvotes) ? b.upvotes.length : 0;
