@@ -19,27 +19,22 @@ export const RAPPRESENTANTI_EMAILS = [
   "alessandromoreschi712@gmail.com"
 ];
 
-export function isRappresentante(email) {
-  if (!email) return false;
-  return RAPPRESENTANTI_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase());
-}
+export function isRappresentante(userOrEmail) {
+  if (!userOrEmail) return false;
+  const whitelist = RAPPRESENTANTI_EMAILS.map(e => e.trim().toLowerCase());
 
-const isLoginPage = window.location.pathname.endsWith("index.html") || window.location.pathname.endsWith("/");
-const isModulePage = window.location.pathname.includes("/modules/");
+  // Se viene passata una stringa email
+  if (typeof userOrEmail === "string") {
+    return whitelist.includes(userOrEmail.trim().toLowerCase());
+  }
 
-let isRegisterMode = false;
-let checkingGoogleAuth = false;
+  // Se viene passato l'intero oggetto user di Firebase (controlla sia user.email che i provider Google/Email)
+  const emailsToCheck = [
+    userOrEmail.email,
+    ...(userOrEmail.providerData || []).map(p => p.email)
+  ].filter(Boolean);
 
-const authForm = document.getElementById("authForm");
-const toggleModeBtn = document.getElementById("toggleMode");
-const googleBtn = document.getElementById("googleLoginBtn");
-const googleBtnText = document.getElementById("googleBtnText");
-const errorBox = document.getElementById("errorBox");
-
-function showError(msg) {
-  if (!errorBox) return;
-  errorBox.textContent = msg;
-  errorBox.style.display = "block";
+  return emailsToCheck.some(em => whitelist.includes(em.trim().toLowerCase()));
 }
 
 function setAuthMode(register) {

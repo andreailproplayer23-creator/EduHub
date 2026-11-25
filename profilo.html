@@ -108,7 +108,6 @@
           <h2 id="profileFullName" style="font-size: 1.6rem; font-weight: 800;">Caricamento...</h2>
           <p id="profileEmail" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">...</p>
 
-          <!-- QUI APPARE SUBITO LA TUA DESCRIZIONE SALVATA -->
           <div id="bioDisplayBox" class="bio-display">Nessuna descrizione impostata.</div>
 
           <div class="profile-tags">
@@ -172,20 +171,7 @@
       document.getElementById("bioDisplayBox").textContent = clean || "Nessuna descrizione impostata.";
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-
-      const name = user.displayName || user.email.split("@")[0];
-      const isRep = isRappresentante(user.email);
-
-      document.getElementById("profileFullName").textContent = name;
-      document.getElementById("profileEmail").textContent = user.email;
-      document.getElementById("editNameInput").value = name;
-
-      // Carica subito eventuale backup locale
-      const localBio = localStorage.getItem(`eduhub_bio_${user.uid}`);
-      if (localBio !== null) applyBioUI(localBio);
-
+    function applyRoleBadge(isRep) {
       const roleBadge = document.getElementById("roleAutoBadge");
       const permText = document.getElementById("boardPermText");
       if (isRep) {
@@ -195,8 +181,26 @@
         permText.style.color = "#10b981";
       } else {
         roleBadge.textContent = "Studente 1BI";
+        roleBadge.classList.remove("tag-rep");
         permText.textContent = "Visualizzazione Annunci";
       }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      const displayEmail = user.email || user.providerData?.[0]?.email || "";
+      const name = user.displayName || displayEmail.split("@")[0] || "Studente";
+      let isRep = isRappresentante(user);
+
+      document.getElementById("profileFullName").textContent = name;
+      document.getElementById("profileEmail").textContent = displayEmail;
+      document.getElementById("editNameInput").value = name;
+
+      const localBio = localStorage.getItem(`eduhub_bio_${user.uid}`);
+      if (localBio !== null) applyBioUI(localBio);
+
+      applyRoleBadge(isRep);
 
       const bigAv = document.getElementById("bigAvatar");
       if (user.photoURL) {
@@ -205,8 +209,17 @@
         bigAv.textContent = name.charAt(0).toUpperCase();
       }
 
-      const isGoogleUser = user.providerData.some(p => p.providerId === "google.com");
-      document.getElementById("profileMethod").textContent = isGoogleUser ? "Accesso Google" : "Accesso Email";
+      const providers = user.providerData.map(p => p.providerId);
+      const hasGoogle = providers.includes("google.com");
+      const hasPassword = providers.includes("password");
+      if (hasGoogle && hasPassword) {
+        document.getElementById("profileMethod").textContent = "Google + Email";
+      } else if (hasGoogle) {
+        document.getElementById("profileMethod").textContent = "Accesso Google";
+      } else {
+        document.getElementById("profileMethod").textContent = "Accesso Email";
+      }
+
       if (user.metadata?.creationTime) {
         document.getElementById("profileDate").textContent = new Date(user.metadata.creationTime).toLocaleDateString("it-IT");
       }
@@ -215,6 +228,10 @@
         const snap = await getDoc(doc(db, "utenti_registrati", user.uid));
         if (snap.exists()) {
           const data = snap.data();
+          if (data.ruolo === "rappresentante" || isRappresentante(data.email)) {
+            isRep = true;
+            applyRoleBadge(true);
+          }
           if (data.descrizione !== undefined) {
             applyBioUI(data.descrizione);
             localStorage.setItem(`eduhub_bio_${user.uid}`, data.descrizione);
@@ -224,7 +241,7 @@
           }
         }
       } catch (err) {
-        console.warn("Lettura Firestore bloccata (controlla AdBlocker):", err);
+        console.warn("Lettura Firestore bloccata:", err);
       }
     });
 
@@ -253,7 +270,8 @@
         await setDoc(doc(db, "utenti_registrati", user.uid), {
           nome: newName,
           descrizione: newDesc,
-          classe: "1BI"
+          classe: "1BI",
+          ruolo: isRappresentante(user) ? "rappresentante" : "studente"
         }, { merge: true });
 
         const toast = document.getElementById("saveToast");
