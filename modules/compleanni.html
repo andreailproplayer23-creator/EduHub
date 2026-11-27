@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Compleanni & Auguri Live 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .bday-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .bday-layout { grid-template-columns: 1fr; }
+    }
+    .bday-card-box {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 18px;
+      padding: 20px;
+    }
+    .today-hero {
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.22), rgba(245, 158, 11, 0.18));
+      border: 1px solid rgba(236, 72, 153, 0.45);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .bday-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      border: 1px solid transparent;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .bday-row.active-target {
+      border-color: #ec4899;
+      background: rgba(236, 72, 153, 0.12);
+    }
+    .bday-row.is-today {
+      border-color: #fbbf24;
+      background: rgba(245, 158, 11, 0.16);
+    }
+    .wishes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .wish-note {
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      border-left: 4px solid #ec4899;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .form-inline-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .bday-input {
+      padding: 9px 11px;
+      border-radius: 10px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.15));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.86rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Compleanni & Auguri 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="todayBanner" class="today-hero">
+      <div style="font-size:2rem; margin-bottom:4px;">🎂🎉</div>
+      <h2 id="heroTitle" style="font-size:1.25rem; font-weight:800;">Calendario Compleanni 1BI</h2>
+      <p id="heroSub" style="font-size:0.88rem; color:var(--text-muted); margin-top:4px;">
+        Salva il tuo compleanno e firma il biglietto d'auguri digitale per i compagni!
+      </p>
+    </div>
+
+    <div class="bday-layout">
+      <!-- COLONNA SINISTRA: SALVA DATA + ELENCO COMPLEANNI -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <section class="bday-card-box">
+          <h3 style="font-size:0.98rem; font-weight:800;">📅 Inserisci il Tuo Compleanno</h3>
+          <form id="myBdayForm" class="form-inline-row">
+            <select id="daySelect" class="bday-input" required></select>
+            <select id="monthSelect" class="bday-input" required>
+              <option value="1">Gennaio</option>
+              <option value="2">Febbraio</option>
+              <option value="3">Marzo</option>
+              <option value="4">Aprile</option>
+              <option value="5">Maggio</option>
+              <option value="6">Giugno</option>
+              <option value="7">Luglio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Settembre</option>
+              <option value="10">Ottobre</option>
+              <option value="11">Novembre</option>
+              <option value="12">Dicembre</option>
+            </select>
+            <button type="submit" style="padding:9px 14px; border-radius:10px; border:none; background:#ec4899; color:#fff; font-weight:800; cursor:pointer;">
+              Salva
+            </button>
+          </form>
+        </section>
+
+        <section class="bday-card-box">
+          <h3 style="font-size:0.98rem; font-weight:800; margin-bottom:12px;">🎈 Prossimi Compleanni 1BI</h3>
+          <div id="bdayList">
+            <div style="font-size:0.82rem; color:var(--text-muted);">Nessun compleanno registrato ancora.</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- COLONNA DESTRA: BIGLIETTO D'AUGURI LIVE -->
+      <section class="bday-card-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <div>
+            <h3 id="cardTargetTitle" style="font-size:1.1rem; font-weight:800;">💌 Biglietto d'Auguri della Classe</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Seleziona un compagno a sinistra per firmare il suo biglietto d'auguri</p>
+          </div>
+        </div>
+
+        <form id="wishForm" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="wishInput" class="bday-input" style="flex:1; min-width:210px;" placeholder="Scrivi una dedica o un augurio per il festeggiato..." maxlength="220" required />
+          <button type="submit" style="padding:9px 16px; border-radius:10px; border:none; background:linear-gradient(135deg, #ec4899, #f59e0b); color:#fff; font-weight:800; cursor:pointer;">
+            ✍️ Firma Biglietto
+          </button>
+        </form>
+
+        <div id="wishesGrid" class="wishes-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      doc,
+      setDoc,
+      onSnapshot,
+      arrayUnion
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const MONTHS = ["", "Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
+    const COLORS = ["#ec4899", "#f59e0b", "#10b981", "#38bdf8", "#8b5cf6"];
+
+    const daySel = document.getElementById("daySelect");
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      daySel.appendChild(opt);
+    }
+
+    let currentUser = null;
+    let allBdays = [];
+    let selectedUid = null;
+
+    function daysUntil(day, month) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      let next = new Date(now.getFullYear(), month - 1, day);
+      if (next < today) next = new Date(now.getFullYear() + 1, month - 1, day);
+      return Math.round((next - today) / 86400000);
+    }
+
+    document.getElementById("myBdayForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const day = Number(document.getElementById("daySelect").value);
+      const month = Number(document.getElementById("monthSelect").value);
+
+      await setDoc(doc(db, "compleanni_1bi", currentUser.uid), {
+        uid: currentUser.uid,
+        nome: currentUser.displayName || "Studente 1BI",
+        day,
+        month
+      }, { merge: true });
+    });
+
+    document.getElementById("wishForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser || !selectedUid) return;
+      const text = document.getElementById("wishInput").value.trim();
+      if (!text) return;
+
+      await setDoc(doc(db, "compleanni_1bi", selectedUid), {
+        auguri: arrayUnion({
+          autore: currentUser.displayName || "Compagno 1BI",
+          testo: text,
+          data: new Date().toLocaleDateString("it-IT")
+        })
+      }, { merge: true });
+
+      document.getElementById("wishInput").value = "";
+    });
+
+    function renderAll() {
+      const listEl = document.getElementById("bdayList");
+      const wishesEl = document.getElementById("wishesGrid");
+
+      if (allBdays.length === 0) {
+        listEl.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">Nessun compleanno registrato ancora. Inserisci il tuo qui sopra!</div>`;
+        wishesEl.innerHTML = "";
+        return;
+      }
+
+      const sorted = [...allBdays].sort((a, b) => daysUntil(a.day, a.month) - daysUntil(b.day, b.month));
+      if (!selectedUid || !sorted.some(x => x.uid === selectedUid)) {
+        selectedUid = sorted[0].uid;
+      }
+
+      const todayCelebrants = sorted.filter(x => daysUntil(x.day, x.month) === 0);
+      if (todayCelebrants.length > 0) {
+        document.getElementById("heroTitle").textContent = `🎉 Buon Compleanno a ${todayCelebrants.map(x => x.nome).join(" & ")}!`;
+        document.getElementById("heroSub").textContent = "Oggi si festeggia in 1BI! Lascia subito una dedica sul biglietto digitale.";
+      } else {
+        const next = sorted[0];
+        const diff = daysUntil(next.day, next.month);
+        document.getElementById("heroTitle").textContent = `Prossimo compleanno: ${next.nome}`;
+        document.getElementById("heroSub").textContent = `Mancano ${diff} ${diff === 1 ? "giorno" : "giorni"} (${next.day} ${MONTHS[next.month]})`;
+      }
+
+      listEl.innerHTML = sorted.map(person => {
+        const diff = daysUntil(person.day, person.month);
+        const isToday = diff === 0;
+        const isSel = person.uid === selectedUid;
+        return `
+          <div class="bday-row ${isToday ? "is-today" : ""} ${isSel ? "active-target" : ""}" data-uid="${person.uid}">
+            <div>
+              <div style="font-weight:800; font-size:0.9rem;">${isToday ? "🎂 " : ""}${escapeHtml(person.nome)}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${person.day} ${MONTHS[person.month]}</div>
+            </div>
+            <span style="font-size:0.76rem; font-weight:800; color:${isToday ? "#fbbf24" : "#38bdf8"};">
+              ${isToday ? "OGGI!" : `tra ${diff}g`}
+            </span>
+          </div>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll("[data-uid]").forEach(row => {
+        row.addEventListener("click", () => {
+          selectedUid = row.dataset.uid;
+          renderAll();
+        });
+      });
+
+      const target = sorted.find(x => x.uid === selectedUid);
+      if (target) {
+        document.getElementById("cardTargetTitle").textContent = `💌 Biglietto d'Auguri per ${target.nome} (${target.day} ${MONTHS[target.month]})`;
+        const auguri = Array.isArray(target.auguri) ? target.auguri : [];
+        if (auguri.length === 0) {
+          wishesEl.innerHTML = `<div style="grid-column:1/-1; font-size:0.84rem; color:var(--text-muted); padding:16px 0;">Nessuna firma ancora. Scrivi tu il primo augurio!</div>`;
+        } else {
+          wishesEl.innerHTML = auguri.map((w, i) => `
+            <div class="wish-note" style="border-left-color:${COLORS[i % COLORS.length]};">
+              <div style="font-size:0.88rem; margin-bottom:6px; line-height:1.4;">"${escapeHtml(w.testo)}"</div>
+              <div style="font-size:0.74rem; font-weight:800; color:var(--text-muted);">— ${escapeHtml(w.autore)}</div>
+            </div>
+          `).join("");
+        }
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      onSnapshot(collection(db, "compleanni_1bi"), (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ uid: d.id, ...d.data() }));
+        allBdays = list;
+        renderAll();
+      });
+    });
+  </script>
+</body>
+</html>

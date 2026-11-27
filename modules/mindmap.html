@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Mind Map Studio 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .studio-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tab-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .studio-tab-btn {
+      padding: 9px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--card-bg);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .studio-tab-btn.active {
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .btn-new-board {
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #ec4899, #f43f5e);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 6px 18px rgba(244, 63, 94, 0.28);
+    }
+
+    /* Griglia Bacheche / Modelli */
+    .boards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 16px;
+    }
+    .board-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .board-card:hover {
+      transform: translateY(-3px);
+      border-color: #38bdf8;
+    }
+    .board-cover {
+      height: 108px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 2.2rem;
+    }
+    .board-type-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.72);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+    }
+    .board-body {
+      padding: 14px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .board-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .board-meta {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    /* EDITOR WORKSPACE */
+    .editor-shell {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .editor-shell.active { display: flex; }
+
+    .editor-toolbar {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .editor-title-input {
+      background: transparent;
+      border: 1px dashed transparent;
+      color: var(--text-main);
+      font-size: 1.1rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 8px;
+      min-width: 210px;
+      font-family: inherit;
+    }
+    .editor-title-input:focus {
+      outline: none;
+      border-color: #38bdf8;
+      background: rgba(255,255,255,0.04);
+    }
+    .tool-btn {
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-btn:hover { border-color: #38bdf8; }
+    .tool-btn.primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .tool-btn.connect-active {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+    .save-pill {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.14);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* CANVAS MAPPA A NODI */
+    .mindmap-canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 68vh;
+      min-height: 500px;
+      border-radius: 18px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background-color: var(--card-bg);
+      background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+      background-size: 22px 22px;
+      overflow: auto;
+    }
+    .mindmap-stage {
+      position: relative;
+      width: 2200px;
+      height: 1500px;
+    }
+    .mindmap-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .mm-node {
+      position: absolute;
+      width: 230px;
+      background: var(--card-bg);
+      border: 2px solid #38bdf8;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+      user-select: none;
+      z-index: 2;
+    }
+    .mm-node.selected-source {
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.55);
+      border-color: #f59e0b !important;
+    }
+    .mm-node-header {
+      padding: 7px 10px;
+      border-radius: 11px 11px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: grab;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .mm-node-header:active { cursor: grabbing; }
+    .mm-node-body {
+      padding: 10px 12px;
+    }
+    .mm-node-title {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 0.92rem;
+      margin-bottom: 5px;
+      font-family: inherit;
+      outline: none;
+    }
+    .mm-node-text {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      resize: vertical;
+      min-height: 46px;
+      font-family: inherit;
+      outline: none;
+      line-height: 1.4;
+    }
+
+    /* VISTA MURO / COLONNE / TIMELINE */
+    .structured-board {
+      min-height: 62vh;
+      border-radius: 18px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--card-bg);
+      padding: 20px;
+    }
+    .wall-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+    .columns-wrap {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      align-items: flex-start;
+    }
+    .padlet-col {
+      min-width: 280px;
+      max-width: 280px;
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .padlet-card-item {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 12px;
+      border-top: 4px solid #38bdf8;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.16);
+    }
+
+    /* Modal Nuovo Padlet */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.15));
+      border-radius: 20px;
+      padding: 22px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+    .layout-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin: 12px 0 18px;
+    }
+    .layout-option {
+      border: 2px solid var(--table-border, rgba(255,255,255,0.12));
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+    }
+    .layout-option.selected {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.14);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Mind Map & Padlet Studio</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- VISTA HOME / GALLERIA -->
+    <div id="homeView">
+      <div class="welcome-banner" style="margin-bottom: 18px;">
+        <div>
+          <h2>Mind Map Studio & Bacheche 1BI</h2>
+          <p>Crea mappe concettuali a nodi e bacheche stile Padlet senza limiti • Salvataggio automatico sul tuo profilo</p>
+        </div>
+        <button id="openCreateModalBtn" class="btn-new-board">
+          <i data-lucide="plus" style="width:18px;height:18px;"></i>
+          <span>Crea Mappa / Bacheca</span>
+        </button>
+      </div>
+
+      <div class="studio-tabs">
+        <div class="tab-group">
+          <button type="button" class="studio-tab-btn active" data-tab="mine">
+            <i data-lucide="folder-heart" style="width:16px;height:16px;"></i> Le Mie Mappe (Illimitate)
+          </button>
+          <button type="button" class="studio-tab-btn" data-tab="templates">
+            <i data-lucide="layout-template" style="width:16px;height:16px;"></i> Galleria Modelli Pronti
+          </button>
+          <button type="button" class="studio-tab-btn" data-tab="shared">
+            <i data-lucide="users" style="width:16px;height:16px;"></i> Condivise dalla 1BI
+          </button>
+        </div>
+        <span id="boardsCounter" style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">0 mappe salvate</span>
+      </div>
+
+      <div id="boardsGrid" class="boards-grid"></div>
+    </div>
+
+    <!-- VISTA EDITOR INTERATTIVO -->
+    <div id="editorView" class="editor-shell">
+      <div class="editor-toolbar">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button type="button" id="backToHomeBtn" class="tool-btn">
+            <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> Tutte le Mappe
+          </button>
+          <input type="text" id="boardTitleInput" class="editor-title-input" value="Nuova Mappa Concettuale" />
+          <span id="saveStatusPill" class="save-pill">✓ Salvato nel tuo profilo</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <select id="layoutSwitcher" class="tool-btn" style="cursor:pointer;">
+            <option value="mindmap">🧠 Mappa a Nodi</option>
+            <option value="wall">🧱 Muro Schede</option>
+            <option value="columns">📊 Colonne</option>
+            <option value="timeline">⏳ Timeline</option>
+          </select>
+
+          <button type="button" id="addNodeBtn" class="tool-btn primary">
+            <i data-lucide="plus-circle" style="width:15px;height:15px;"></i> Aggiungi Nodo / Scheda
+          </button>
+
+          <button type="button" id="connectModeBtn" class="tool-btn" title="Clicca due nodi per collegarli con una freccia">
+            <i data-lucide="git-branch" style="width:15px;height:15px;"></i> Collega Nodi
+          </button>
+
+          <button type="button" id="shareToggleBtn" class="tool-btn" title="Condividi una copia con la 1BI">
+            <i data-lucide="share-2" style="width:15px;height:15px;"></i> <span id="shareBtnLabel">Privata</span>
+          </button>
+
+          <button type="button" id="deleteBoardBtn" class="tool-btn" style="color:#f87171; border-color:rgba(239,68,68,0.35);">
+            <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- AREA MAPPA A NODI (CON FRECCE SVG) -->
+      <div id="mindmapCanvasWrap" class="mindmap-canvas-wrap">
+        <div id="mindmapStage" class="mindmap-stage">
+          <svg id="mindmapSvg" class="mindmap-svg"></svg>
+        </div>
+      </div>
+
+      <!-- AREA MURO / COLONNE / TIMELINE -->
+      <div id="structuredBoardWrap" class="structured-board" style="display:none;"></div>
+    </div>
+  </main>
+
+  <!-- MODAL CREA NUOVA MAPPA / PADLET -->
+  <div id="createModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:1.15rem; font-weight:800;">Crea da Zero (Senza Limiti)</h3>
+        <button type="button" id="closeCreateModalBtn" class="tool-btn">✕</button>
+      </div>
+
+      <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Titolo Mappa o Bacheca</label>
+      <input type="text" id="newBoardTitle" placeholder="Es. Mappa Storia Rivoluzione Francese, Appunti C++..." style="width:100%; margin:6px 0 14px; padding:10px 12px; border-radius:11px; border:1px solid var(--table-border, rgba(255,255,255,0.15)); background:var(--surface-sub, rgba(255,255,255,0.05)); color:var(--text-main); font-size:0.92rem; box-sizing:border-box;" />
+
+      <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Scegli Formato</label>
+      <div class="layout-picker-grid">
+        <div class="layout-option selected" data-layout="mindmap">
+          <div style="font-size:1.7rem; margin-bottom:6px;">🧠</div>
+          <div style="font-weight:800; font-size:0.85rem;">Mappa a Nodi</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Collega concetti e frecce</div>
+        </div>
+        <div class="layout-option" data-layout="wall">
+          <div style="font-size:1.7rem; margin-bottom:6px;">🧱</div>
+          <div style="font-weight:800; font-size:0.85rem;">Muro</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Schede libere a griglia</div>
+        </div>
+        <div class="layout-option" data-layout="columns">
+          <div style="font-size:1.7rem; margin-bottom:6px;">📊</div>
+          <div style="font-weight:800; font-size:0.85rem;">Colonne</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Organizza per argomento</div>
+        </div>
+        <div class="layout-option" data-layout="timeline">
+          <div style="font-size:1.7rem; margin-bottom:6px;">⏳</div>
+          <div style="font-weight:800; font-size:0.85rem;">Timeline</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Eventi in ordine di data</div>
+        </div>
+      </div>
+
+      <button type="button" id="confirmCreateBoardBtn" class="btn-new-board" style="width:100%; justify-content:center; padding:12px;">
+        Crea e Apri Subito →
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      doc,
+      setDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const NODE_COLORS = ["#0284c7", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#ef4444"];
+
+    const TEMPLATES = [
+      {
+        id: "tpl_mindmap",
+        title: "Mappa Concettuale Classica",
+        layout: "mindmap",
+        emoji: "🧠",
+        gradient: "linear-gradient(135deg, #0284c7, #2563eb)",
+        desc: "Idea centrale collegata a 3 rami principali per studiare qualsiasi materia.",
+        nodes: [
+          { id: "n1", x: 460, y: 120, color: "#2563eb", col: "Concetto Centrale", title: "Argomento Principale", text: "Scrivi qui il titolo del capitolo o della verifica" },
+          { id: "n2", x: 160, y: 330, color: "#10b981", col: "Ramo 1", title: "1. Definizione e Cause", text: "Spiega cosa è e perché succede" },
+          { id: "n3", x: 460, y: 340, color: "#f59e0b", col: "Ramo 2", title: "2. Caratteristiche Chiave", text: "Punti principali da ricordare" },
+          { id: "n4", x: 760, y: 330, color: "#ec4899", col: "Ramo 3", title: "3. Esempi & Conseguenze", text: "Collegamenti ed esercizi" }
+        ],
+        edges: [
+          { from: "n1", to: "n2" },
+          { from: "n1", to: "n3" },
+          { from: "n1", to: "n4" }
+        ]
+      },
+      {
+        id: "tpl_compare",
+        title: "Confronta e Metti a Confronto",
+        layout: "columns",
+        emoji: "⚖️",
+        gradient: "linear-gradient(135deg, #7c3aed, #db2777)",
+        desc: "Ideale per confrontare due teorie, linguaggi di programmazione o personaggi storici.",
+        nodes: [
+          { id: "n1", x: 120, y: 120, color: "#2563eb", col: "Elemento A", title: "Caratteristiche A", text: "Punti di forza e dettagli del primo elemento" },
+          { id: "n2", x: 420, y: 120, color: "#10b981", col: "Punti in Comune", title: "Analogie", text: "Cosa hanno in comune A e B" },
+          { id: "n3", x: 720, y: 120, color: "#f59e0b", col: "Elemento B", title: "Caratteristiche B", text: "Differenze e peculiarità del secondo elemento" }
+        ],
+        edges: []
+      },
+      {
+        id: "tpl_timeline",
+        title: "Timeline Storica / Cronologia",
+        layout: "timeline",
+        emoji: "⏳",
+        gradient: "linear-gradient(135deg, #059669, #0d9488)",
+        desc: "Ordina date, battaglie, scoperte scientifiche o fasi di un algoritmo.",
+        nodes: [
+          { id: "n1", x: 100, y: 150, color: "#0284c7", col: "Fase 1", title: "Data / Step 1", text: "Inizio degli eventi" },
+          { id: "n2", x: 380, y: 150, color: "#8b5cf6", col: "Fase 2", title: "Data / Step 2", text: "Svolta centrale" },
+          { id: "n3", x: 660, y: 150, color: "#ec4899", col: "Fase 3", title: "Data / Step 3", text: "Conclusione e risultati" }
+        ],
+        edges: [{ from: "n1", to: "n2" }, { from: "n2", to: "n3" }]
+      },
+      {
+        id: "tpl_brainstorm",
+        title: "Lavagna Brainstorming & Gruppi",
+        layout: "wall",
+        emoji: "💡",
+        gradient: "linear-gradient(135deg, #ea580c, #eab308)",
+        desc: "Bacheca libera stile Padlet per raccogliere idee, link e appunti veloci.",
+        nodes: [
+          { id: "n1", x: 140, y: 130, color: "#f59e0b", col: "Idee", title: "Idea #1", text: "Appunta qui una proposta o un concetto" },
+          { id: "n2", x: 420, y: 130, color: "#10b981", col: "Idee", title: "Idea #2", text: "Aggiungi altre schede cliccando in alto" }
+        ],
+        edges: []
+      }
+    ];
+
+    let currentUser = null;
+    let activeTab = "mine";
+    let myBoards = [];
+    let sharedBoards = [];
+    let activeBoard = null;
+    let connectMode = false;
+    let connectSourceId = null;
+    let saveTimer = null;
+    let selectedModalLayout = "mindmap";
+
+    // Tab navigation
+    document.querySelectorAll(".studio-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".studio-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeTab = btn.dataset.tab;
+        renderHomeGrid();
+      });
+    });
+
+    // Modal Create
+    document.getElementById("openCreateModalBtn").addEventListener("click", () => {
+      document.getElementById("newBoardTitle").value = "";
+      document.getElementById("createModal").classList.add("open");
+    });
+    document.getElementById("closeCreateModalBtn").addEventListener("click", () => {
+      document.getElementById("createModal").classList.remove("open");
+    });
+    document.querySelectorAll(".layout-option").forEach(opt => {
+      opt.addEventListener("click", () => {
+        document.querySelectorAll(".layout-option").forEach(o => o.classList.remove("selected"));
+        opt.classList.add("selected");
+        selectedModalLayout = opt.dataset.layout;
+      });
+    });
+
+    document.getElementById("confirmCreateBoardBtn").addEventListener("click", () => {
+      const title = document.getElementById("newBoardTitle").value.trim() || "Mappa senza titolo";
+      document.getElementById("createModal").classList.remove("open");
+      createNewBoard({
+        title,
+        layout: selectedModalLayout,
+        nodes: [
+          {
+            id: "n_" + Date.now(),
+            x: 420,
+            y: 160,
+            color: "#0284c7",
+            col: "Generale",
+            title: title,
+            text: "Fai clic per modificare il testo o trascina il blocco"
+          }
+        ],
+        edges: []
+      });
+    });
+
+    function createNewBoard(templateData) {
+      if (!currentUser) return;
+      const newId = "mm_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+      const board = {
+        id: newId,
+        title: templateData.title,
+        layout: templateData.layout || "mindmap",
+        nodes: JSON.parse(JSON.stringify(templateData.nodes || [])),
+        edges: JSON.parse(JSON.stringify(templateData.edges || [])),
+        autoreUid: currentUser.uid,
+        autoreNome: currentUser.displayName || "Studente 1BI",
+        condivisa: false,
+        aggiornatoIl: Date.now()
+      };
+      myBoards.unshift(board);
+      saveBoardNow(board);
+      openBoardEditor(board);
+    }
+
+    function saveBoardNow(board) {
+      if (!board || !currentUser) return;
+      board.aggiornatoIl = Date.now();
+      // Salvataggio locale immediato (backup istantaneo)
+      localStorage.setItem("eduhub_mm_" + board.id, JSON.stringify(board));
+
+      const pill = document.getElementById("saveStatusPill");
+      if (pill) pill.textContent = "Salvataggio...";
+
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        if (board.autoreUid === currentUser.uid) {
+          await setDoc(doc(db, "mindmaps_1bi", board.id), board);
+        }
+        if (pill) pill.textContent = "✓ Salvato nel tuo profilo";
+      }, 350);
+    }
+
+    function renderHomeGrid() {
+      const grid = document.getElementById("boardsGrid");
+      document.getElementById("boardsCounter").textContent = `${myBoards.length} mappe personali (illimitate)`;
+
+      if (activeTab === "templates") {
+        grid.innerHTML = TEMPLATES.map(tpl => `
+          <div class="board-card" data-tpl="${tpl.id}">
+            <div class="board-cover" style="background:${tpl.gradient};">
+              <span>${tpl.emoji}</span>
+              <span class="board-type-tag">${layoutLabel(tpl.layout)}</span>
+            </div>
+            <div class="board-body">
+              <div>
+                <div class="board-title">${tpl.title}</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">${tpl.desc}</div>
+              </div>
+              <div class="board-meta">
+                <span style="color:#38bdf8; font-weight:800;">Usa Modello →</span>
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        grid.querySelectorAll("[data-tpl]").forEach(el => {
+          el.addEventListener("click", () => {
+            const tpl = TEMPLATES.find(t => t.id === el.dataset.tpl);
+            if (tpl) createNewBoard(tpl);
+          });
+        });
+        return;
+      }
+
+      const list = activeTab === "mine" ? myBoards : sharedBoards;
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="board-card" style="grid-column: 1 / -1; padding: 34px; text-align: center; cursor: default;">
+            <div style="font-size:2rem; margin-bottom:8px;">🗺️</div>
+            <div style="font-weight:800; margin-bottom:4px;">
+              ${activeTab === "mine" ? "Non hai ancora creato mappe" : "Nessuna mappa condivisa in 1BI al momento"}
+            </div>
+            <div style="font-size:0.84rem; color:var(--text-muted);">
+              Clicca su <strong>Crea Mappa / Bacheca</strong> o scegli un modello dalla Galleria!
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = list.map(b => {
+        const dateStr = new Date(b.aggiornatoIl || Date.now()).toLocaleDateString("it-IT");
+        const countNodes = Array.isArray(b.nodes) ? b.nodes.length : 0;
+        return `
+          <div class="board-card" data-board-id="${b.id}">
+            <div class="board-cover" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+              <span>${layoutEmoji(b.layout)}</span>
+              <span class="board-type-tag">${layoutLabel(b.layout)}</span>
+            </div>
+            <div class="board-body">
+              <div>
+                <div class="board-title">${escapeHtml(b.title)}</div>
+                <div style="font-size:0.78rem; color:var(--text-muted);">
+                  ${countNodes} ${countNodes === 1 ? "nodo" : "nodi"} • di ${escapeHtml(b.autoreNome || "Studente")}
+                </div>
+              </div>
+              <div class="board-meta">
+                <span>${dateStr}</span>
+                <span style="color:${b.condivisa ? "#34d399" : "#94a3b8"}; font-weight:800;">
+                  ${b.condivisa ? "🌐 Condivisa 1BI" : "🔒 Privata"}
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-board-id]").forEach(el => {
+        el.addEventListener("click", () => {
+          const found = list.find(x => x.id === el.dataset.boardId);
+          if (found) openBoardEditor(found);
+        });
+      });
+    }
+
+    function openBoardEditor(board) {
+      activeBoard = board;
+      connectMode = false;
+      connectSourceId = null;
+
+      document.getElementById("homeView").style.display = "none";
+      document.getElementById("editorView").classList.add("active");
+
+      const isOwner = currentUser && board.autoreUid === currentUser.uid;
+      const titleInput = document.getElementById("boardTitleInput");
+      titleInput.value = board.title;
+      titleInput.readOnly = !isOwner;
+
+      document.getElementById("layoutSwitcher").value = board.layout || "mindmap";
+      document.getElementById("shareBtnLabel").textContent = board.condivisa ? "Condivisa 1BI" : "Privata";
+      document.getElementById("shareToggleBtn").style.display = isOwner ? "inline-flex" : "none";
+      document.getElementById("deleteBoardBtn").style.display = isOwner ? "inline-flex" : "none";
+      document.getElementById("addNodeBtn").style.display = isOwner ? "inline-flex" : "none";
+      document.getElementById("connectModeBtn").style.display = isOwner && board.layout === "mindmap" ? "inline-flex" : "none";
+
+      renderEditorWorkspace();
+    }
+
+    document.getElementById("backToHomeBtn").addEventListener("click", () => {
+      activeBoard = null;
+      document.getElementById("editorView").classList.remove("active");
+      document.getElementById("homeView").style.display = "block";
+      renderHomeGrid();
+    });
+
+    document.getElementById("boardTitleInput").addEventListener("input", (e) => {
+      if (!activeBoard) return;
+      activeBoard.title = e.target.value;
+      saveBoardNow(activeBoard);
+    });
+
+    document.getElementById("layoutSwitcher").addEventListener("change", (e) => {
+      if (!activeBoard) return;
+      activeBoard.layout = e.target.value;
+      const isOwner = currentUser && activeBoard.autoreUid === currentUser.uid;
+      document.getElementById("connectModeBtn").style.display = isOwner && activeBoard.layout === "mindmap" ? "inline-flex" : "none";
+      saveBoardNow(activeBoard);
+      renderEditorWorkspace();
+    });
+
+    document.getElementById("shareToggleBtn").addEventListener("click", () => {
+      if (!activeBoard) return;
+      activeBoard.condivisa = !activeBoard.condivisa;
+      document.getElementById("shareBtnLabel").textContent = activeBoard.condivisa ? "Condivisa 1BI" : "Privata";
+      saveBoardNow(activeBoard);
+    });
+
+    document.getElementById("deleteBoardBtn").addEventListener("click", async () => {
+      if (!activeBoard) return;
+      if (!confirm("Eliminare definitivamente questa mappa?")) return;
+      const id = activeBoard.id;
+      localStorage.removeItem("eduhub_mm_" + id);
+      await deleteDoc(doc(db, "mindmaps_1bi", id));
+      myBoards = myBoards.filter(b => b.id !== id);
+      document.getElementById("backToHomeBtn").click();
+    });
+
+    document.getElementById("connectModeBtn").addEventListener("click", () => {
+      connectMode = !connectMode;
+      connectSourceId = null;
+      const btn = document.getElementById("connectModeBtn");
+      btn.classList.toggle("connect-active", connectMode);
+      btn.innerHTML = connectMode
+        ? `<i data-lucide="git-branch" style="width:15px;height:15px;"></i> Clicca 1° nodo...`
+        : `<i data-lucide="git-branch" style="width:15px;height:15px;"></i> Collega Nodi`;
+      if (window.lucide) lucide.createIcons();
+      renderEditorWorkspace();
+    });
+
+    document.getElementById("addNodeBtn").addEventListener("click", () => {
+      if (!activeBoard) return;
+      const idx = activeBoard.nodes.length;
+      const color = NODE_COLORS[idx % NODE_COLORS.length];
+      const newNode = {
+        id: "n_" + Date.now() + "_" + idx,
+        x: 180 + (idx % 4) * 250,
+        y: 140 + Math.floor(idx / 4) * 190,
+        color,
+        col: "Sezione " + ((idx % 3) + 1),
+        title: "Nuovo Concetto",
+        text: "Scrivi qui i dettagli..."
+      };
+      activeBoard.nodes.push(newNode);
+      saveBoardNow(activeBoard);
+      renderEditorWorkspace();
+    });
+
+    function renderEditorWorkspace() {
+      if (!activeBoard) return;
+      const canvasWrap = document.getElementById("mindmapCanvasWrap");
+      const structWrap = document.getElementById("structuredBoardWrap");
+      const isOwner = currentUser && activeBoard.autoreUid === currentUser.uid;
+
+      if (activeBoard.layout === "mindmap") {
+        canvasWrap.style.display = "block";
+        structWrap.style.display = "none";
+        renderMindmapNodes(isOwner);
+      } else {
+        canvasWrap.style.display = "none";
+        structWrap.style.display = "block";
+        renderStructuredBoard(isOwner);
+      }
+    }
+
+    function renderMindmapNodes(isOwner) {
+      const stage = document.getElementById("mindmapStage");
+      const svg = document.getElementById("mindmapSvg");
+      stage.querySelectorAll(".mm-node").forEach(n => n.remove());
+
+      activeBoard.nodes.forEach((node) => {
+        const el = document.createElement("div");
+        el.className = "mm-node" + (connectSourceId === node.id ? " selected-source" : "");
+        el.style.left = (node.x || 100) + "px";
+        el.style.top = (node.y || 100) + "px";
+        el.style.borderColor = node.color || "#38bdf8";
+
+        el.innerHTML = `
+          <div class="mm-node-header" style="background:${node.color || "#0284c7"};">
+            <span>⠿ Trascina</span>
+            ${isOwner ? `
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" class="btn-color-node" title="Cambia colore" style="background:rgba(0,0,0,0.25); border:none; color:#fff; border-radius:6px; padding:1px 6px; cursor:pointer; font-size:0.7rem;">🎨</button>
+                <button type="button" class="btn-del-node" title="Elimina nodo" style="background:rgba(0,0,0,0.25); border:none; color:#fff; border-radius:6px; padding:1px 6px; cursor:pointer; font-size:0.7rem;">✕</button>
+              </div>
+            ` : ""}
+          </div>
+          <div class="mm-node-body">
+            <input type="text" class="mm-node-title" value="${escapeHtml(node.title)}" ${isOwner ? "" : "readonly"} />
+            <textarea class="mm-node-text" ${isOwner ? "" : "readonly"}>${escapeHtml(node.text)}</textarea>
+          </div>
+        `;
+
+        // Modalità collegamento nodi
+        el.addEventListener("click", (e) => {
+          if (!connectMode || !isOwner) return;
+          if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON") return;
+
+          if (!connectSourceId) {
+            connectSourceId = node.id;
+            document.getElementById("connectModeBtn").textContent = "Ora clicca il 2° nodo...";
+            renderMindmapNodes(isOwner);
+          } else if (connectSourceId !== node.id) {
+            const existsIdx = activeBoard.edges.findIndex(
+              ed => (ed.from === connectSourceId && ed.to === node.id) || (ed.from === node.id && ed.to === connectSourceId)
+            );
+            if (existsIdx >= 0) {
+              activeBoard.edges.splice(existsIdx, 1);
+            } else {
+              activeBoard.edges.push({ from: connectSourceId, to: node.id });
+            }
+            connectSourceId = null;
+            connectMode = false;
+            const btn = document.getElementById("connectModeBtn");
+            btn.classList.remove("connect-active");
+            btn.innerHTML = `<i data-lucide="git-branch" style="width:15px;height:15px;"></i> Collega Nodi`;
+            if (window.lucide) lucide.createIcons();
+            saveBoardNow(activeBoard);
+            renderMindmapNodes(isOwner);
+          }
+        });
+
+        if (isOwner) {
+          el.querySelector(".mm-node-title").addEventListener("input", (e) => {
+            node.title = e.target.value;
+            saveBoardNow(activeBoard);
+          });
+          el.querySelector(".mm-node-text").addEventListener("input", (e) => {
+            node.text = e.target.value;
+            saveBoardNow(activeBoard);
+          });
+          el.querySelector(".btn-color-node")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const cur = NODE_COLORS.indexOf(node.color);
+            node.color = NODE_COLORS[(cur + 1) % NODE_COLORS.length];
+            saveBoardNow(activeBoard);
+            renderMindmapNodes(isOwner);
+          });
+          el.querySelector(".btn-del-node")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            activeBoard.nodes = activeBoard.nodes.filter(n => n.id !== node.id);
+            activeBoard.edges = activeBoard.edges.filter(ed => ed.from !== node.id && ed.to !== node.id);
+            saveBoardNow(activeBoard);
+            renderMindmapNodes(isOwner);
+          });
+
+          // Drag & Drop nodo (mouse + touch)
+          const header = el.querySelector(".mm-node-header");
+          let dragging = false, startX = 0, startY = 0, origX = 0, origY = 0;
+
+          const startDrag = (clientX, clientY) => {
+            dragging = true;
+            startX = clientX;
+            startY = clientY;
+            origX = node.x || 100;
+            origY = node.y || 100;
+          };
+          const moveDrag = (clientX, clientY) => {
+            if (!dragging) return;
+            node.x = Math.max(10, origX + (clientX - startX));
+            node.y = Math.max(10, origY + (clientY - startY));
+            el.style.left = node.x + "px";
+            el.style.top = node.y + "px";
+            drawSvgEdges();
+          };
+          const endDrag = () => {
+            if (!dragging) return;
+            dragging = false;
+            saveBoardNow(activeBoard);
+          };
+
+          header.addEventListener("mousedown", (e) => {
+            if (e.target.tagName === "BUTTON") return;
+            startDrag(e.clientX, e.clientY);
+          });
+          window.addEventListener("mousemove", (e) => moveDrag(e.clientX, e.clientY));
+          window.addEventListener("mouseup", endDrag);
+
+          header.addEventListener("touchstart", (e) => {
+            if (e.target.tagName === "BUTTON") return;
+            const t = e.touches[0];
+            startDrag(t.clientX, t.clientY);
+          }, { passive: true });
+          window.addEventListener("touchmove", (e) => {
+            if (!dragging) return;
+            const t = e.touches[0];
+            moveDrag(t.clientX, t.clientY);
+          }, { passive: true });
+          window.addEventListener("touchend", endDrag);
+        }
+
+        stage.appendChild(el);
+      });
+
+      drawSvgEdges();
+    }
+
+    function drawSvgEdges() {
+      const svg = document.getElementById("mindmapSvg");
+      if (!activeBoard || !svg) return;
+      const lines = (activeBoard.edges || []).map(ed => {
+        const a = activeBoard.nodes.find(n => n.id === ed.from);
+        const b = activeBoard.nodes.find(n => n.id === ed.to);
+        if (!a || !b) return "";
+        const x1 = (a.x || 0) + 115;
+        const y1 = (a.y || 0) + 60;
+        const x2 = (b.x || 0) + 115;
+        const y2 = (b.y || 0) + 60;
+        const cx = (x1 + x2) / 2;
+        return `<path d="M ${x1} ${y1} Q ${cx} ${y1}, ${x2} ${y2}" stroke="#38bdf8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.85" />`;
+      }).join("");
+      svg.innerHTML = lines;
+    }
+
+    function renderStructuredBoard(isOwner) {
+      const wrap = document.getElementById("structuredBoardWrap");
+      if (activeBoard.layout === "columns") {
+        const groups = {};
+        activeBoard.nodes.forEach(n => {
+          const colName = n.col || "Colonna 1";
+          if (!groups[colName]) groups[colName] = [];
+          groups[colName].push(n);
+        });
+        wrap.innerHTML = `
+          <div class="columns-wrap">
+            ${Object.entries(groups).map(([colName, items]) => `
+              <div class="padlet-col">
+                <div style="font-weight:800; font-size:0.9rem; color:#38bdf8; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.08);">
+                  ${escapeHtml(colName)}
+                </div>
+                ${items.map(n => renderCardItemHtml(n, isOwner, true)).join("")}
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } else {
+        wrap.innerHTML = `
+          <div class="wall-grid">
+            ${activeBoard.nodes.map((n, i) => renderCardItemHtml(n, isOwner, false, activeBoard.layout === "timeline" ? `Step ${i + 1}` : "")).join("")}
+          </div>
+        `;
+      }
+
+      if (isOwner) {
+        wrap.querySelectorAll("[data-edit-title]").forEach(inp => {
+          inp.addEventListener("input", () => {
+            const node = activeBoard.nodes.find(x => x.id === inp.dataset.editTitle);
+            if (node) { node.title = inp.value; saveBoardNow(activeBoard); }
+          });
+        });
+        wrap.querySelectorAll("[data-edit-text]").forEach(ta => {
+          ta.addEventListener("input", () => {
+            const node = activeBoard.nodes.find(x => x.id === ta.dataset.editText);
+            if (node) { node.text = ta.value; saveBoardNow(activeBoard); }
+          });
+        });
+        wrap.querySelectorAll("[data-edit-col]").forEach(inp => {
+          inp.addEventListener("change", () => {
+            const node = activeBoard.nodes.find(x => x.id === inp.dataset.editCol);
+            if (node) { node.col = inp.value.trim() || "Colonna"; saveBoardNow(activeBoard); renderStructuredBoard(isOwner); }
+          });
+        });
+        wrap.querySelectorAll("[data-del-card]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            activeBoard.nodes = activeBoard.nodes.filter(x => x.id !== btn.dataset.delCard);
+            saveBoardNow(activeBoard);
+            renderStructuredBoard(isOwner);
+          });
+        });
+      }
+    }
+
+    function renderCardItemHtml(n, isOwner, showColInput, stepBadge = "") {
+      return `
+        <div class="padlet-card-item" style="border-top-color:${n.color || "#38bdf8"};">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
+            ${stepBadge ? `<span style="font-size:0.7rem; font-weight:800; color:#34d399;">${stepBadge}</span>` : ""}
+            ${showColInput && isOwner
+              ? `<input type="text" data-edit-col="${n.id}" value="${escapeHtml(n.col || "")}" style="font-size:0.72rem; background:rgba(255,255,255,0.06); border:none; color:var(--text-muted); border-radius:6px; padding:2px 6px; width:120px;" />`
+              : `<span></span>`}
+            ${isOwner ? `<button type="button" data-del-card="${n.id}" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:800;">✕</button>` : ""}
+          </div>
+          <input type="text" data-edit-title="${n.id}" class="mm-node-title" value="${escapeHtml(n.title)}" ${isOwner ? "" : "readonly"} />
+          <textarea data-edit-text="${n.id}" class="mm-node-text" ${isOwner ? "" : "readonly"}>${escapeHtml(n.text)}</textarea>
+        </div>
+      `;
+    }
+
+    function layoutLabel(l) {
+      return { mindmap: "Mappa a Nodi", wall: "Muro", columns: "Colonne", timeline: "Timeline" }[l] || "Mappa";
+    }
+    function layoutEmoji(l) {
+      return { mindmap: "🧠", wall: "🧱", columns: "📊", timeline: "⏳" }[l] || "🗺️";
+    }
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+
+      // Carica le mappe personali dell'utente (illimitate)
+      const qMine = query(collection(db, "mindmaps_1bi"), where("autoreUid", "==", user.uid));
+      onSnapshot(qMine, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => (b.aggiornatoIl || 0) - (a.aggiornatoIl || 0));
+        myBoards = list;
+        if (!activeBoard && activeTab === "mine") renderHomeGrid();
+      });
+
+      // Carica le mappe condivise dalla classe 1BI
+      const qShared = query(collection(db, "mindmaps_1bi"), where("condivisa", "==", true));
+      onSnapshot(qShared, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => (b.aggiornatoIl || 0) - (a.aggiornatoIl || 0));
+        sharedBoards = list;
+        if (!activeBoard && activeTab === "shared") renderHomeGrid();
+      });
+    });
+  </script>
+</body>
+</html>
