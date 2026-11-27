@@ -337,7 +337,7 @@
           <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
         </select>
       </div>
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <div id="repApiKeyControls" style="display:none; gap:8px; align-items:center; flex-wrap:wrap;">
         <input type="password" id="apiKeyInput" class="form-ctrl" style="width:230px; padding:6px 10px; font-size:0.8rem;" placeholder="Incolla API Key Google AI Studio..." />
         <button type="button" id="saveApiKeyBtn" style="padding:7px 12px; border-radius:9px; border:none; background:#2563eb; color:#fff; font-weight:800; font-size:0.78rem; cursor:pointer;">
           Salva Key
@@ -451,6 +451,7 @@
   <script type="module" src="../js/auth.js"></script>
   <script type="module">
     import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       doc,
@@ -459,11 +460,6 @@
       updateDoc,
       increment
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const REP_EMAILS = [
-      "andrea.ilproplayer23@gmail.com",
-      "alessandromoreschi.712@gmail.com"
-    ];
 
     let currentUser = null;
     let isRepUser = false;
@@ -810,7 +806,10 @@ Valuta con precisione questa risposta confrontandola con le righe delle pagine d
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
       currentUser = user;
-      isRepUser = REP_EMAILS.includes((user.email || "").toLowerCase());
+      isRepUser = isRappresentante(user);
+
+      const keyControls = document.getElementById("repApiKeyControls");
+      if (keyControls) keyControls.style.display = isRepUser ? "flex" : "none";
 
       try {
         const cfgSnap = await getDoc(doc(db, "ai_config_1bi", "gemini"));
@@ -828,7 +827,9 @@ Valuta con precisione questa risposta confrontandola con le righe delle pagine d
       if (geminiApiKey) {
         updateApiStatus(true, "✓ Gemini Pro Connesso (Chiave salvata)");
       } else {
-        updateApiStatus(false, "⚠️ Incolla la API Key Gemini Pro qui a destra per attivare il Prof");
+        updateApiStatus(false, isRepUser
+          ? "⚠️ Incolla la API Key Gemini Pro qui a destra per attivare il Prof"
+          : "⚠️ Chiedi ai Rappresentanti di attivare la chiave Gemini Pro");
       }
     });
   </script>

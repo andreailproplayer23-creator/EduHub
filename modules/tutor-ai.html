@@ -921,8 +921,22 @@
       currentUser = user;
       userIsRep = isRappresentante(user);
 
-      if (userIsRep) {
-        document.getElementById("saveClassKeysBtn").style.display = "inline-flex";
+      // Mostra i controlli API Key SOLO ai Rappresentanti (li nasconde agli studenti e in Vista Studente)
+      const saveClassBtn = document.getElementById("saveClassKeysBtn");
+      if (saveClassBtn) {
+        saveClassBtn.style.display = userIsRep ? "inline-flex" : "none";
+      }
+
+      const apiToggleBtn = document.getElementById("toggleApiDrawerBtn") ||
+        Array.from(document.querySelectorAll("button")).find(b => b.textContent.includes("API Key"));
+      if (apiToggleBtn) {
+        apiToggleBtn.style.display = userIsRep ? "inline-flex" : "none";
+      }
+
+      const apiDrawer = document.getElementById("apiKeyDrawer") ||
+        document.querySelector('input[placeholder*="API Key"]')?.closest("div")?.parentElement;
+      if (apiDrawer) {
+        apiDrawer.style.display = userIsRep ? "" : "none";
       }
 
       renderMessagesViewport();
