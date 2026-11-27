@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Turni Interrogazioni 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .rep-box {
+      background: var(--card-bg);
+      border: 1px solid rgba(245, 158, 11, 0.38);
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+    .rep-tag {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .turn-form-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 170px 140px 1.2fr auto;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    @media (max-width: 920px) {
+      .turn-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .t-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+    }
+    .t-input:focus {
+      border-color: #3b82f6;
+    }
+    .btn-create-turn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .turns-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    @media (max-width: 480px) {
+      .turns-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .turn-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .turn-card.is-booked {
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+    .turn-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .turn-subject {
+      font-size: 1.15rem;
+      font-weight: 900;
+      margin: 0 0 4px 0;
+      color: var(--text-main);
+    }
+    .turn-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.14);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .status-pill {
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .st-open {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+    }
+    .st-full {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+    }
+    .st-closed {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+    }
+    .turn-notes {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin: 8px 0 0 0;
+    }
+    .slots-bar-wrap {
+      margin: 6px 0;
+    }
+    .slots-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .slots-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .slots-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    .volunteers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.07));
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 76px;
+    }
+    .volunteer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.88rem;
+    }
+    .volunteer-row.me {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .pos-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .btn-book {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-book:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn-unbook {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.14);
+      color: #f87171;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .rep-footer-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 10px;
+      border-top: 1px solid var(--table-border, rgba(255,255,255,0.08));
+    }
+    .mini-rep-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+    }
+    .mini-rep-btn.del {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Interrogazioni 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner">
+      <div>
+        <h2>Lavagna Interrogazioni & Turni Volontari</h2>
+        <p>Prenota il tuo turno come volontario in ordine cronologico in tempo reale senza sovrapposizioni!</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span>Prenotazioni Live</span>
+      </div>
+    </div>
+
+    <!-- PANNELLO CREAZIONE TURNO (SOLO RAPPRESENTANTI) -->
+    <section id="repTurnCreator" class="rep-box" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 style="margin:0; font-size:1.05rem; font-weight:800;">Apri una nuova Lista Volontari</h3>
+          <small style="color:var(--text-muted);">Imposta materia, data dell'interrogazione e numero massimo di posti disponibili</small>
+        </div>
+        <span class="rep-tag">★ Area Rappresentanti</span>
+      </div>
+
+      <div class="turn-form-grid">
+        <input type="text" id="turnMateriaInput" class="t-input" placeholder="Materia (es. Informatica, Storia)..." />
+        <input type="date" id="turnDateInput" class="t-input" />
+        <input type="number" id="turnMaxInput" class="t-input" min="1" max="30" value="4" title="Numero massimo volontari" placeholder="Max posti" />
+        <input type="text" id="turnNotesInput" class="t-input" placeholder="Argomento o note (opzionale)..." />
+        <button type="button" id="createTurnBtn" class="btn-create-turn">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i>
+          <span>Apri Lista</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- GRIGLIA LISTE INTERROGAZIONI -->
+    <div id="turnsContainer" class="turns-grid">
+      <div style="text-align:center; color:var(--text-muted); padding:30px; grid-column:1/-1;">Caricamento turni interrogazioni...</div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      runTransaction,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let userIsRep = false;
+
+    // CREA NUOVA LISTA INTERROGAZIONE
+    document.getElementById("createTurnBtn").addEventListener("click", async () => {
+      if (!userIsRep) return;
+      const materia = document.getElementById("turnMateriaInput").value.trim();
+      const data = document.getElementById("turnDateInput").value;
+      const maxPosti = Math.max(1, Math.min(35, Number(document.getElementById("turnMaxInput").value) || 4));
+      const note = document.getElementById("turnNotesInput").value.trim();
+
+      if (!materia || !data) {
+        alert("Inserisci almeno la materia e la data dell'interrogazione!");
+        return;
+      }
+
+      const btn = document.getElementById("createTurnBtn");
+      btn.disabled = true;
+      try {
+        await addDoc(collection(db, "interrogazioni_1bi"), {
+          materia,
+          data,
+          maxPosti,
+          note,
+          chiusa: false,
+          prenotati: [],
+          creatoDa: currentUser.displayName || "Rappresentanti 1BI",
+          creatoIl: Date.now()
+        });
+        document.getElementById("turnMateriaInput").value = "";
+        document.getElementById("turnNotesInput").value = "";
+      } catch (err) {
+        alert("Errore nella creazione della lista: " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // PRENOTA / ANNULLA CON TRANSAZIONE ATOMICA (ZERO CONFLITTI)
+    async function toggleBooking(turnId, shouldBook) {
+      if (!currentUser) return;
+      const turnRef = doc(db, "interrogazioni_1bi", turnId);
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(turnRef);
+          if (!snap.exists()) throw new Error("Lista non trovata.");
+          const d = snap.data();
+
+          if (d.chiusa) {
+            throw new Error("Questa lista è stata chiusa dai Rappresentanti.");
+          }
+
+          const list = Array.isArray(d.prenotati) ? [...d.prenotati] : [];
+          const existingIdx = list.findIndex(p => p.uid === currentUser.uid);
+
+          if (shouldBook) {
+            if (existingIdx !== -1) return; // Già prenotato
+            if (list.length >= (d.maxPosti || 4)) {
+              throw new Error("Posti esauriti! Qualcun altro ha preso l'ultimo posto un attimo fa.");
+            }
+            list.push({
+              uid: currentUser.uid,
+              nome: currentUser.displayName || currentUser.email.split("@")[0],
+              ora: Date.now()
+            });
+          } else {
+            if (existingIdx === -1) return;
+            list.splice(existingIdx, 1);
+          }
+
+          tx.update(turnRef, { prenotati: list });
+        });
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function renderTurns(turnsList) {
+      const container = document.getElementById("turnsContainer");
+      if (turnsList.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:34px; grid-column:1/-1;">Nessuna lista interrogazioni aperta al momento.</div>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      turnsList.forEach(item => {
+        const prenotati = Array.isArray(item.prenotati) ? item.prenotati : [];
+        const maxPosti = item.maxPosti || 4;
+        const myIndex = currentUser ? prenotati.findIndex(p => p.uid === currentUser.uid) : -1;
+        const amIBooked = myIndex !== -1;
+        const isFull = prenotati.length >= maxPosti;
+        const pct = Math.min(100, Math.round((prenotati.length / maxPosti) * 100));
+
+        const formattedDate = item.data
+          ? new Date(item.data + "T12:00:00").toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" })
+          : "";
+
+        let statusHtml = `<span class="status-pill st-open">Aperta (${maxPosti - prenotati.length} liberi)</span>`;
+        if (item.chiusa) {
+          statusHtml = `<span class="status-pill st-closed">Lista Chiusa 🔒</span>`;
+        } else if (isFull) {
+          statusHtml = `<span class="status-pill st-full">Posti Esauriti</span>`;
+        }
+
+        const card = document.createElement("div");
+        card.className = `turn-card ${amIBooked ? "is-booked" : ""}`;
+        card.innerHTML = `
+          <div>
+            <div class="turn-header">
+              <div>
+                <h3 class="turn-subject">${escapeHtml(item.materia)}</h3>
+                <span class="turn-date-badge">
+                  <i data-lucide="calendar" style="width:13px;height:13px;"></i>
+                  <span>${escapeHtml(formattedDate)}</span>
+                </span>
+              </div>
+              ${statusHtml}
+            </div>
+            ${item.note ? `<p class="turn-notes">${escapeHtml(item.note)}</p>` : ""}
+
+            <div class="slots-bar-wrap" style="margin-top:14px;">
+              <div class="slots-bar-label">
+                <span>Volontari prenotati</span>
+                <span>${prenotati.length} / ${maxPosti}</span>
+              </div>
+              <div class="slots-track">
+                <div class="slots-fill" style="width:${pct}%;"></div>
+              </div>
+            </div>
+
+            <div class="volunteers-list" style="margin-top:12px;">
+              ${prenotati.length === 0
+                ? `<div style="margin:auto; color:var(--text-muted); font-size:0.84rem;">Nessun volontario ancora prenotato</div>`
+                : prenotati.map((p, idx) => {
+                    const isMe = currentUser && p.uid === currentUser.uid;
+                    const timeStr = p.ora ? new Date(p.ora).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "";
+                    return `
+                      <div class="volunteer-row ${isMe ? "me" : ""}">
+                        <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+                          <span class="pos-badge">${idx + 1}</span>
+                          <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.nome)} ${isMe ? "(Tu)" : ""}</strong>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                          <small style="color:var(--text-muted); font-size:0.74rem;">${timeStr}</small>
+                          ${userIsRep ? `<button type="button" class="mini-rep-btn del kick-btn" data-uid="${p.uid}" title="Rimuovi dalla lista">&times;</button>` : ""}
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+            </div>
+          </div>
+
+          <div>
+            ${amIBooked ? `
+              <button type="button" class="btn-unbook" ${item.chiusa ? "disabled" : ""}>
+                Ritirati dal turno (#${myIndex + 1})
+              </button>
+            ` : `
+              <button type="button" class="btn-book" ${(item.chiusa || isFull) ? "disabled" : ""}>
+                <i data-lucide="hand" style="width:16px;height:16px;"></i>
+                <span>${item.chiusa ? "Prenotazioni Chiuse" : isFull ? "Lista Completa" : "Prenotati come Volontario"}</span>
+              </button>
+            `}
+
+            ${userIsRep ? `
+              <div class="rep-footer-actions" style="margin-top:12px;">
+                <button type="button" class="mini-rep-btn toggle-lock-btn">
+                  ${item.chiusa ? "Riapri Lista" : "Chiudi Lista"}
+                </button>
+                <button type="button" class="mini-rep-btn del del-turn-btn">Elimina</button>
+              </div>
+            ` : ""}
+          </div>
+        `;
+
+        // Eventi Studente
+        card.querySelector(".btn-book")?.addEventListener("click", () => toggleBooking(item.id, true));
+        card.querySelector(".btn-unbook")?.addEventListener("click", () => {
+          if (confirm("Vuoi liberare il tuo posto da questa interrogazione?")) {
+            toggleBooking(item.id, false);
+          }
+        });
+
+        // Eventi Rappresentanti
+        if (userIsRep) {
+          card.querySelector(".toggle-lock-btn")?.addEventListener("click", async () => {
+            await updateDoc(doc(db, "interrogazioni_1bi", item.id), { chiusa: !item.chiusa });
+          });
+
+          card.querySelector(".del-turn-btn")?.addEventListener("click", async () => {
+            if (confirm(`Vuoi eliminare la lista interrogazioni di ${item.materia}?`)) {
+              await deleteDoc(doc(db, "interrogazioni_1bi", item.id));
+            }
+          });
+
+          card.querySelectorAll(".kick-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const targetUid = btn.dataset.uid;
+              if (!confirm("Rimuovere questo studente dalla lista?")) return;
+              const updated = prenotati.filter(p => p.uid !== targetUid);
+              await updateDoc(doc(db, "interrogazioni_1bi", item.id), { prenotati: updated });
+            });
+          });
+        }
+
+        container.appendChild(card);
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      userIsRep = isRappresentante(user);
+
+      if (userIsRep) {
+        document.getElementById("repTurnCreator").style.display = "block";
+      }
+
+      const qTurns = query(collection(db, "interrogazioni_1bi"), orderBy("data", "asc"));
+      onSnapshot(qTurns, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        renderTurns(list);
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
