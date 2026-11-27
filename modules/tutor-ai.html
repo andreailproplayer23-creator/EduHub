@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Tutor Multi-AI 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .ai-layout {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .ai-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .ai-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 20px;
+      padding: 20px;
+    }
+    /* SELETTORE MODELLI AI */
+    .models-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .model-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+    }
+    .model-chip:hover {
+      border-color: rgba(139, 92, 246, 0.55);
+      transform: translateY(-1px);
+    }
+    .model-chip.active {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(37, 99, 235, 0.25));
+      border-color: #8b5cf6;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25);
+    }
+    .model-chip strong {
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+    .model-chip small {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* MODALITÀ DIDATTICHE */
+    .modes-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .mode-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mode-pill.active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    /* AREA CHAT */
+    .chat-box {
+      height: 410px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.08));
+      margin-bottom: 14px;
+    }
+    .msg-bubble {
+      max-width: 88%;
+      padding: 12px 15px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.52;
+      word-break: break-word;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-ai {
+      align-self: flex-start;
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+    }
+    .msg-ai pre {
+      background: rgba(0, 0, 0, 0.45);
+      padding: 10px 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      margin: 8px 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .msg-ai code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: rgba(139, 92, 246, 0.16);
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-size: 0.84rem;
+    }
+    .msg-ai pre code {
+      background: transparent;
+      padding: 0;
+    }
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+    .btn-share-ai {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.73rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-share-ai:hover {
+      background: rgba(245, 158, 11, 0.28);
+    }
+
+    /* INPUT PROMPT */
+    .prompt-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .ai-select, .ai-input {
+      padding: 10px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .prompt-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .prompt-textarea {
+      flex: 1;
+      min-height: 54px;
+      max-height: 150px;
+      resize: vertical;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+      font-size: 0.92rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .prompt-textarea:focus {
+      border-color: #8b5cf6;
+    }
+    .btn-send-ai {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-send-ai:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* BACHECA SPIEGAZIONI CONDIVISE */
+    .shared-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 640px;
+      overflow-y: auto;
+    }
+    .shared-item {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.09));
+    }
+    .shared-q {
+      font-weight: 800;
+      font-size: 0.92rem;
+      margin: 6px 0;
+      color: var(--text-main);
+    }
+    .shared-a {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.48;
+      max-height: 170px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .like-mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .like-mini-pill.liked {
+      background: rgba(37, 99, 235, 0.25);
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+    .typing-dots {
+      display: inline-flex;
+      gap: 5px;
+      padding: 6px 4px;
+    }
+    .typing-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #a78bfa;
+      animation: bounceDot 0.9s infinite alternate;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounceDot {
+      from { transform: translateY(0); opacity: 0.4; }
+      to { transform: translateY(-5px); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Tutor Multi-AI 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner">
+      <div>
+        <h2>Assistente AI & Tutor di Studio 1BI</h2>
+        <p>Scegli tra più Intelligenze Artificiali, fatti spiegare esercizi o codice passo-passo e condividi le risposte migliori!</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span id="activeModelBadge">GPT-4o Mini</span>
+      </div>
+    </div>
+
+    <div class="ai-layout">
+      <!-- COLONNA SINISTRA: CHAT TUTOR MULTI-AI -->
+      <section class="ai-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <span style="font-size:0.8rem; font-weight:800; color:#c4b5fd; text-transform:uppercase;">1. Scegli il motore AI</span>
+          <button type="button" id="toggleApiKeyDrawer" class="mode-pill" style="font-size:0.74rem;">
+            🔑 Chiavi API Opzionali (Gemini / Groq)
+          </button>
+        </div>
+
+        <!-- PANNELLO OPZIONALE API KEY (GRATUITO DI DEFAULT ANCHE SENZA CHIAVI) -->
+        <div id="apiKeyDrawer" style="display:none; padding:12px; border-radius:12px; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.28); margin-bottom:12px;">
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
+            I 6 modelli sopra funzionano <strong>già gratis senza chiavi</strong>. Se vuoi usare anche una tua chiave personale (es. Google AI Studio o Groq), incollala qui (resta salvata solo nel tuo browser):
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:8px;">
+            <input type="password" id="geminiKeyInput" class="ai-input" placeholder="Google Gemini API Key (AIza...)" />
+            <input type="password" id="groqKeyInput" class="ai-input" placeholder="Groq API Key (gsk_...)" />
+            <button type="button" id="saveLocalKeysBtn" class="mode-pill active">Salva</button>
+          </div>
+        </div>
+
+        <!-- GRIGLIA MOTORI AI -->
+        <div class="models-bar" id="modelsBar">
+          <button type="button" class="model-chip active" data-provider="pollinations" data-model="openai" data-label="OpenAI GPT-4o">
+            <strong>OpenAI GPT-4o</strong>
+            <small>Versatile & Rapido</small>
+          </button>
+          <button type="button" class="model-chip" data-provider="pollinations" data-model="gemini" data-label="Google Gemini">
+            <strong>Google Gemini</strong>
+            <small>Studio & Sintesi</small>
+          </button>
+          <button type="button" class="model-chip" data-provider="pollinations" data-model="claude" data-label="Anthropic Claude">
+            <strong>Anthropic Claude</strong>
+            <small>Spiegazioni Chiare</small>
+          </button>
+          <button type="button" class="model-chip" data-provider="pollinations" data-model="deepseek-reasoning" data-label="DeepSeek R1">
+            <strong>DeepSeek R1</strong>
+            <small>Matematica & Logica</small>
+          </button>
+          <button type="button" class="model-chip" data-provider="pollinations" data-model="llama" data-label="Meta Llama 3.3">
+            <strong>Meta Llama 3.3</strong>
+            <small>Open-Source 70B</small>
+          </button>
+          <button type="button" class="model-chip" data-provider="pollinations" data-model="mistral" data-label="Mistral Large">
+            <strong>Mistral Large</strong>
+            <small>Codice & Lingue</small>
+          </button>
+        </div>
+
+        <!-- MODALITÀ TUTOR -->
+        <div style="font-size:0.8rem; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:8px;">2. Modalità Tutor</div>
+        <div class="modes-row" id="modesRow">
+          <button type="button" class="mode-pill active" data-mode="Spiegazione Passo-Passo">📘 Spiega Passo-Passo</button>
+          <button type="button" class="mode-pill" data-mode="Tutor Informatica & Codice">💻 Codice & Debug</button>
+          <button type="button" class="mode-pill" data-mode="Riassunto per Verifica">📝 Riassunto Verifica</button>
+          <button type="button" class="mode-pill" data-mode="Simulazione Interrogazione">🎤 Interrogami tu</button>
+          <button type="button" class="mode-pill" data-mode="Risolvi Esercizio">🧮 Risolvi Esercizio</button>
+        </div>
+
+        <!-- FINESTRA MESSAGGI -->
+        <div id="aiChatBox" class="chat-box">
+          <div class="msg-bubble msg-ai">
+            Ciao! Sono il <strong>Tutor Multi-AI della 1BI</strong> 🤖<br />
+            Scegli in alto il modello AI che preferisci (GPT-4o, Gemini, Claude, DeepSeek, Llama o Mistral), imposta la materia e chiedimi qualsiasi cosa: esercizi di matematica, programmi in C++/HTML/Python, riassunti di storia o simulazioni di interrogazione!
+          </div>
+        </div>
+
+        <!-- CONTROLLI INVIO -->
+        <div class="prompt-controls">
+          <select id="subjectSelect" class="ai-select">
+            <option value="Informatica & Sistemi">Informatica & Sistemi</option>
+            <option value="Matematica">Matematica</option>
+            <option value="Fisica">Fisica</option>
+            <option value="Chimica & Scienze">Chimica & Scienze</option>
+            <option value="Storia & Geografia">Storia & Geografia</option>
+            <option value="Italiano">Italiano</option>
+            <option value="Inglese">Inglese</option>
+            <option value="Altro">Altra Materia</option>
+          </select>
+          <button type="button" id="clearChatBtn" class="mode-pill" title="Pulisci la tua chat corrente">
+            Nuova Chat
+          </button>
+        </div>
+
+        <div class="prompt-row">
+          <textarea id="aiPromptInput" class="prompt-textarea" placeholder="Scrivi qui la tua domanda, incolla un esercizio o un pezzo di codice (Invio per inviare, Shift+Invio a capo)..."></textarea>
+          <button type="button" id="sendAiBtn" class="btn-send-ai">
+            <i data-lucide="sparkles" style="width:17px;height:17px;"></i>
+            <span>Chiedi</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- COLONNA DESTRA: SPIEGAZIONI CONDIVISE CON LA CLASSE -->
+      <aside class="ai-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+          <div>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:800;">✨ Spiegazioni d'Oro 1BI</h3>
+            <small style="color:var(--text-muted);">Le risposte AI migliori condivise dai compagni</small>
+          </div>
+          <select id="filterSharedSubject" class="ai-select" style="padding:6px 10px; font-size:0.8rem;">
+            <option value="TUTTE">Tutte le materie</option>
+            <option value="Informatica & Sistemi">Informatica & Sistemi</option>
+            <option value="Matematica">Matematica</option>
+            <option value="Fisica">Fisica</option>
+            <option value="Chimica & Scienze">Chimica & Scienze</option>
+            <option value="Storia & Geografia">Storia & Geografia</option>
+            <option value="Italiano">Italiano</option>
+            <option value="Inglese">Inglese</option>
+            <option value="Altro">Altra Materia</option>
+          </select>
+        </div>
+
+        <div id="sharedAiList" class="shared-list">
+          <div style="text-align:center; color:var(--text-muted); padding:24px; font-size:0.88rem;">
+            Nessuna spiegazione condivisa ancora. Chiedi qualcosa all'AI e clicca "Condividi con la 1BI"!
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      arrayUnion,
+      arrayRemove
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let userIsRep = false;
+    let selectedModel = "openai";
+    let selectedModelLabel = "OpenAI GPT-4o";
+    let selectedMode = "Spiegazione Passo-Passo";
+    let conversationHistory = [];
+    let allSharedItems = [];
+
+    // Gestione Chiavi API Locali Opzionali
+    const geminiInput = document.getElementById("geminiKeyInput");
+    const groqInput = document.getElementById("groqKeyInput");
+    geminiInput.value = localStorage.getItem("eduhub_gemini_key") || "";
+    groqInput.value = localStorage.getItem("eduhub_groq_key") || "";
+
+    document.getElementById("toggleApiKeyDrawer").addEventListener("click", () => {
+      const box = document.getElementById("apiKeyDrawer");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    });
+
+    document.getElementById("saveLocalKeysBtn").addEventListener("click", () => {
+      localStorage.setItem("eduhub_gemini_key", geminiInput.value.trim());
+      localStorage.setItem("eduhub_groq_key", groqInput.value.trim());
+      alert("Chiavi salvate nel tuo browser! Se presenti verranno usate automaticamente.");
+    });
+
+    // Selezione Modello AI
+    document.querySelectorAll("#modelsBar .model-chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#modelsBar .model-chip").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedModel = btn.dataset.model;
+        selectedModelLabel = btn.dataset.label;
+        document.getElementById("activeModelBadge").textContent = selectedModelLabel;
+      });
+    });
+
+    // Selezione Modalità Tutor
+    document.querySelectorAll("#modesRow .mode-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#modesRow .mode-pill").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedMode = btn.dataset.mode;
+      });
+    });
+
+    // Pulisci Chat
+    document.getElementById("clearChatBtn").addEventListener("click", () => {
+      conversationHistory = [];
+      document.getElementById("aiChatBox").innerHTML = `
+        <div class="msg-bubble msg-ai">
+          Chat azzerata! Sono pronto con <strong>${escapeHtml(selectedModelLabel)}</strong>. Cosa studiamo adesso?
+        </div>
+      `;
+    });
+
+    // Formattazione leggera Markdown -> HTML sicuro
+    function formatAiMarkdown(raw) {
+      let safe = escapeHtml(raw);
+      // Blocchi di codice ```...```
+      safe = safe.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code.trim()}</code></pre>`);
+      // Codice inline `...`
+      safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+      // Grassetto **...**
+      safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      // Corsivo *...*
+      safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      // A capo fuori dai <pre>
+      const parts = safe.split(/(<pre>[\s\S]*?<\/pre>)/g);
+      return parts.map(part => part.startsWith("<pre>") ? part : part.replace(/\n/g, "<br />")).join("");
+    }
+
+    function appendMessage(role, text, metaInfo = null) {
+      const box = document.getElementById("aiChatBox");
+      const div = document.createElement("div");
+      div.className = `msg-bubble ${role === "user" ? "msg-user" : "msg-ai"}`;
+
+      if (role === "user") {
+        div.innerHTML = escapeHtml(text).replace(/\n/g, "<br />");
+      } else {
+        div.innerHTML = `
+          <div>${formatAiMarkdown(text)}</div>
+          ${metaInfo ? `
+            <div class="msg-meta">
+              <span>🤖 ${escapeHtml(metaInfo.modelLabel)} • ${escapeHtml(metaInfo.materia)}</span>
+              <button type="button" class="btn-share-ai">★ Condividi con la 1BI</button>
+            </div>
+          ` : ""}
+        `;
+
+        if (metaInfo) {
+          const shareBtn = div.querySelector(".btn-share-ai");
+          shareBtn.addEventListener("click", async () => {
+            if (!currentUser) return;
+            shareBtn.disabled = true;
+            shareBtn.textContent = "Condivisa ✓";
+            await addDoc(collection(db, "ai_spiegazioni_1bi"), {
+              domanda: metaInfo.question,
+              risposta: text,
+              materia: metaInfo.materia,
+              modello: metaInfo.modelLabel,
+              autore: currentUser.displayName || "Studente 1BI",
+              autoreUid: currentUser.uid,
+              likes: [currentUser.uid],
+              creatoIl: Date.now()
+            });
+          });
+        }
+      }
+
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+      return div;
+    }
+
+    // Chiamata Multi-AI (con fallback automatico tra motori)
+    async function queryMultiAI(userPrompt, materia, mode) {
+      const systemPrompt =
+        `Sei il Tutor AI ufficiale della classe 1BI (Istituto Tecnico Informatico IIS Giorgi-Woolf). ` +
+        `Rispondi sempre in italiano chiaro, preciso e adatto a studenti delle superiori. ` +
+        `Materia attuale: ${materia}. Modalità richiesta: ${mode}. ` +
+        `Spiega i passaggi logici in modo comprensibile senza saltare gli step importanti.`;
+
+      const customGeminiKey = localStorage.getItem("eduhub_gemini_key");
+      const customGroqKey = localStorage.getItem("eduhub_groq_key");
+
+      // 1. Se l'utente ha inserito una chiave Google Gemini ufficiale ed ha scelto Gemini
+      if (selectedModel === "gemini" && customGeminiKey) {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(customGeminiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${systemPrompt}\n\nDomanda studente: ${userPrompt}` }] }]
+            })
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (txt) return txt;
+        }
+      }
+
+      // 2. Se l'utente ha inserito una chiave Groq ufficiale ed ha scelto Llama
+      if (selectedModel === "llama" && customGroqKey) {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${customGroqKey}`
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: systemPrompt },
+              ...conversationHistory.slice(-6),
+              { role: "user", content: userPrompt }
+            ]
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const txt = data?.choices?.[0]?.message?.content;
+          if (txt) return txt;
+        }
+      }
+
+      // 3. Motore Multi-AI Gratuito Integrato (OpenAI / Gemini / Claude / DeepSeek / Llama / Mistral)
+      const messagesPayload = [
+        { role: "system", content: systemPrompt },
+        ...conversationHistory.slice(-6),
+        { role: "user", content: userPrompt }
+      ];
+
+      const res = await fetch("https://text.pollinations.ai/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messagesPayload,
+          model: selectedModel,
+          private: true
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error("Il modello selezionato è momentaneamente occupato. Prova a cambiare modello AI in alto!");
+      }
+
+      const replyText = await res.text();
+      if (!replyText || !replyText.trim()) {
+        throw new Error("Risposta vuota dal server AI. Riprova tra qualche secondo.");
+      }
+      return replyText.trim();
+    }
+
+    async function handleSendPrompt() {
+      const input = document.getElementById("aiPromptInput");
+      const sendBtn = document.getElementById("sendAiBtn");
+      const promptText = input.value.trim();
+      const materia = document.getElementById("subjectSelect").value;
+
+      if (!promptText) return;
+
+      input.value = "";
+      sendBtn.disabled = true;
+      appendMessage("user", promptText);
+
+      // Fumetto caricamento
+      const box = document.getElementById("aiChatBox");
+      const loadingDiv = document.createElement("div");
+      loadingDiv.className = "msg-bubble msg-ai";
+      loadingDiv.innerHTML = `<div style="font-size:0.78rem; color:#c4b5fd; margin-bottom:4px;">${escapeHtml(selectedModelLabel)} sta elaborando...</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
+      box.appendChild(loadingDiv);
+      box.scrollTop = box.scrollHeight;
+
+      try {
+        const aiReply = await queryMultiAI(promptText, materia, selectedMode);
+        loadingDiv.remove();
+
+        conversationHistory.push({ role: "user", content: promptText });
+        conversationHistory.push({ role: "assistant", content: aiReply });
+
+        appendMessage("ai", aiReply, {
+          question: promptText,
+          materia,
+          modelLabel: selectedModelLabel
+        });
+      } catch (err) {
+        loadingDiv.remove();
+        appendMessage("ai", `⚠️ **Errore:** ${err.message}`);
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    document.getElementById("sendAiBtn").addEventListener("click", handleSendPrompt);
+    document.getElementById("aiPromptInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSendPrompt();
+      }
+    });
+
+    // Render Spiegazioni Condivise
+    document.getElementById("filterSharedSubject").addEventListener("change", renderSharedList);
+
+    function renderSharedList() {
+      const container = document.getElementById("sharedAiList");
+      const filter = document.getElementById("filterSharedSubject").value;
+
+      const filtered = allSharedItems.filter(it => filter === "TUTTE" || it.materia === filter);
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:24px; font-size:0.86rem;">Nessuna spiegazione condivisa per questa materia.</div>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      filtered.forEach(item => {
+        const likes = Array.isArray(item.likes) ? item.likes : [];
+        const hasLiked = currentUser && likes.includes(currentUser.uid);
+        const canDel = userIsRep || (currentUser && item.autoreUid === currentUser.uid);
+
+        const card = document.createElement("div");
+        card.className = "shared-item";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:0.72rem; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(139,92,246,0.18); color:#c4b5fd;">
+              ${escapeHtml(item.materia || "Studio")} • ${escapeHtml(item.modello || "AI")}
+            </span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button type="button" class="like-mini-pill ${hasLiked ? "liked" : ""}">
+                👍 <span>${likes.length}</span>
+              </button>
+              ${canDel ? `<button type="button" class="like-mini-pill del-shared-btn" style="color:#f87171; border-color:rgba(239,68,68,0.35);">&times;</button>` : ""}
+            </div>
+          </div>
+          <div class="shared-q">❓ ${escapeHtml(item.domanda)}</div>
+          <div class="shared-a">${formatAiMarkdown(item.risposta)}</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:8px;">
+            Condivisa da <strong>${escapeHtml(item.autore || "Studente 1BI")}</strong>
+          </div>
+        `;
+
+        card.querySelector(".like-mini-pill").addEventListener("click", async () => {
+          if (!currentUser) return;
+          await updateDoc(doc(db, "ai_spiegazioni_1bi", item.id), {
+            likes: hasLiked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
+          });
+        });
+
+        if (canDel) {
+          card.querySelector(".del-shared-btn")?.addEventListener("click", async () => {
+            if (confirm("Eliminare questa spiegazione condivisa?")) {
+              await deleteDoc(doc(db, "ai_spiegazioni_1bi", item.id));
+            }
+          });
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      userIsRep = isRappresentante(user);
+
+      const qShared = query(collection(db, "ai_spiegazioni_1bi"), orderBy("creatoIl", "desc"));
+      onSnapshot(qShared, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => {
+          const lA = Array.isArray(a.likes) ? a.likes.length : 0;
+          const lB = Array.isArray(b.likes) ? b.likes.length : 0;
+          if (lB !== lA) return lB - lA;
+          return (b.creatoIl || 0) - (a.creatoIl || 0);
+        });
+        allSharedItems = list;
+        renderSharedList();
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
