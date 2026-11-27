@@ -41,6 +41,7 @@
       border: 1px solid transparent;
       margin-bottom: 8px;
       cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
     }
     .bday-row.active-target {
       border-color: #ec4899;
@@ -52,21 +53,36 @@
     }
     .wishes-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: 12px;
       margin-top: 14px;
     }
     .wish-note {
+      position: relative;
       background: var(--surface-sub, rgba(255,255,255,0.05));
       border-left: 4px solid #ec4899;
       border-radius: 12px;
       padding: 12px 14px;
+    }
+    .btn-del-wish {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+      border-radius: 7px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-del-wish:hover {
+      background: rgba(239, 68, 68, 0.3);
     }
     .form-inline-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       margin-top: 10px;
+      align-items: center;
     }
     .bday-input {
       padding: 9px 11px;
@@ -76,6 +92,13 @@
       color: var(--text-main);
       font-family: inherit;
       font-size: 0.86rem;
+    }
+    .save-feedback {
+      font-size: 0.78rem;
+      color: #34d399;
+      font-weight: 800;
+      margin-top: 8px;
+      display: none;
     }
   </style>
 </head>
@@ -102,15 +125,19 @@
       <div style="font-size:2rem; margin-bottom:4px;">🎂🎉</div>
       <h2 id="heroTitle" style="font-size:1.25rem; font-weight:800;">Calendario Compleanni 1BI</h2>
       <p id="heroSub" style="font-size:0.88rem; color:var(--text-muted); margin-top:4px;">
-        Salva il tuo compleanno e firma il biglietto d'auguri digitale per i compagni!
+        Salva o modifica il tuo compleanno e firma il biglietto d'auguri digitale per i compagni!
       </p>
     </div>
 
     <div class="bday-layout">
-      <!-- COLONNA SINISTRA: SALVA DATA + ELENCO COMPLEANNI -->
+      <!-- COLONNA SINISTRA: SALVA / MODIFICA DATA + ELENCO COMPLEANNI -->
       <div style="display:flex; flex-direction:column; gap:16px;">
         <section class="bday-card-box">
-          <h3 style="font-size:0.98rem; font-weight:800;">📅 Inserisci il Tuo Compleanno</h3>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <h3 id="myBdayFormTitle" style="font-size:0.98rem; font-weight:800;">📅 Inserisci il Tuo Compleanno</h3>
+            <span id="myCurrentDateBadge" style="font-size:0.74rem; color:#ec4899; font-weight:800;"></span>
+          </div>
+
           <form id="myBdayForm" class="form-inline-row">
             <select id="daySelect" class="bday-input" required></select>
             <select id="monthSelect" class="bday-input" required>
@@ -127,10 +154,14 @@
               <option value="11">Novembre</option>
               <option value="12">Dicembre</option>
             </select>
-            <button type="submit" style="padding:9px 14px; border-radius:10px; border:none; background:#ec4899; color:#fff; font-weight:800; cursor:pointer;">
+            <button type="submit" id="saveBdayBtn" style="padding:9px 14px; border-radius:10px; border:none; background:#ec4899; color:#fff; font-weight:800; cursor:pointer;">
               Salva
             </button>
+            <button type="button" id="removeMyBdayBtn" style="display:none; padding:9px 11px; border-radius:10px; border:1px solid rgba(239,68,68,0.4); background:rgba(239,68,68,0.12); color:#f87171; font-weight:800; cursor:pointer;" title="Rimuovi la tua data">
+              Rimuovi
+            </button>
           </form>
+          <div id="bdaySaveFeedback" class="save-feedback">✓ Compleanno aggiornato!</div>
         </section>
 
         <section class="bday-card-box">
@@ -146,7 +177,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
           <div>
             <h3 id="cardTargetTitle" style="font-size:1.1rem; font-weight:800;">💌 Biglietto d'Auguri della Classe</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted);">Seleziona un compagno a sinistra per firmare il suo biglietto d'auguri</p>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Seleziona un compagno a sinistra per firmare o gestire il suo biglietto d'auguri</p>
           </div>
         </div>
 
@@ -165,11 +196,13 @@
   <script type="module" src="../js/auth.js"></script>
   <script type="module">
     import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       collection,
       doc,
       setDoc,
+      updateDoc,
       onSnapshot,
       arrayUnion
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -186,8 +219,10 @@
     }
 
     let currentUser = null;
+    let userIsRep = false;
     let allBdays = [];
     let selectedUid = null;
+    let formInitialized = false;
 
     function daysUntil(day, month) {
       const now = new Date();
@@ -197,6 +232,14 @@
       return Math.round((next - today) / 86400000);
     }
 
+    function showFeedback(msg) {
+      const fb = document.getElementById("bdaySaveFeedback");
+      fb.textContent = msg;
+      fb.style.display = "block";
+      setTimeout(() => { fb.style.display = "none"; }, 2500);
+    }
+
+    // Salva o Modifica il proprio compleanno
     document.getElementById("myBdayForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentUser) return;
@@ -209,8 +252,26 @@
         day,
         month
       }, { merge: true });
+
+      selectedUid = currentUser.uid;
+      showFeedback(`✓ Compleanno salvato (${day} ${MONTHS[month]})!`);
     });
 
+    // Rimuovi il proprio compleanno
+    document.getElementById("removeMyBdayBtn").addEventListener("click", async () => {
+      if (!currentUser) return;
+      if (!confirm("Vuoi rimuovere la tua data di compleanno dall'elenco?")) return;
+
+      await setDoc(doc(db, "compleanni_1bi", currentUser.uid), {
+        day: null,
+        month: null
+      }, { merge: true });
+
+      formInitialized = false;
+      showFeedback("✓ Data rimossa dall'elenco.");
+    });
+
+    // Firma Biglietto d'Auguri
     document.getElementById("wishForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentUser || !selectedUid) return;
@@ -219,7 +280,9 @@
 
       await setDoc(doc(db, "compleanni_1bi", selectedUid), {
         auguri: arrayUnion({
+          id: "w_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
           autore: currentUser.displayName || "Compagno 1BI",
+          autoreUid: currentUser.uid,
           testo: text,
           data: new Date().toLocaleDateString("it-IT")
         })
@@ -228,17 +291,48 @@
       document.getElementById("wishInput").value = "";
     });
 
+    function syncMyFormState() {
+      if (!currentUser) return;
+      const me = allBdays.find(x => x.uid === currentUser.uid && x.day && x.month);
+      const titleEl = document.getElementById("myBdayFormTitle");
+      const badgeEl = document.getElementById("myCurrentDateBadge");
+      const btnEl = document.getElementById("saveBdayBtn");
+      const remBtn = document.getElementById("removeMyBdayBtn");
+
+      if (me) {
+        titleEl.textContent = "✏️ Modifica il Tuo Compleanno";
+        badgeEl.textContent = `${me.day} ${MONTHS[me.month]}`;
+        btnEl.textContent = "Aggiorna";
+        remBtn.style.display = "inline-block";
+        if (!formInitialized) {
+          document.getElementById("daySelect").value = me.day;
+          document.getElementById("monthSelect").value = me.month;
+          formInitialized = true;
+        }
+      } else {
+        titleEl.textContent = "📅 Inserisci il Tuo Compleanno";
+        badgeEl.textContent = "";
+        btnEl.textContent = "Salva";
+        remBtn.style.display = "none";
+      }
+    }
+
     function renderAll() {
+      syncMyFormState();
+
       const listEl = document.getElementById("bdayList");
       const wishesEl = document.getElementById("wishesGrid");
+      const validBdays = allBdays.filter(x => x.day && x.month);
 
-      if (allBdays.length === 0) {
+      if (validBdays.length === 0) {
+        document.getElementById("heroTitle").textContent = "Calendario Compleanni 1BI";
+        document.getElementById("heroSub").textContent = "Salva il tuo compleanno e firma il biglietto d'auguri digitale per i compagni!";
         listEl.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">Nessun compleanno registrato ancora. Inserisci il tuo qui sopra!</div>`;
         wishesEl.innerHTML = "";
         return;
       }
 
-      const sorted = [...allBdays].sort((a, b) => daysUntil(a.day, a.month) - daysUntil(b.day, b.month));
+      const sorted = [...validBdays].sort((a, b) => daysUntil(a.day, a.month) - daysUntil(b.day, b.month));
       if (!selectedUid || !sorted.some(x => x.uid === selectedUid)) {
         selectedUid = sorted[0].uid;
       }
@@ -264,17 +358,40 @@
               <div style="font-weight:800; font-size:0.9rem;">${isToday ? "🎂 " : ""}${escapeHtml(person.nome)}</div>
               <div style="font-size:0.75rem; color:var(--text-muted);">${person.day} ${MONTHS[person.month]}</div>
             </div>
-            <span style="font-size:0.76rem; font-weight:800; color:${isToday ? "#fbbf24" : "#38bdf8"};">
-              ${isToday ? "OGGI!" : `tra ${diff}g`}
-            </span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:0.76rem; font-weight:800; color:${isToday ? "#fbbf24" : "#38bdf8"};">
+                ${isToday ? "OGGI!" : `tra ${diff}g`}
+              </span>
+              ${userIsRep ? `<button type="button" class="btn-edit-rep" data-edit-uid="${person.uid}" title="Modifica data (Rappresentante)" style="background:none; border:none; cursor:pointer; font-size:0.85rem;">✏️</button>` : ""}
+            </div>
           </div>
         `;
       }).join("");
 
       listEl.querySelectorAll("[data-uid]").forEach(row => {
-        row.addEventListener("click", () => {
+        row.addEventListener("click", (e) => {
+          if (e.target.closest(".btn-edit-rep")) return;
           selectedUid = row.dataset.uid;
           renderAll();
+        });
+      });
+
+      // Modifica rapida da parte dei Rappresentanti
+      listEl.querySelectorAll(".btn-edit-rep").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const targetPerson = sorted.find(x => x.uid === btn.dataset.editUid);
+          if (!targetPerson) return;
+          const newDateStr = prompt(`Modifica compleanno di ${targetPerson.nome} (formato GG/MM, es. 23/01):`, `${targetPerson.day}/${targetPerson.month}`);
+          if (!newDateStr) return;
+          const parts = newDateStr.split("/");
+          const d = Number(parts[0]);
+          const m = Number(parts[1]);
+          if (d >= 1 && d <= 31 && m >= 1 && m <= 12) {
+            await updateDoc(doc(db, "compleanni_1bi", targetPerson.uid), { day: d, month: m });
+          } else {
+            alert("Formato non valido. Usa GG/MM (es. 14/05).");
+          }
         });
       });
 
@@ -285,12 +402,33 @@
         if (auguri.length === 0) {
           wishesEl.innerHTML = `<div style="grid-column:1/-1; font-size:0.84rem; color:var(--text-muted); padding:16px 0;">Nessuna firma ancora. Scrivi tu il primo augurio!</div>`;
         } else {
-          wishesEl.innerHTML = auguri.map((w, i) => `
-            <div class="wish-note" style="border-left-color:${COLORS[i % COLORS.length]};">
-              <div style="font-size:0.88rem; margin-bottom:6px; line-height:1.4;">"${escapeHtml(w.testo)}"</div>
-              <div style="font-size:0.74rem; font-weight:800; color:var(--text-muted);">— ${escapeHtml(w.autore)}</div>
-            </div>
-          `).join("");
+          wishesEl.innerHTML = auguri.map((w, i) => {
+            const canDeleteWish = currentUser && (
+              w.autoreUid === currentUser.uid ||
+              target.uid === currentUser.uid ||
+              userIsRep
+            );
+            return `
+              <div class="wish-note" style="border-left-color:${COLORS[i % COLORS.length]};">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px;">
+                  <div style="font-size:0.88rem; line-height:1.4; word-break:break-word;">"${escapeHtml(w.testo)}"</div>
+                  ${canDeleteWish ? `<button type="button" class="btn-del-wish" data-wish-idx="${i}" title="Elimina augurio">✕</button>` : ""}
+                </div>
+                <div style="font-size:0.74rem; font-weight:800; color:var(--text-muted);">— ${escapeHtml(w.autore)}</div>
+              </div>
+            `;
+          }).join("");
+
+          wishesEl.querySelectorAll(".btn-del-wish").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              if (!confirm("Eliminare questo messaggio di auguri?")) return;
+              const idx = Number(btn.dataset.wishIdx);
+              const updatedAuguri = auguri.filter((_, index) => index !== idx);
+              await updateDoc(doc(db, "compleanni_1bi", target.uid), {
+                auguri: updatedAuguri
+              });
+            });
+          });
         }
       }
     }
@@ -302,6 +440,8 @@
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
       currentUser = user;
+      userIsRep = isRappresentante(user);
+
       onSnapshot(collection(db, "compleanni_1bi"), (snap) => {
         const list = [];
         snap.forEach(d => list.push({ uid: d.id, ...d.data() }));
