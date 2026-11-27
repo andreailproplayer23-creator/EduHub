@@ -864,7 +864,8 @@
             </div>
           `;
 
-          btn.addEventListener("click", async () => {
+          container.querySelectorAll(".k-ans-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
               const choice = Number(btn.dataset.choice);
               const elapsedSec = Math.min(totalTime, Math.max(0, (Date.now() - match.questionStartTime) / 1000));
               const isCorrect = choice === qObj.corretta;
@@ -878,7 +879,6 @@
                 if (match.settings.pointsMode === "fixed") {
                   earned = 1000;
                 } else {
-                  // Formula ufficiale Kahoot: da 50% a 100% dei punti base in base ai millisecondi + bonus streak
                   const maxPts = Number(match.settings.pointsMode) || 1000;
                   const baseScore = Math.round((1 - (elapsedSec / (2 * totalTime))) * maxPts);
                   const streakBonus = newStreak >= 4 ? 300 : newStreak === 3 ? 200 : newStreak === 2 ? 100 : 0;
@@ -894,6 +894,7 @@
                 [`players.${currentUser.uid}.streak`]: newStreak
               });
             });
+          });
 
           document.getElementById("forceShowResultsBtn")?.addEventListener("click", async () => {
             await updateDoc(doc(db, "kahoot_live_1bi", "current_match"), {
