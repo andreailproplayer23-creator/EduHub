@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Tutoraggio tra Pari 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    .tutor-grid-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .tutor-grid-layout { grid-template-columns: 1fr; }
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    /* Selettore Tipo Annuncio (Cerco / Offro) */
+    .type-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .type-btn {
+      padding: 11px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.04));
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .type-btn.active-cerco {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+    .type-btn.active-offro {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    .form-group { margin-bottom: 12px; }
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .form-control:focus { border-color: #38bdf8; }
+
+    .btn-submit-tutor {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .btn-submit-tutor:hover { filter: brightness(1.08); }
+
+    /* Barra Filtri */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pill-filter {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--card-bg);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .pill-filter.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    /* Card Annunci */
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .tutor-post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      border-radius: 16px;
+      padding: 18px;
+      transition: transform 0.15s ease;
+    }
+    .tutor-post-card.resolved {
+      opacity: 0.72;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .badges-row {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .badge-type-cerco {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    .badge-type-offro {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    .badge-subject {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    .badge-mode {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .badge-done {
+      background: rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .post-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .post-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 12px;
+      white-space: pre-line;
+    }
+
+    .candidates-box {
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.08));
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.82rem;
+    }
+    .candidate-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37, 99, 235, 0.18);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #93c5fd;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin: 4px 4px 0 0;
+    }
+    .btn-thank-chip {
+      background: #10b981;
+      color: #06281e;
+      border: none;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .post-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 10px;
+      border-top: 1px solid var(--table-border, rgba(255,255,255,0.08));
+    }
+    .btn-join {
+      padding: 7px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(14, 165, 233, 0.16);
+      color: #38bdf8;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .btn-join.joined {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .btn-resolve {
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .btn-del-post {
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    /* Podio Tutor */
+    .tutor-rank-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      margin-bottom: 6px;
+      font-size: 0.84rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Tutoraggio tra Pari 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner" style="margin-bottom: 20px;">
+      <div>
+        <h2>Tutoraggio tra Pari 1BI</h2>
+        <p>Chiedi aiuto prima di una verifica o mettiti a disposizione per spiegare un argomento ai compagni</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span id="openCountBadge">0 Annunci Aperti</span>
+      </div>
+    </div>
+
+    <div class="tutor-grid-layout">
+      <!-- COLONNA SINISTRA: CREA ANNUNCIO + TOP TUTOR -->
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <section class="panel-card">
+          <h3 style="font-size:1.05rem; font-weight:800; margin-bottom:14px;">Pubblica un Annuncio</h3>
+
+          <div class="type-switch">
+            <button type="button" id="btnTypeCerco" class="type-btn active-cerco">🆘 Cerco Aiuto</button>
+            <button type="button" id="btnTypeOffro" class="type-btn">🎓 Offro Aiuto</button>
+          </div>
+
+          <form id="tutorForm">
+            <div class="form-group">
+              <label class="form-label">Materia</label>
+              <select id="materiaInput" class="form-control" required>
+                <option value="Informatica & Sistemi">Informatica & Sistemi</option>
+                <option value="Matematica">Matematica</option>
+                <option value="Fisica">Fisica</option>
+                <option value="Chimica & Scienze">Chimica & Scienze</option>
+                <option value="Italiano">Italiano</option>
+                <option value="Storia & Geografia">Storia & Geografia</option>
+                <option value="Inglese">Inglese</option>
+                <option value="Altro">Altro</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Argomento</label>
+              <input type="text" id="titoloInput" class="form-control" placeholder="Es. Equazioni di 1° grado, Ciclo for, Verbi irregolari..." maxlength="80" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Modalità preferita</label>
+              <select id="modalitaInput" class="form-control">
+                <option value="In classe / Ricreazione">🏫 In classe / Ricreazione</option>
+                <option value="Online (Discord / Chiamata)">🎧 Online (Discord / Chiamata)</option>
+                <option value="Chat / Invio Appunti">💬 Chat / Invio Appunti</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Dettagli (quando ti serve / disponibilità)</label>
+              <textarea id="descrizioneInput" class="form-control" rows="3" placeholder="Scrivi qui cosa non ti è chiaro o quando sei libero per spiegare..." maxlength="400" required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit-tutor">
+              <i data-lucide="send" style="width:16px;height:16px;"></i>
+              <span>Pubblica in Bacheca</span>
+            </button>
+          </form>
+        </section>
+
+        <!-- CLASSIFICA TOP TUTOR DELLA 1BI -->
+        <section class="panel-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <h3 style="font-size:0.98rem; font-weight:800;">🏆 Migliori Tutor 1BI</h3>
+            <span style="font-size:0.72rem; color:var(--text-muted);">Aiuti completati</span>
+          </div>
+          <div id="topTutorsList">
+            <div style="font-size:0.82rem; color:var(--text-muted); text-align:center; padding:10px;">
+              Nessun tutoraggio completato ancora.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- COLONNA DESTRA: BACHECA ANNUNCI -->
+      <section>
+        <div class="filter-bar">
+          <div class="filter-pills">
+            <button type="button" class="pill-filter active" data-type="TUTTI">Tutti</button>
+            <button type="button" class="pill-filter" data-type="CERCO">🆘 Cerco Aiuto</button>
+            <button type="button" class="pill-filter" data-type="OFFRO">🎓 Offro Aiuto</button>
+          </div>
+
+          <select id="filterMateria" class="form-control" style="width:auto; min-width:170px; padding:7px 12px; font-size:0.82rem;">
+            <option value="TUTTE">Tutte le materie</option>
+            <option value="Informatica & Sistemi">Informatica & Sistemi</option>
+            <option value="Matematica">Matematica</option>
+            <option value="Fisica">Fisica</option>
+            <option value="Chimica & Scienze">Chimica & Scienze</option>
+            <option value="Italiano">Italiano</option>
+            <option value="Storia & Geografia">Storia & Geografia</option>
+            <option value="Inglese">Inglese</option>
+            <option value="Altro">Altro</option>
+          </select>
+
+          <input type="text" id="searchInput" class="form-control" style="flex:1; min-width:180px; padding:7px 12px; font-size:0.82rem;" placeholder="Cerca argomento o compagno..." />
+        </div>
+
+        <div id="postsList" class="posts-list">
+          <div class="panel-card" style="text-align:center; color:var(--text-muted);">
+            Caricamento annunci di tutoraggio...
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      arrayUnion,
+      arrayRemove
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let userIsRep = false;
+    let selectedType = "CERCO";
+    let filterType = "TUTTI";
+    let allPosts = [];
+
+    const btnCerco = document.getElementById("btnTypeCerco");
+    const btnOffro = document.getElementById("btnTypeOffro");
+
+    btnCerco.addEventListener("click", () => {
+      selectedType = "CERCO";
+      btnCerco.classList.add("active-cerco");
+      btnOffro.classList.remove("active-offro");
+    });
+
+    btnOffro.addEventListener("click", () => {
+      selectedType = "OFFRO";
+      btnOffro.classList.add("active-offro");
+      btnCerco.classList.remove("active-cerco");
+    });
+
+    document.querySelectorAll(".pill-filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".pill-filter").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filterType = btn.dataset.type;
+        renderPosts();
+      });
+    });
+
+    document.getElementById("filterMateria").addEventListener("change", renderPosts);
+    document.getElementById("searchInput").addEventListener("input", renderPosts);
+
+    // Invio Nuovo Annuncio
+    document.getElementById("tutorForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const materia = document.getElementById("materiaInput").value;
+      const titolo = document.getElementById("titoloInput").value.trim();
+      const modalita = document.getElementById("modalitaInput").value;
+      const descrizione = document.getElementById("descrizioneInput").value.trim();
+      if (!titolo || !descrizione) return;
+
+      await addDoc(collection(db, "tutoraggio_1bi"), {
+        tipo: selectedType, // "CERCO" o "OFFRO"
+        materia,
+        titolo,
+        modalita,
+        descrizione,
+        autore: currentUser.displayName || "Studente 1BI",
+        autoreUid: currentUser.uid,
+        candidati: [],
+        risolto: false,
+        tutorScelto: "",
+        creatoIl: Date.now()
+      });
+
+      document.getElementById("tutorForm").reset();
+    });
+
+    function renderTopTutors() {
+      const counts = {};
+      allPosts.forEach(p => {
+        if (p.risolto) {
+          const helper = p.tutorScelto || (p.tipo === "OFFRO" ? p.autore : "");
+          if (helper) {
+            counts[helper] = (counts[helper] || 0) + 1;
+          }
+        }
+      });
+
+      const ranking = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+      const box = document.getElementById("topTutorsList");
+      if (ranking.length === 0) {
+        box.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted); text-align:center; padding:10px;">Nessun tutoraggio completato ancora.</div>`;
+        return;
+      }
+
+      const medals = ["🥇", "🥈", "🥉", "⭐", "⭐"];
+      box.innerHTML = ranking.map(([nome, num], i) => `
+        <div class="tutor-rank-row">
+          <span><strong>${medals[i]} ${escapeHtml(nome)}</strong></span>
+          <span style="color:#34d399; font-weight:800;">${num} ${num === 1 ? "aiuto" : "aiuti"}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderPosts() {
+      const listEl = document.getElementById("postsList");
+      const matFilter = document.getElementById("filterMateria").value;
+      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      const openCount = allPosts.filter(p => !p.risolto).length;
+      document.getElementById("openCountBadge").textContent = `${openCount} Annunci Aperti`;
+
+      const filtered = allPosts.filter(p => {
+        if (filterType !== "TUTTI" && p.tipo !== filterType) return false;
+        if (matFilter !== "TUTTE" && p.materia !== matFilter) return false;
+        if (search) {
+          const hay = `${p.titolo} ${p.descrizione} ${p.autore} ${p.materia}`.toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="panel-card" style="text-align:center; color:var(--text-muted); padding:28px;">
+            Nessun annuncio trovato con questi filtri. Pubblica il primo tu!
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      filtered.forEach(post => {
+        const isAuthor = currentUser && post.autoreUid === currentUser.uid;
+        const canDelete = isAuthor || userIsRep;
+        const candidati = Array.isArray(post.candidati) ? post.candidati : [];
+        const hasJoined = currentUser && candidati.some(c => c.uid === currentUser.uid);
+        const dateStr = post.creatoIl
+          ? new Date(post.creatoIl).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+          : "";
+
+        const card = document.createElement("div");
+        card.className = `tutor-post-card ${post.risolto ? "resolved" : ""}`;
+
+        const typeBadge = post.tipo === "CERCO"
+          ? `<span class="badge-type-cerco">🆘 CERCO AIUTO</span>`
+          : `<span class="badge-type-offro">🎓 OFFRO AIUTO</span>`;
+
+        const actionLabel = post.tipo === "CERCO"
+          ? (hasJoined ? "✓ Ti sei offerto di aiutare" : "✋ Posso aiutarti io!")
+          : (hasJoined ? "✓ Prenotato per ripetizione" : "🙋 Prenotami");
+
+        const candidatesHtml = candidati.length > 0 ? `
+          <div class="candidates-box">
+            <div style="font-weight:800; color:var(--text-muted); font-size:0.75rem; margin-bottom:4px;">
+              ${post.tipo === "CERCO" ? "Compagni disponibili ad aiutare:" : "Compagni interessati:"}
+            </div>
+            <div>
+              ${candidati.map(c => `
+                <span class="candidate-chip">
+                  👤 ${escapeHtml(c.nome)}
+                  ${isAuthor && !post.risolto && post.tipo === "CERCO"
+                    ? `<button type="button" class="btn-thank-chip" data-helper="${escapeHtml(c.nome)}">★ Ringrazia & Chiudi</button>`
+                    : ""}
+                </span>
+              `).join("")}
+            </div>
+          </div>
+        ` : "";
+
+        card.innerHTML = `
+          <div class="post-header">
+            <div class="badges-row">
+              ${typeBadge}
+              <span class="badge-subject">${escapeHtml(post.materia)}</span>
+              <span class="badge-mode">${escapeHtml(post.modalita || "")}</span>
+              ${post.risolto ? `<span class="badge-done">✅ Completato${post.tutorScelto ? ` da ${escapeHtml(post.tutorScelto)}` : ""}</span>` : ""}
+            </div>
+            <span style="font-size:0.76rem; color:var(--text-muted);">${dateStr}</span>
+          </div>
+
+          <div class="post-title">${escapeHtml(post.titolo)}</div>
+          <div class="post-desc">${escapeHtml(post.descrizione)}</div>
+
+          ${candidatesHtml}
+
+          <div class="post-footer">
+            <div style="font-size:0.8rem; color:var(--text-muted);">
+              Pubblicato da <strong style="color:var(--text-main);">${escapeHtml(post.autore)}</strong>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              ${!isAuthor && !post.risolto ? `
+                <button type="button" class="btn-join ${hasJoined ? "joined" : ""}">${actionLabel}</button>
+              ` : ""}
+              ${isAuthor && !post.risolto ? `
+                <button type="button" class="btn-resolve">✅ Segna Risolto</button>
+              ` : ""}
+              ${canDelete ? `
+                <button type="button" class="btn-del-post" title="Elimina annuncio">Elimina</button>
+              ` : ""}
+            </div>
+          </div>
+        `;
+
+        // Bottone Mi Offro / Mi Prenoto
+        card.querySelector(".btn-join")?.addEventListener("click", async () => {
+          if (!currentUser) return;
+          const myObj = candidati.find(c => c.uid === currentUser.uid);
+          if (myObj) {
+            await updateDoc(doc(db, "tutoraggio_1bi", post.id), {
+              candidati: arrayRemove(myObj)
+            });
+          } else {
+            await updateDoc(doc(db, "tutoraggio_1bi", post.id), {
+              candidati: arrayUnion({
+                uid: currentUser.uid,
+                nome: currentUser.displayName || "Studente 1BI"
+              })
+            });
+          }
+        });
+
+        // Bottone Ringrazia specifico compagno (assegna punto classifica tutor)
+        card.querySelectorAll(".btn-thank-chip").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const helperName = btn.dataset.helper;
+            await updateDoc(doc(db, "tutoraggio_1bi", post.id), {
+              risolto: true,
+              tutorScelto: helperName
+            });
+          });
+        });
+
+        // Bottone Segna Risolto generico
+        card.querySelector(".btn-resolve")?.addEventListener("click", async () => {
+          const defaultTutor = post.tipo === "OFFRO" ? post.autore : (candidati[0]?.nome || "");
+          await updateDoc(doc(db, "tutoraggio_1bi", post.id), {
+            risolto: true,
+            tutorScelto: defaultTutor
+          });
+        });
+
+        // Bottone Elimina
+        card.querySelector(".btn-del-post")?.addEventListener("click", async () => {
+          if (!confirm("Eliminare questo annuncio di tutoraggio?")) return;
+          await deleteDoc(doc(db, "tutoraggio_1bi", post.id));
+        });
+
+        listEl.appendChild(card);
+      });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      userIsRep = isRappresentante(user);
+
+      const q = query(collection(db, "tutoraggio_1bi"), orderBy("creatoIl", "desc"));
+      onSnapshot(q, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        // Prima gli annunci aperti, poi quelli già completati
+        list.sort((a, b) => Number(Boolean(a.risolto)) - Number(Boolean(b.risolto)) || (b.creatoIl || 0) - (a.creatoIl || 0));
+        allPosts = list;
+        renderTopTutors();
+        renderPosts();
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
