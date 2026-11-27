@@ -53,6 +53,23 @@
       transition: width 0.5s ease;
     }
 
+    .lb-avatar {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      background: linear-gradient(135deg, #2563eb, #1e293b);
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .lb-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     /* PODIO TOP 3 */
     .podium-grid {
       display: grid;
@@ -90,30 +107,27 @@
       background: linear-gradient(165deg, rgba(180, 83, 9, 0.14), var(--surface-sub));
     }
     .medal-badge {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      margin: 0 auto 12px auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
       font-weight: 900;
-      font-size: 1.15rem;
+      font-size: 0.76rem;
+      margin-bottom: 10px;
     }
     .rank-1 .medal-badge {
       background: rgba(251, 191, 36, 0.22);
       color: #fbbf24;
-      border: 2px solid #fbbf24;
+      border: 1.5px solid #fbbf24;
     }
     .rank-2 .medal-badge {
       background: rgba(203, 213, 225, 0.2);
       color: #cbd5e1;
-      border: 2px solid #94a3b8;
+      border: 1.5px solid #94a3b8;
     }
     .rank-3 .medal-badge {
       background: rgba(217, 119, 6, 0.22);
       color: #f59e0b;
-      border: 2px solid #d97706;
+      border: 1.5px solid #d97706;
     }
 
     /* LISTA COMPLETA CLASSIFICA */
@@ -201,6 +215,12 @@
       font-weight: 900;
       font-family: 'JetBrains Mono', monospace;
     }
+
+    @media (max-width: 780px) {
+      #repXpAdminCard > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -223,11 +243,11 @@
   <main class="container" style="max-width: 1120px;">
     <a href="../dashboard.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Torna al Cruscotto</a>
 
-    <div class="module-panel">
+    <div class="module-panel" id="leaderboardMainPanel">
       <div class="lb-header">
         <div>
           <h2 style="font-size: 1.45rem; font-weight: 800;">Classifica <span style="color: #fbbf24;">Contributori 1BI</span></h2>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Punti XP calcolati in tempo reale in base ad appunti, file progetti e aiuto ai compagni</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Punti XP, cornici, titoli e badge aggiornati in tempo reale</p>
         </div>
 
         <span style="font-size: 0.78rem; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
@@ -237,13 +257,17 @@
 
       <!-- BANNER PROFILO XP PERSONALE -->
       <div class="my-rank-banner" id="myRankBanner">
-        <div>
-          <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #38bdf8;">Il tuo Stato Contributore</div>
-          <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px; flex-wrap: wrap;">
-            <span id="myNameTitle" style="font-size: 1.2rem; font-weight: 900;">Studente 1BI</span>
-            <span id="myLevelBadge" class="lvl-pill" style="background: rgba(56,189,248,0.2); color: #38bdf8;">Novizio 1BI</span>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div id="myBannerAvatar" class="lb-avatar" style="width:56px; height:56px; font-size:1.3rem;">S</div>
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #38bdf8;">Il tuo Stato Contributore</div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
+              <span id="myNameTitle" style="font-size: 1.2rem; font-weight: 900;">Studente 1BI</span>
+              <span id="myCosmeticInline"></span>
+              <span id="myLevelBadge" class="lvl-pill" style="background: rgba(56,189,248,0.2); color: #38bdf8;">Novizio 1BI</span>
+            </div>
+            <div id="myRankPosText" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Calcolo posizione in corso...</div>
           </div>
-          <div id="myRankPosText" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Calcolo posizione in corso...</div>
         </div>
 
         <div class="xp-progress-wrap">
@@ -290,10 +314,12 @@
   <script type="module" src="../js/auth.js"></script>
   <script type="module">
     import { auth, db } from "../js/firebase-config.js";
+    import { getUserCosmetics, renderCosmeticInlineHtml, mountRepXpAdminPanel } from "../js/xp-cosmetics.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     let currentUser = null;
+    let registeredUsersMap = new Map();
     let appuntiDocs = [];
     let progettiDocs = [];
     let qaDocs = [];
@@ -317,21 +343,23 @@
     onAuthStateChanged(auth, (user) => {
       if (user) {
         currentUser = user;
+        mountRepXpAdminPanel(document.getElementById("leaderboardMainPanel"), user);
         recalculateLeaderboard();
       }
     });
 
     function recalculateLeaderboard() {
-      // Mappa aggregata per nome normalizzato o UID
       const usersMap = new Map();
 
       function getOrCreateUser(uid, rawName) {
-        const cleanName = (rawName || "Studente 1BI").trim();
+        const regProfile = uid ? registeredUsersMap.get(uid) : null;
+        const cleanName = (regProfile?.nome || regProfile?.nomeCompleto || rawName || "Studente 1BI").trim();
         const key = uid || cleanName.toLowerCase();
         if (!usersMap.has(key)) {
           usersMap.set(key, {
             uid: uid || "",
             name: cleanName,
+            profileData: regProfile || {},
             appunti: 0,
             fileProgetti: 0,
             cartelle: 0,
@@ -339,19 +367,27 @@
             risposte: 0,
             miglioriRisposte: 0,
             messaggiChat: 0,
+            activityXp: 0,
             xp: 0
           });
-        } else if (cleanName && cleanName !== "Studente 1BI") {
-          usersMap.get(key).name = cleanName;
+        } else {
+          const entry = usersMap.get(key);
+          if (cleanName && cleanName !== "Studente 1BI") entry.name = cleanName;
+          if (regProfile) entry.profileData = regProfile;
         }
         return usersMap.get(key);
       }
+
+      // Carica tutti gli utenti registrati con i loro cosmetici e saldo XP reale
+      registeredUsersMap.forEach((profile, uid) => {
+        getOrCreateUser(uid, profile.nome || profile.nomeCompleto);
+      });
 
       // 1. Appunti (+50 XP ciascuno)
       appuntiDocs.forEach(d => {
         const u = getOrCreateUser(d.autoreUid, d.autore);
         u.appunti += 1;
-        u.xp += 50;
+        u.activityXp += 50;
       });
 
       // 2. Progetti: File (+40 XP) e Cartelle (+20 XP)
@@ -359,47 +395,47 @@
         const u = getOrCreateUser(d.autoreUid, d.autore);
         if (d.type === "folder") {
           u.cartelle += 1;
-          u.xp += 20;
+          u.activityXp += 20;
         } else {
           u.fileProgetti += 1;
-          u.xp += 40;
+          u.activityXp += 40;
         }
       });
 
-      // 3. Forum Q&A: Domande (+15 XP), Risposte (+30 XP), Miglior Risposta (+50 XP bonus)
+      // 3. Forum Q&A
       qaDocs.forEach(d => {
         const author = getOrCreateUser(d.autoreUid, d.autore);
         author.domande += 1;
-        author.xp += 15;
+        author.activityXp += 15;
 
         const risposte = d.risposte || [];
         risposte.forEach(r => {
           const respUser = getOrCreateUser(null, r.autore);
           respUser.risposte += 1;
-          respUser.xp += 30;
+          respUser.activityXp += 30;
           if (r.isBest) {
             respUser.miglioriRisposte += 1;
-            respUser.xp += 50;
+            respUser.activityXp += 50;
           }
         });
       });
 
-      // 4. Chat Live (+2 XP a messaggio, max 100 XP)
+      // 4. Chat Live
       chatDocs.forEach(d => {
         const u = getOrCreateUser(d.autoreUid, d.autore);
         u.messaggiChat += 1;
       });
 
       usersMap.forEach(u => {
-        u.xp += Math.min(100, u.messaggiChat * 2);
+        u.activityXp += Math.min(100, u.messaggiChat * 2);
+        const firestoreXp = u.profileData?.xp ?? u.profileData?.punti;
+        u.xp = firestoreXp !== undefined ? Number(firestoreXp) : u.activityXp;
       });
 
-      // Assicuriamoci che l'utente corrente compaia anche se ha 0 XP
       if (currentUser) {
         getOrCreateUser(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
       }
 
-      // Ordina per XP decrescente
       const sorted = Array.from(usersMap.values()).sort((a, b) => b.xp - a.xp);
 
       renderMyBanner(sorted);
@@ -408,21 +444,42 @@
       if (window.lucide) window.lucide.createIcons();
     }
 
+    function buildAvatarHtml(userEntry, sizePx = 42, fontSize = "1rem") {
+      const cos = getUserCosmetics(userEntry.profileData);
+      const photo = userEntry.profileData?.photoURL || "";
+      const initial = (userEntry.name || "S").charAt(0).toUpperCase();
+      return `
+        <div class="lb-avatar" style="width:${sizePx}px; height:${sizePx}px; font-size:${fontSize}; ${cos.frameCss}">
+          ${photo ? `<img src="${photo}" alt="" referrerpolicy="no-referrer" />` : initial}
+        </div>
+      `;
+    }
+
     function renderMyBanner(sorted) {
       if (!currentUser) return;
       const myName = currentUser.displayName || currentUser.email.split("@")[0];
       const idx = sorted.findIndex(u => u.uid === currentUser.uid || u.name.toLowerCase() === myName.toLowerCase());
-      const me = idx >= 0 ? sorted[idx] : { name: myName, xp: 0 };
+      const me = idx >= 0 ? sorted[idx] : { name: myName, xp: 0, profileData: {} };
       const lvl = getLevelInfo(me.xp);
+      const cos = getUserCosmetics(me.profileData);
+
+      const bannerAv = document.getElementById("myBannerAvatar");
+      bannerAv.style.cssText = `width:56px; height:56px; font-size:1.3rem; ${cos.frameCss}`;
+      const myPhoto = me.profileData?.photoURL || currentUser.photoURL || "";
+      bannerAv.innerHTML = myPhoto
+        ? `<img src="${myPhoto}" alt="" referrerpolicy="no-referrer" />`
+        : me.name.charAt(0).toUpperCase();
 
       document.getElementById("myNameTitle").textContent = me.name;
+      document.getElementById("myCosmeticInline").innerHTML = renderCosmeticInlineHtml(me.profileData, true);
+
       const badge = document.getElementById("myLevelBadge");
       badge.textContent = lvl.name;
       badge.style.background = `${lvl.color}25`;
       badge.style.color = lvl.color;
 
       document.getElementById("myRankPosText").textContent = idx >= 0
-        ? `Posizione attuale: #${idx + 1} su ${sorted.length} compagni attivi`
+        ? `Posizione attuale: #${idx + 1} su ${sorted.length} compagni`
         : "Condividi un appunto o rispondi in Q&A per salire in classifica!";
 
       document.getElementById("myXpTotal").textContent = `${me.xp} XP`;
@@ -446,7 +503,6 @@
         return;
       }
 
-      // Ordine visivo podio su desktop: 2° - 1° - 3° se ci sono almeno 3 utenti
       const displayOrder = top3.length === 3
         ? [{ data: top3[1], rank: 2 }, { data: top3[0], rank: 1 }, { data: top3[2], rank: 3 }]
         : top3.map((d, i) => ({ data: d, rank: i + 1 }));
@@ -457,10 +513,19 @@
         const card = document.createElement("div");
         card.className = `podium-card rank-${rank}`;
         card.innerHTML = `
-          <div class="medal-badge">#${rank}</div>
-          <div style="font-size: 1.08rem; font-weight: 900; margin-bottom: 5px;">${data.name}</div>
+          <div><span class="medal-badge">#${rank} POSTO</span></div>
+          <div style="display:flex; justify-content:center; margin-bottom:10px;">
+            ${buildAvatarHtml(data, rank === 1 ? 68 : 56, rank === 1 ? "1.6rem" : "1.3rem")}
+          </div>
+          <div style="font-size: 1.08rem; font-weight: 900; margin-bottom: 4px; display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;">
+            <span>${data.name}</span>
+            ${renderCosmeticInlineHtml(data.profileData, false)}
+          </div>
+          <div style="margin-bottom: 8px;">
+            ${renderCosmeticInlineHtml({ ...data.profileData, equippedBadge: "" }, true)}
+          </div>
           <span class="lvl-pill" style="background: ${lvl.color}22; color: ${lvl.color}; display: inline-block; margin-bottom: 10px;">${lvl.name}</span>
-          <div style="font-size: 1.35rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">${data.xp} XP</div>
+          <div style="font-size: 1.35rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">⚡ ${data.xp} XP</div>
           <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px;">
             ${data.appunti} appunti • ${data.fileProgetti} file • ${data.risposte} risposte
           </div>
@@ -484,9 +549,11 @@
         row.innerHTML = `
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div class="rank-pos">${idx + 1}</div>
+            ${buildAvatarHtml(u, 42, "1rem")}
             <div>
-              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
                 <strong style="font-size: 0.96rem;">${u.name} ${isMe ? "(Tu)" : ""}</strong>
+                ${renderCosmeticInlineHtml(u.profileData, true)}
                 <span class="lvl-pill" style="background: ${lvl.color}22; color: ${lvl.color};">${lvl.name}</span>
               </div>
               <div class="stats-chips" style="margin-top: 5px;">
@@ -499,14 +566,22 @@
           </div>
 
           <div style="font-size: 1.08rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
-            ${u.xp} XP
+            ⚡ ${u.xp} XP
           </div>
         `;
         container.appendChild(row);
       });
     }
 
-    // Ascolto live sulle 4 collezioni di attività della 1BI
+    // Ascolto live sui profili registrati (XP, cornici, titoli, badge)
+    onSnapshot(collection(db, "utenti_registrati"), (snap) => {
+      registeredUsersMap.clear();
+      snap.forEach(d => {
+        registeredUsersMap.set(d.id, d.data());
+      });
+      recalculateLeaderboard();
+    });
+
     onSnapshot(collection(db, "appunti_1bi"), (snap) => {
       appuntiDocs = snap.docs.map(d => d.data());
       recalculateLeaderboard();

@@ -52,6 +52,13 @@
       background: linear-gradient(135deg, #1e293b, #0f172a);
       color: #fff;
       position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .custom-avatar-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Cornici Avatar Sbloccabili */
@@ -155,6 +162,12 @@
       font-size: 0.84rem;
       cursor: default;
     }
+
+    @media (max-width: 780px) {
+      #repXpAdminCard > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -175,7 +188,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="shopMainContainer">
     <!-- ANTEPRIMA LIVE PROFILO PERSONALIZZATO -->
     <div class="profile-showcase">
       <div class="showcase-left">
@@ -212,6 +225,7 @@
   <script type="module" src="../js/auth.js"></script>
   <script type="module">
     import { auth, db } from "../js/firebase-config.js";
+    import { mountRepXpAdminPanel } from "../js/xp-cosmetics.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -271,8 +285,9 @@
     }
 
     function updateShowcase() {
-      const name = userData.nomeCompleto || currentUser?.displayName || "Studente 1BI";
+      const name = userData.nome || userData.nomeCompleto || currentUser?.displayName || "Studente 1BI";
       const initial = name.charAt(0).toUpperCase();
+      const photoUrl = userData.photoURL || currentUser?.photoURL || "";
       const eq = getEquipped();
 
       const frameObj = SHOP_ITEMS.find(i => i.id === eq.frame) || SHOP_ITEMS[0];
@@ -280,7 +295,11 @@
       const badgeObj = SHOP_ITEMS.find(i => i.id === eq.badge) || SHOP_ITEMS.find(i => i.id === "badge-base");
 
       const ring = document.getElementById("previewAvatarRing");
-      ring.textContent = initial;
+      if (photoUrl) {
+        ring.innerHTML = `<img src="${photoUrl}" alt="${name}" referrerpolicy="no-referrer" />`;
+      } else {
+        ring.textContent = initial;
+      }
       ring.className = `custom-avatar-ring ${frameObj.cssClass}`;
 
       document.getElementById("previewFullName").textContent = name;
@@ -371,6 +390,10 @@
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
       currentUser = user;
+
+      // Monta il Pannello Admin XP (visibile SOLO ai Rappresentanti, nascosto in Vista Studente)
+      mountRepXpAdminPanel(document.getElementById("shopMainContainer"), user);
+
       onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
         userData = snap.exists() ? snap.data() : {};
         updateShowcase();
