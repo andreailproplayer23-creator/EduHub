@@ -7,6 +7,142 @@
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="js/theme.js"></script>
+  <style>
+    /* STREAK GIORNALIERA & MISSIONI LAMPO */
+    .streak-missions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.45fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .streak-card {
+      background: linear-gradient(145deg, rgba(249, 115, 22, 0.16), rgba(245, 158, 11, 0.08));
+      border: 1.5px solid rgba(251, 146, 60, 0.45);
+      border-radius: 18px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .streak-days-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .streak-day-dot {
+      flex: 1;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--text-muted);
+    }
+    .streak-day-dot.done {
+      background: linear-gradient(135deg, #f97316, #f59e0b);
+      border-color: #fde047;
+      color: #0f172a;
+    }
+    .btn-claim-streak {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 11px;
+      border: none;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+    .btn-claim-streak:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+    .btn-claim-streak:disabled {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #34d399;
+      cursor: default;
+    }
+
+    .missions-card {
+      background: var(--card-bg);
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      border-radius: 18px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .mission-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 11px;
+      background: rgba(15, 23, 42, 0.32);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      font-size: 0.82rem;
+    }
+    html[data-theme="light"] .mission-row {
+      background: rgba(15, 23, 42, 0.04);
+    }
+    .btn-mission-action {
+      padding: 5px 11px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 900;
+      font-size: 0.74rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-mission-go {
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      text-decoration: none;
+    }
+    .btn-mission-claim {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+    }
+    .btn-mission-done {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      cursor: default;
+    }
+
+    .crate-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.24), rgba(236, 72, 153, 0.2));
+      border: 1px solid rgba(192, 132, 252, 0.55);
+      color: #e879f9;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+    .crate-pill-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 860px) {
+      .streak-missions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -17,7 +153,7 @@
     <div class="topbar-right">
       <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
       <span class="badge-role">1BI</span>
-      <a href="profilo.html" class="profile-pill" title="Apri il tuo profilo">
+      <a href="profilo.html" class="profile-pill" data-track="profilo" title="Apri il tuo profilo">
         <div class="nav-avatar" id="navAvatar">S</div>
         <span id="userDisplayName">STUDENTE</span>
       </a>
@@ -32,7 +168,10 @@
         <p>Strumenti digitali condivisi per la <strong>1BI Informatica</strong> • Clicca sul tuo nome in alto per il profilo</p>
       </div>
       <div class="banner-actions-right">
-        <a href="modules/classifica.html" class="trophy-pill-btn" title="Apri la Classifica Contributori XP della 1BI">
+        <a href="modules/casse-xp.html" class="crate-pill-btn" data-track="casse" title="Apri le Casse Misteriose e gira la Ruota della Fortuna XP">
+          <span>🎰 Casse & Ruota XP</span>
+        </a>
+        <a href="modules/classifica.html" class="trophy-pill-btn" data-track="classifica" title="Apri la Classifica Contributori XP della 1BI">
           <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
           <span>Classifica 1BI</span>
         </a>
@@ -43,9 +182,63 @@
       </div>
     </div>
 
+    <!-- STREAK GIORNALIERA & MISSIONI LAMPO XP -->
+    <div class="streak-missions-grid">
+      <!-- BOX STREAK GIORNALIERA -->
+      <div class="streak-card">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:#fb923c;">
+              🔥 Streak Giornaliera 1BI
+            </span>
+            <span id="streakCountBadge" style="padding:3px 10px; border-radius:999px; background:rgba(249,115,22,0.22); color:#fdba74; font-size:0.78rem; font-weight:900;">
+              0 Giorni
+            </span>
+          </div>
+          <div style="font-size:0.84rem; color:var(--text-muted); margin-top:4px;">
+            Accedi ogni giorno per moltiplicare il bonus (7° giorno = <strong>+300 XP</strong>!)
+          </div>
+          <div class="streak-days-dots" id="streakDaysDots">
+            <div class="streak-day-dot">G1</div>
+            <div class="streak-day-dot">G2</div>
+            <div class="streak-day-dot">G3</div>
+            <div class="streak-day-dot">G4</div>
+            <div class="streak-day-dot">G5</div>
+            <div class="streak-day-dot">G6</div>
+            <div class="streak-day-dot">🎁</div>
+          </div>
+        </div>
+
+        <button type="button" id="claimStreakBtn" class="btn-claim-streak">
+          🔥 Riscatta Bonus Giornaliero (+30 XP)
+        </button>
+      </div>
+
+      <!-- BOX MISSIONI LAMPO DEL GIORNO -->
+      <div class="missions-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:#38bdf8;">
+              ⚡ Missioni Lampo del Giorno
+            </span>
+            <span style="font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(56,189,248,0.14); color:#7dd3fc;">
+              🔄 Nuove ogni 24h
+            </span>
+          </div>
+          <span id="missionsXpWalletBadge" style="font-size:0.78rem; font-weight:900; color:#fbbf24;">
+            Saldo: -- XP
+          </span>
+        </div>
+
+        <div id="dailyMissionsList" style="display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:0.82rem; color:var(--text-muted);">Caricamento missioni...</div>
+        </div>
+      </div>
+    </div>
+
     <!-- RIEPILOGO RAPIDO: ULTIMO ANNUNCIO IN BACHECA -->
     <div style="margin-bottom: 18px;">
-      <a href="modules/bacheca.html" id="latestBachecaBox" class="recap-box recap-bacheca" style="display: block;">
+      <a href="modules/bacheca.html" id="latestBachecaBox" data-track="bacheca" class="recap-box recap-bacheca" style="display: block;">
         <div>
           <span class="recap-label" style="color: #f87171;">
             <i data-lucide="megaphone" style="width: 14px; height: 14px;"></i> Ultimo Annuncio Bacheca
@@ -60,7 +253,7 @@
     </div>
 
     <!-- 1. ORARIO SCOLASTICO IN EVIDENZA -->
-    <a href="modules/orario.html" class="featured-circolari" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(6, 182, 212, 0.08));">
+    <a href="modules/orario.html" data-track="orario" class="featured-circolari" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(6, 182, 212, 0.08));">
       <div class="featured-left">
         <div class="icon-badge" style="background: rgba(16,185,129,0.18); color: #34d399; width: 64px; height: 64px;">
           <i data-lucide="calendar-days" style="width: 30px; height: 30px;"></i>
@@ -80,7 +273,7 @@
     </a>
 
     <!-- 2. BACHECA DI CLASSE IN EVIDENZA -->
-    <a href="modules/bacheca.html" class="featured-bacheca">
+    <a href="modules/bacheca.html" data-track="bacheca" class="featured-bacheca">
       <div class="featured-left">
         <div class="icon-badge" style="background: rgba(220,38,38,0.18); color: #ef4444; width: 64px; height: 64px;">
           <i data-lucide="bell-ring" style="width: 30px; height: 30px;"></i>
@@ -102,7 +295,7 @@
     <!-- BARRA FILTRO RAPIDO SEZIONI -->
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin: 20px 0 16px; align-items:center;">
       <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:7px 15px; border-radius:999px; border:1px solid #38bdf8; background:rgba(56,189,248,0.18); color:#38bdf8; font-weight:800; font-size:0.78rem; cursor:pointer;">
-        Tutte (21)
+        Tutte (24)
       </button>
       <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
         📚 Didattica & Studio
@@ -114,17 +307,17 @@
         🏫 Vita di Classe
       </button>
       <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
-        🎮 Arena & Svago
+        🎮 Arena, Casse XP & Svago
       </button>
     </div>
 
-    <!-- SEZIONE 1: DIDATTICA & STUDIO (6 CARD = 2 RIGHE COMPLETE DA 3) -->
+    <!-- SEZIONE 1: DIDATTICA & STUDIO -->
     <div class="dash-section" data-section="studio" style="margin-bottom: 26px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         📚 Didattica & Studio
       </div>
       <div class="cards-grid">
-        <a href="modules/verifiche.html" class="hub-card">
+        <a href="modules/verifiche.html" class="hub-card" data-track="verifiche">
           <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
             <i data-lucide="calendar-check"></i>
           </div>
@@ -132,7 +325,7 @@
           <p>Calendario condiviso delle prove 1BI con conto alla rovescia</p>
         </a>
 
-        <a href="modules/interrogazioni.html" class="hub-card">
+        <a href="modules/interrogazioni.html" class="hub-card" data-track="interrogazioni">
           <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #60a5fa;">
             <i data-lucide="hand"></i>
           </div>
@@ -140,7 +333,7 @@
           <p>Prenotati come volontario in ordine cronologico per le interrogazioni</p>
         </a>
 
-        <a href="modules/appunti.html" class="hub-card">
+        <a href="modules/appunti.html" class="hub-card" data-track="appunti">
           <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
             <i data-lucide="folder-git-2"></i>
           </div>
@@ -148,7 +341,7 @@
           <p>Schemi per materia e cartelle condivise con ogni tipo di file</p>
         </a>
 
-        <a href="modules/tutor-ai.html" class="hub-card">
+        <a href="modules/tutor-ai.html" class="hub-card" data-track="tutor_ai">
           <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #c4b5fd;">
             <i data-lucide="bot"></i>
           </div>
@@ -156,7 +349,7 @@
           <p>Chiedi aiuto a GPT-4o, Gemini, Claude, DeepSeek e condividi le spiegazioni</p>
         </a>
 
-        <a href="modules/interrogazione-ai.html" class="hub-card">
+        <a href="modules/interrogazione-ai.html" class="hub-card" data-track="interrogazione_ai">
           <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #a78bfa;">
             <i data-lucide="mic"></i>
           </div>
@@ -164,7 +357,7 @@
           <p>Carica le foto delle pagine del libro e fatti interrogare da Gemini Pro</p>
         </a>
 
-        <a href="modules/mindmap.html" class="hub-card">
+        <a href="modules/mindmap.html" class="hub-card" data-track="mindmap">
           <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #f472b6;">
             <i data-lucide="network"></i>
           </div>
@@ -172,7 +365,7 @@
           <p>Mappe concettuali a nodi e bacheche stile Padlet illimitate salvate per te</p>
         </a>
 
-        <a href="modules/tutoraggio.html" class="hub-card">
+        <a href="modules/tutoraggio.html" class="hub-card" data-track="tutoraggio">
           <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #38bdf8;">
             <i data-lucide="graduation-cap"></i>
           </div>
@@ -182,13 +375,13 @@
       </div>
     </div>
 
-    <!-- SEZIONE 2: LABORATORI & STRUMENTI TECH (6 CARD = 2 RIGHE COMPLETE DA 3) -->
+    <!-- SEZIONE 2: LABORATORI & STRUMENTI TECH -->
     <div class="dash-section" data-section="tech" style="margin-bottom: 26px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         💻 Laboratori & Strumenti Tech
       </div>
       <div class="cards-grid">
-        <a href="modules/presentazioni.html" class="hub-card">
+        <a href="modules/presentazioni.html" class="hub-card" data-track="presentazioni">
           <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #60a5fa;">
             <i data-lucide="presentation"></i>
           </div>
@@ -196,7 +389,7 @@
           <p>Crea slide, importa PDF/PPTX e controlla la LIM dal telefono in tempo reale</p>
         </a>
 
-        <a href="modules/convertitore-basi.html" class="hub-card">
+        <a href="modules/convertitore-basi.html" class="hub-card" data-track="basi">
           <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #3b82f6;">
             <i data-lucide="binary"></i>
           </div>
@@ -204,7 +397,7 @@
           <p>Binario, Esadecimale e Decimale con passaggi spiegati</p>
         </a>
 
-        <a href="modules/porte-logiche.html" class="hub-card">
+        <a href="modules/porte-logiche.html" class="hub-card" data-track="porte_logiche">
           <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
             <i data-lucide="cpu"></i>
           </div>
@@ -212,7 +405,7 @@
           <p>Simulatore interattivo AND, OR, NOT, XOR e tabella verità</p>
         </a>
 
-        <a href="modules/convertitore-unita.html" class="hub-card">
+        <a href="modules/convertitore-unita.html" class="hub-card" data-track="unita">
           <div class="icon-badge" style="background: rgba(139,92,246,0.16); color: #8b5cf6;">
             <i data-lucide="flask-conical"></i>
           </div>
@@ -220,7 +413,7 @@
           <p>Convertitore unità di misura e formule di 1ª superiore</p>
         </a>
 
-        <a href="modules/guida-laboratori.html" class="hub-card">
+        <a href="modules/guida-laboratori.html" class="hub-card" data-track="manuali">
           <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
             <i data-lucide="terminal"></i>
           </div>
@@ -228,7 +421,7 @@
           <p>Guide complete e trucchetti per Word, Excel, PowerPoint e AutoCAD</p>
         </a>
 
-        <a href="modules/risorse.html" class="hub-card">
+        <a href="modules/risorse.html" class="hub-card" data-track="risorse">
           <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #34d399;">
             <i data-lucide="bookmark"></i>
           </div>
@@ -238,13 +431,13 @@
       </div>
     </div>
 
-    <!-- SEZIONE 3: VITA DI CLASSE & RAPPRESENTANTI (6 CARD = 2 RIGHE COMPLETE DA 3) -->
+    <!-- SEZIONE 3: VITA DI CLASSE & RAPPRESENTANTI -->
     <div class="dash-section" data-section="classe" style="margin-bottom: 26px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         🏫 Vita di Classe & Rappresentanti
       </div>
       <div class="cards-grid">
-        <a href="modules/appello.html" class="hub-card">
+        <a href="modules/appello.html" class="hub-card" data-track="appello">
           <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #0ea5e9;">
             <i data-lucide="users"></i>
           </div>
@@ -252,7 +445,7 @@
           <p>Elenco ufficiale numerato degli studenti della 1BI</p>
         </a>
 
-        <a href="modules/posti.html" class="hub-card">
+        <a href="modules/posti.html" class="hub-card" data-track="posti">
           <div class="icon-badge" style="background: rgba(56,189,248,0.16); color: #38bdf8;">
             <i data-lucide="layout-grid"></i>
           </div>
@@ -260,7 +453,7 @@
           <p>Piantina interattiva dei banchi e disposizione della 1BI</p>
         </a>
 
-        <a href="modules/sondaggi.html" class="hub-card">
+        <a href="modules/sondaggi.html" class="hub-card" data-track="sondaggi">
           <div class="icon-badge" style="background: rgba(99,102,241,0.16); color: #818cf8;">
             <i data-lucide="vote"></i>
           </div>
@@ -268,7 +461,7 @@
           <p>Votazioni della 1BI in tempo reale su proposte, felpe e attività</p>
         </a>
 
-        <a href="modules/proposte.html" class="hub-card">
+        <a href="modules/proposte.html" class="hub-card" data-track="proposte">
           <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
             <i data-lucide="lightbulb"></i>
           </div>
@@ -276,7 +469,7 @@
           <p>Suggerisci idee per assemblee, eventi o EduHub e vota le migliori</p>
         </a>
 
-        <a href="modules/assemblee.html" class="hub-card">
+        <a href="modules/assemblee.html" class="hub-card" data-track="assemblee">
           <div class="icon-badge" style="background: rgba(239,68,68,0.16); color: #ef4444;">
             <i data-lucide="megaphone"></i>
           </div>
@@ -284,7 +477,7 @@
           <p>Calendario assemblee programmate, svolte e registro presenze</p>
         </a>
 
-        <a href="modules/countdown.html" class="hub-card">
+        <a href="modules/countdown.html" class="hub-card" data-track="countdown">
           <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
             <i data-lucide="hourglass"></i>
           </div>
@@ -294,13 +487,29 @@
       </div>
     </div>
 
-    <!-- SEZIONE 4: ARENA, LAVAGNA & SVAGO (3 CARD IN FONDO = 1 RIGA COMPLETA DA 3, SENZA DOPPIONI) -->
+    <!-- SEZIONE 4: ARENA, CASSE XP & SVAGO -->
     <div class="dash-section" data-section="svago" style="margin-bottom: 24px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
-        🎮 Arena, Lavagna & Compleanni
+        🎮 Arena, Casse XP & Compleanni
       </div>
       <div class="cards-grid">
-        <a href="modules/kahoot.html" class="hub-card">
+        <a href="modules/casse-xp.html" class="hub-card" data-track="casse" style="border-color: rgba(192, 132, 252, 0.45);">
+          <div class="icon-badge" style="background: rgba(168,85,247,0.2); color: #e879f9;">
+            <i data-lucide="gift"></i>
+          </div>
+          <h3>Casse Misteriose & Ruota</h3>
+          <p>Apri casse animate e gira la Ruota della Fortuna XP giornaliera</p>
+        </a>
+
+        <a href="modules/negozio-xp.html" class="hub-card" data-track="shop">
+          <div class="icon-badge" style="background: rgba(245,158,11,0.18); color: #fbbf24;">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <h3>Negozio XP & Profilo</h3>
+          <p>Spendi i tuoi punti XP per sbloccare cornici avatar, titoli e badge rari</p>
+        </a>
+
+        <a href="modules/kahoot.html" class="hub-card" data-track="kahoot">
           <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #a78bfa;">
             <i data-lucide="gamepad-2"></i>
           </div>
@@ -308,7 +517,7 @@
           <p>Quiz multiplayer dal vivo in classe, PIN Kahoot e Albo d'Oro</p>
         </a>
 
-        <a href="modules/lavagna.html" class="hub-card">
+        <a href="modules/lavagna.html" class="hub-card" data-track="lavagna">
           <div class="icon-badge" style="background: rgba(6,182,212,0.16); color: #22d3ee;">
             <i data-lucide="pen-tool"></i>
           </div>
@@ -316,7 +525,7 @@
           <p>Disegna, traccia forme e fai schemi in tempo reale con tutta la 1BI</p>
         </a>
 
-        <a href="modules/compleanni.html" class="hub-card">
+        <a href="modules/compleanni.html" class="hub-card" data-track="compleanni">
           <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #ec4899;">
             <i data-lucide="cake"></i>
           </div>
@@ -326,16 +535,8 @@
       </div>
     </div>
 
-    <a href="modules/negozio-xp.html" class="hub-card">
-          <div class="icon-badge" style="background: rgba(245,158,11,0.18); color: #fbbf24;">
-            <i data-lucide="sparkles"></i>
-          </div>
-          <h3>Negozio XP & Profilo</h3>
-          <p>Spendi i tuoi punti XP per sbloccare cornici avatar, titoli e badge rari</p>
-        </a>
-
     <!-- PULSANTE FLUTTUANTE CHAT & Q&A IN BASSO A DESTRA -->
-    <a href="modules/chat.html" class="floating-chat-btn" title="Apri Chat Live e Forum Q&A della 1BI">
+    <a href="modules/chat.html" data-track="chat" class="floating-chat-btn" title="Apri Chat Live e Forum Q&A della 1BI">
       <i data-lucide="messages-square" style="width: 20px; height: 20px;"></i>
       <span>Chat & Q&A 1BI</span>
       <span id="chatUnreadDot" class="chat-unread-dot"></span>
@@ -344,9 +545,10 @@
 
   <script type="module" src="js/auth.js"></script>
   <script type="module">
-    import { db } from "./js/firebase-config.js";
+    import { db, auth } from "./js/firebase-config.js";
     import { initCompagniWidget } from "./js/compagni-widget.js";
-    import { collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, doc, onSnapshot, query, orderBy, limit, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // Filtro rapido sezioni dashboard
     document.querySelectorAll(".dash-filter-btn").forEach(btn => {
@@ -369,6 +571,198 @@
 
     // Avvia widget flottante Rubrica Compagni 1BI (in basso a sinistra)
     initCompagniWidget();
+
+    // =========================================================================
+    // STREAK GIORNALIERA & 28 MISSIONI LAMPO A ROTAZIONE GIORNALIERA
+    // =========================================================================
+    let currentUser = null;
+    let userProfileData = {};
+
+    function getTodayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function getYesterdayKey() {
+      const d = new Date(Date.now() - 86400000);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    // Mega-catalogo di 28 Missioni Lampo (ne vengono sorteggiate 3 diverse ogni giorno!)
+    const MISSION_POOL = [
+      { id: "m_casse", track: "casse", label: "🎰 Visita la Sala Casse & Ruota XP", xp: 30, href: "modules/casse-xp.html" },
+      { id: "m_shop", track: "shop", label: "✨ Controlla le novità nel Negozio XP", xp: 25, href: "modules/negozio-xp.html" },
+      { id: "m_oral_ai", track: "interrogazione_ai", label: "🎤 Allenati con l'Interrogazione Orale AI", xp: 60, href: "modules/interrogazione-ai.html" },
+      { id: "m_tutor_ai", track: "tutor_ai", label: "🤖 Fai una domanda al Tutor Multi-AI", xp: 50, href: "modules/tutor-ai.html" },
+      { id: "m_verifiche", track: "verifiche", label: "📅 Controlla le prossime Verifiche 1BI", xp: 25, href: "modules/verifiche.html" },
+      { id: "m_appunti", track: "appunti", label: "📚 Esplora gli Appunti & Progetti condivisi", xp: 35, href: "modules/appunti.html" },
+      { id: "m_bacheca", track: "bacheca", label: "📢 Leggi gli avvisi in Bacheca di Classe", xp: 25, href: "modules/bacheca.html" },
+      { id: "m_orario", track: "orario", label: "🕒 Controlla l'Orario Scolastico di domani", xp: 20, href: "modules/orario.html" },
+      { id: "m_mindmap", track: "mindmap", label: "🧠 Apri Mind Map Studio per uno schema", xp: 45, href: "modules/mindmap.html" },
+      { id: "m_basi", track: "basi", label: "🔢 Fai una conversione nel Convertitore Basi", xp: 35, href: "modules/convertitore-basi.html" },
+      { id: "m_porte", track: "porte_logiche", label: "⚡ Testa un circuito nelle Porte Logiche", xp: 40, href: "modules/porte-logiche.html" },
+      { id: "m_unita", track: "unita", label: "🧪 Apri il Convertitore Fisica & Chimica", xp: 30, href: "modules/convertitore-unita.html" },
+      { id: "m_manuali", track: "manuali", label: "💻 Sfoglia i Manuali & Tips dei Laboratori", xp: 30, href: "modules/guida-laboratori.html" },
+      { id: "m_risorse", track: "risorse", label: "🔖 Scopri un tool in Risorse & Tool Utili", xp: 25, href: "modules/risorse.html" },
+      { id: "m_chat", track: "chat", label: "💬 Saluta la classe nella Chat & Q&A 1BI", xp: 30, href: "modules/chat.html" },
+      { id: "m_classifica", track: "classifica", label: "🏆 Controlla la tua posizione in Classifica", xp: 25, href: "modules/classifica.html" },
+      { id: "m_sondaggi", track: "sondaggi", label: "🗳️ Controlla i Sondaggi Rapidi della 1BI", xp: 30, href: "modules/sondaggi.html" },
+      { id: "m_proposte", track: "proposte", label: "💡 Leggi o vota le Proposte & Idee", xp: 30, href: "modules/proposte.html" },
+      { id: "m_posti", track: "posti", label: "🪑 Dai un'occhiata alla Mappa Posti Aula", xp: 20, href: "modules/posti.html" },
+      { id: "m_interrogazioni", track: "interrogazioni", label: "✋ Controlla i Turni Interrogazioni", xp: 25, href: "modules/interrogazioni.html" },
+      { id: "m_tutoraggio", track: "tutoraggio", label: "🎓 Visita la bacheca Tutoraggio tra Pari", xp: 30, href: "modules/tutoraggio.html" },
+      { id: "m_presentazioni", track: "presentazioni", label: "🖥️ Apri Presentazioni & LIM Studio", xp: 35, href: "modules/presentazioni.html" },
+      { id: "m_kahoot", track: "kahoot", label: "🎮 Entra nella Kahoot Arena 1BI", xp: 40, href: "modules/kahoot.html" },
+      { id: "m_lavagna", track: "lavagna", label: "🎨 Fai un salto sulla Lavagna Condivisa", xp: 30, href: "modules/lavagna.html" },
+      { id: "m_compleanni", track: "compleanni", label: "🎂 Controlla i prossimi Compleanni 1BI", xp: 25, href: "modules/compleanni.html" },
+      { id: "m_countdown", track: "countdown", label: "⏳ Controlla il Countdown & Ponti", xp: 20, href: "modules/countdown.html" },
+      { id: "m_assemblee", track: "assemblee", label: "📣 Controlla le Assemblee di Classe", xp: 25, href: "modules/assemblee.html" },
+      { id: "m_profilo", track: "profilo", label: "🪪 Aggiorna o controlla il tuo Profilo", xp: 25, href: "profilo.html" }
+    ];
+
+    // Seleziona 3 missioni diverse in modo deterministico in base alla data odierna
+    function getTodaysMissions() {
+      const dateStr = getTodayKey();
+      let seed = 0;
+      for (let i = 0; i < dateStr.length; i++) {
+        seed = (seed * 31 + dateStr.charCodeAt(i)) >>> 0;
+      }
+
+      const poolCopy = [...MISSION_POOL];
+      const selected = [];
+      for (let i = 0; i < 3; i++) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const idx = seed % poolCopy.length;
+        selected.push(poolCopy.splice(idx, 1)[0]);
+      }
+      return selected;
+    }
+
+    // Traccia automaticamente quando lo studente apre qualsiasi sezione della dashboard
+    document.querySelectorAll("[data-track]").forEach(el => {
+      el.addEventListener("click", () => {
+        const trackKey = el.dataset.track;
+        if (trackKey) {
+          localStorage.setItem(`eduhub_track_${getTodayKey()}_${trackKey}`, "1");
+        }
+      });
+    });
+
+    function renderStreakAndMissions() {
+      const today = getTodayKey();
+      const yesterday = getYesterdayKey();
+      const lastClaim = userProfileData.lastStreakDate || "";
+      let streakCount = Number(userProfileData.streakCount || 0);
+
+      if (lastClaim !== today && lastClaim !== yesterday) {
+        streakCount = 0;
+      }
+
+      const claimedToday = lastClaim === today;
+      const nextDayIndex = claimedToday ? ((streakCount - 1) % 7) + 1 : (streakCount % 7) + 1;
+      const rewardXp = nextDayIndex === 7 ? 300 : 30 + (nextDayIndex - 1) * 15;
+
+      document.getElementById("streakCountBadge").textContent = `${streakCount} ${streakCount === 1 ? "Giorno" : "Giorni"}`;
+
+      const dots = document.querySelectorAll("#streakDaysDots .streak-day-dot");
+      const filledCount = claimedToday ? ((streakCount - 1) % 7) + 1 : (streakCount % 7);
+      dots.forEach((dot, idx) => {
+        if (idx < filledCount) dot.classList.add("done");
+        else dot.classList.remove("done");
+      });
+
+      const streakBtn = document.getElementById("claimStreakBtn");
+      if (claimedToday) {
+        streakBtn.disabled = true;
+        streakBtn.textContent = `✓ Bonus Giornaliero Riscattato (${streakCount}g di fila)`;
+      } else {
+        streakBtn.disabled = false;
+        streakBtn.textContent = `🔥 Riscatta Giorno ${nextDayIndex} (+${rewardXp} XP)`;
+      }
+
+      const curXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0);
+      document.getElementById("missionsXpWalletBadge").textContent = `Saldo: ${curXp} XP`;
+
+      const todaysMissions = getTodaysMissions();
+      const claimedMissions = Array.isArray(userProfileData.claimedMissionsToday?.[today])
+        ? userProfileData.claimedMissionsToday[today]
+        : [];
+
+      const listEl = document.getElementById("dailyMissionsList");
+      listEl.innerHTML = todaysMissions.map(m => {
+        const isClaimed = claimedMissions.includes(m.id);
+        const isCompleted = localStorage.getItem(`eduhub_track_${today}_${m.track}`) === "1";
+
+        let actionHtml = "";
+        if (isClaimed) {
+          actionHtml = `<span class="btn-mission-action btn-mission-done">✓ +${m.xp} XP</span>`;
+        } else if (isCompleted) {
+          actionHtml = `<button type="button" class="btn-mission-action btn-mission-claim" data-claim-mission="${m.id}">Riscatta +${m.xp} XP</button>`;
+        } else {
+          actionHtml = `<a href="${m.href}" class="btn-mission-action btn-mission-go" data-go-track="${m.track}">Vai (+${m.xp} XP)</a>`;
+        }
+
+        return `
+          <div class="mission-row">
+            <span style="font-weight:700;">${m.label}</span>
+            ${actionHtml}
+          </div>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll("[data-go-track]").forEach(a => {
+        a.addEventListener("click", () => {
+          localStorage.setItem(`eduhub_track_${today}_${a.dataset.goTrack}`, "1");
+        });
+      });
+
+      listEl.querySelectorAll("[data-claim-mission]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!currentUser) return;
+          const m = todaysMissions.find(x => x.id === btn.dataset.claimMission);
+          if (!m) return;
+
+          const latestXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0) + m.xp;
+          const updatedList = Array.from(new Set([...claimedMissions, m.id]));
+
+          await setDoc(doc(db, "utenti_registrati", currentUser.uid), {
+            xp: latestXp,
+            punti: latestXp,
+            claimedMissionsToday: { [today]: updatedList }
+          }, { merge: true });
+        });
+      });
+    }
+
+    document.getElementById("claimStreakBtn").addEventListener("click", async () => {
+      if (!currentUser) return;
+      const today = getTodayKey();
+      const yesterday = getYesterdayKey();
+      const lastClaim = userProfileData.lastStreakDate || "";
+      if (lastClaim === today) return;
+
+      const prevStreak = lastClaim === yesterday ? Number(userProfileData.streakCount || 0) : 0;
+      const newStreak = prevStreak + 1;
+      const daySlot = ((newStreak - 1) % 7) + 1;
+      const bonusXp = daySlot === 7 ? 300 : 30 + (daySlot - 1) * 15;
+      const newTotalXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0) + bonusXp;
+
+      await setDoc(doc(db, "utenti_registrati", currentUser.uid), {
+        xp: newTotalXp,
+        punti: newTotalXp,
+        streakCount: newStreak,
+        lastStreakDate: today
+      }, { merge: true });
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+        userProfileData = snap.exists() ? snap.data() : {};
+        renderStreakAndMissions();
+      });
+    });
 
     // 1. Ultimo Annuncio in Bacheca
     const qBach = query(collection(db, "bacheca_1bi"), orderBy("creatoIl", "desc"), limit(1));

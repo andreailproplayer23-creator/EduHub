@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Casse Misteriose & Ruota XP 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    .top-wallet-bar {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .xp-pill-big {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.12));
+      border: 1.5px solid rgba(251, 191, 36, 0.5);
+      color: #fbbf24;
+      padding: 10px 20px;
+      border-radius: 14px;
+      font-size: 1.45rem;
+      font-weight: 900;
+    }
+
+    /* GRID DELLE 3 CASSE */
+    .crates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .crate-card {
+      background: var(--solid-panel);
+      border: 1.5px solid var(--solid-border);
+      border-radius: 22px;
+      padding: 24px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+    }
+    .crate-card:hover {
+      transform: translateY(-6px);
+    }
+    .crate-card.tier-std {
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 12px 30px rgba(56, 189, 248, 0.12);
+    }
+    .crate-card.tier-epic {
+      border-color: rgba(168, 85, 247, 0.55);
+      box-shadow: 0 12px 32px rgba(168, 85, 247, 0.18);
+    }
+    .crate-card.tier-mythic {
+      border-color: rgba(251, 191, 36, 0.65);
+      background: linear-gradient(165deg, rgba(245, 158, 11, 0.14), var(--solid-panel) 65%);
+      box-shadow: 0 14px 36px rgba(245, 158, 11, 0.22);
+    }
+
+    @keyframes floatChest {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1.5deg); }
+    }
+
+    .crate-icon-wrap {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 14px;
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.3rem;
+      animation: floatChest 3.2s ease-in-out infinite;
+    }
+    .tier-std .crate-icon-wrap { background: rgba(56, 189, 248, 0.15); box-shadow: 0 0 25px rgba(56, 189, 248, 0.3); }
+    .tier-epic .crate-icon-wrap { background: rgba(168, 85, 247, 0.18); box-shadow: 0 0 28px rgba(168, 85, 247, 0.38); }
+    .tier-mythic .crate-icon-wrap { background: rgba(251, 191, 36, 0.2); box-shadow: 0 0 32px rgba(251, 191, 36, 0.48); }
+
+    .odds-list {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 12px 0 18px;
+    }
+    .odd-tag {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--solid-sub);
+      border: 1px solid var(--solid-border);
+    }
+
+    .btn-open-crate {
+      width: 100%;
+      padding: 13px;
+      border-radius: 13px;
+      border: none;
+      font-weight: 900;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+    .btn-open-crate:hover {
+      transform: scale(1.02);
+      filter: brightness(1.08);
+    }
+    .tier-std .btn-open-crate { background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; }
+    .tier-epic .btn-open-crate { background: linear-gradient(135deg, #9333ea, #6d28d9); color: #fff; }
+    .tier-mythic .btn-open-crate { background: linear-gradient(135deg, #f59e0b, #d97706); color: #0f172a; }
+
+    /* ===================================================== */
+    /* STAGE ANIMAZIONE APERTURA CASSA (OVERLAY CINEMATOGRAFICO)*/
+    /* ===================================================== */
+    .opening-stage-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.98));
+      backdrop-filter: blur(14px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .opening-stage-overlay.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Cassa 3D illustrata animata */
+    .chest-scene {
+      text-align: center;
+      position: relative;
+      max-width: 440px;
+      width: 100%;
+    }
+
+    .chest-aura {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 240px;
+      height: 240px;
+      transform: translate(-50%, -50%) scale(0.5);
+      border-radius: 50%;
+      filter: blur(42px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.6s ease;
+    }
+
+    @keyframes chestChargeShake {
+      0% { transform: scale(1) rotate(0deg); }
+      15% { transform: scale(1.06) rotate(-5deg); }
+      30% { transform: scale(1.1) rotate(5deg); }
+      45% { transform: scale(1.14) rotate(-7deg); }
+      60% { transform: scale(1.18) rotate(7deg); }
+      75% { transform: scale(1.22) rotate(-9deg); }
+      90% { transform: scale(1.28) rotate(9deg); }
+      100% { transform: scale(1.35) rotate(0deg); }
+    }
+
+    .animated-chest-box {
+      width: 170px;
+      height: 150px;
+      margin: 0 auto;
+      position: relative;
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .animated-chest-box.shaking {
+      animation: chestChargeShake 1.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+    }
+    .animated-chest-box.fade-out {
+      opacity: 0;
+      transform: scale(1.7);
+      pointer-events: none;
+    }
+
+    /* Coperchio e Base della Cassa */
+    .chest-lid {
+      width: 170px;
+      height: 58px;
+      background: linear-gradient(180deg, #b45309, #78350f);
+      border: 4px solid #fbbf24;
+      border-radius: 26px 26px 8px 8px;
+      position: relative;
+      z-index: 2;
+      transform-origin: bottom center;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    }
+    .chest-lid::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -14px;
+      transform: translateX(-50%);
+      width: 34px;
+      height: 28px;
+      background: linear-gradient(135deg, #fde047, #f59e0b);
+      border: 3px solid #78350f;
+      border-radius: 8px;
+    }
+    .animated-chest-box.opened .chest-lid {
+      transform: translateY(-28px) rotateX(65deg) scale(0.95);
+    }
+
+    .chest-base {
+      width: 158px;
+      height: 86px;
+      margin: -4px auto 0;
+      background: linear-gradient(180deg, #92400e, #451a03);
+      border: 4px solid #fbbf24;
+      border-top: none;
+      border-radius: 0 0 18px 18px;
+      position: relative;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    }
+    .chest-base::before {
+      content: "";
+      position: absolute;
+      inset: 0 24px;
+      border-left: 4px solid #f59e0b;
+      border-right: 4px solid #f59e0b;
+    }
+
+    .chest-inner-glow {
+      position: absolute;
+      top: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      filter: blur(12px);
+      opacity: 0;
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+    .animated-chest-box.opened .chest-inner-glow {
+      opacity: 1;
+    }
+
+    /* Flash di luce bianco/colorato */
+    .flash-burst {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3100;
+      transition: opacity 0.45s ease;
+    }
+    .flash-burst.active {
+      opacity: 0.85;
+      transition: none;
+    }
+
+    /* CARTA PREMIO ESTRATTO (FADE-IN + POP) */
+    .reward-reveal-card {
+      background: #0f172a;
+      border: 2px solid #38bdf8;
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(28px) scale(0.84);
+      pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    }
+    .reward-reveal-card.revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .reward-preview-circle {
+      width: 104px;
+      height: 104px;
+      margin: 14px auto;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    /* SEZIONE RUOTA DELLA FORTUNA XP */
+    .wheel-section {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 22px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      flex-shrink: 0;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 26px solid #fbbf24;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+      z-index: 10;
+    }
+
+    .wheel-disc {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 6px solid #fbbf24;
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.35);
+      background: conic-gradient(
+        #2563eb 0deg 45deg,
+        #10b981 45deg 90deg,
+        #8b5cf6 90deg 135deg,
+        #f59e0b 135deg 180deg,
+        #0284c7 180deg 225deg,
+        #ec4899 225deg 270deg,
+        #14b8a6 270deg 315deg,
+        #ef4444 315deg 360deg
+      );
+      position: relative;
+      transition: transform 4.2s cubic-bezier(0.15, 0.85, 0.18, 1);
+    }
+
+    .wheel-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0 0;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+      white-space: nowrap;
+    }
+
+    .wheel-center-cap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #0f172a;
+      border: 3px solid #fbbf24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.8rem;
+      color: #fbbf24;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Casse Misteriose & Ruota XP</span>
+    </div>
+    <div class="topbar-right">
+      <a href="negozio-xp.html" class="btn-logout" style="text-decoration:none; border-color:rgba(251,191,36,0.45); color:#fbbf24;">
+        🛒 Negozio XP
+      </a>
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1080px;">
+    <!-- SALDO XP IN ALTO -->
+    <div class="top-wallet-bar">
+      <div>
+        <h2 style="font-size: 1.45rem; font-weight: 900;">🎰 Sala Casse Misteriose & Ruota 1BI</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">
+          Apri le casse per sbloccare cornici animate, titoli e badge rari (doppioni rimborsati al 50% in XP!)
+        </p>
+      </div>
+      <div class="xp-pill-big" id="walletXpDisplay">⚡ 0 XP</div>
+    </div>
+
+    <!-- 3 CASSE MISTERIOSE -->
+    <div class="crates-grid">
+      <!-- CASSA 1: STANDARD -->
+      <div class="crate-card tier-std">
+        <div class="crate-icon-wrap">📦</div>
+        <h3 style="font-size: 1.15rem; font-weight: 900;">Cassa Standard 1BI</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+          Perfetta per sbloccare i primi cosmetici della collezione
+        </p>
+        <div class="odds-list">
+          <span class="odd-tag" style="color:#cbd5e1;">Comune 50%</span>
+          <span class="odd-tag" style="color:#38bdf8;">Raro 35%</span>
+          <span class="odd-tag" style="color:#c084fc;">Epico 13%</span>
+          <span class="odd-tag" style="color:#fbbf24;">Legg. 2%</span>
+        </div>
+        <button type="button" class="btn-open-crate" data-crate="std">
+          Apri Cassa — 150 XP
+        </button>
+      </div>
+
+      <!-- CASSA 2: CYBER EPICA -->
+      <div class="crate-card tier-epic">
+        <div class="crate-icon-wrap">🔮</div>
+        <h3 style="font-size: 1.15rem; font-weight: 900;">Cassa Cyber Epica</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+          Nessun oggetto comune! Alta probabilità di Epici e Leggendari
+        </p>
+        <div class="odds-list">
+          <span class="odd-tag" style="color:#38bdf8;">Raro 40%</span>
+          <span class="odd-tag" style="color:#c084fc;">Epico 40%</span>
+          <span class="odd-tag" style="color:#fbbf24;">Legg. 16%</span>
+          <span class="odd-tag" style="color:#f472b6;">Mitico 4%</span>
+        </div>
+        <button type="button" class="btn-open-crate" data-crate="epic">
+          Apri Cassa — 350 XP
+        </button>
+      </div>
+
+      <!-- CASSA 3: MITICA SUPREMA -->
+      <div class="crate-card tier-mythic">
+        <div class="crate-icon-wrap">👑</div>
+        <h3 style="font-size: 1.15rem; font-weight: 900; color:#fbbf24;">Cassa Mitica Suprema</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+          Drop garantito Epico+ con altissima chance di Cornice RGB & Drago!
+        </p>
+        <div class="odds-list">
+          <span class="odd-tag" style="color:#c084fc;">Epico 35%</span>
+          <span class="odd-tag" style="color:#fbbf24;">Legg. 45%</span>
+          <span class="odd-tag" style="color:#f472b6;">Mitico 20%</span>
+        </div>
+        <button type="button" class="btn-open-crate" data-crate="mythic">
+          Apri Cassa — 750 XP
+        </button>
+      </div>
+    </div>
+
+    <!-- RUOTA DELLA FORTUNA GIORNALIERA -->
+    <div class="wheel-section">
+      <div style="max-width: 460px;">
+        <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:rgba(16,185,129,0.16); color:#10b981; font-size:0.74rem; font-weight:900; margin-bottom:8px;">
+          🎁 BONUS GIORNALIERO GRATUITO
+        </span>
+        <h3 style="font-size: 1.35rem; font-weight: 900;">🎡 Ruota della Fortuna XP</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5;">
+          Gira la ruota gratis una volta al giorno per vincere istantaneamente da <strong>+50 XP</strong> fino al super jackpot da <strong>+1000 XP</strong>!
+        </p>
+        <button type="button" id="spinWheelBtn" style="margin-top: 16px; padding: 13px 24px; border-radius: 13px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; font-size: 0.95rem; cursor: pointer;">
+          🎡 Gira la Ruota Gratis!
+        </button>
+        <div id="wheelStatusMsg" style="margin-top: 10px; font-size: 0.84rem; font-weight: 800; color: #fbbf24;"></div>
+      </div>
+
+      <div class="wheel-container">
+        <div class="wheel-pointer"></div>
+        <div class="wheel-disc" id="fortuneWheelDisc"></div>
+        <div class="wheel-center-cap">1BI</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FLASH DI LUCE E PALCO ANIMAZIONE APERTURA CASSA -->
+  <div id="flashBurst" class="flash-burst"></div>
+
+  <div id="openingStageOverlay" class="opening-stage-overlay">
+    <div class="chest-scene">
+      <div id="chestAura" class="chest-aura"></div>
+
+      <!-- CASSA ANIMATA -->
+      <div id="animatedChestBox" class="animated-chest-box">
+        <div class="chest-lid"></div>
+        <div class="chest-inner-glow"></div>
+        <div class="chest-base"></div>
+        <div id="openingHintText" style="margin-top: 18px; font-weight: 900; font-size: 0.95rem; color: #fde68a; letter-spacing: 0.5px;">
+          ✨ Apertura in corso...
+        </div>
+      </div>
+
+      <!-- SCHEDA PREMIO ESTRATTO -->
+      <div id="rewardRevealCard" class="reward-reveal-card" style="display: none;">
+        <span id="rewardRarityBadge" style="display:inline-block; padding:4px 12px; border-radius:999px; font-size:0.74rem; font-weight:900; text-transform:uppercase;">
+          RARO
+        </span>
+        <div id="rewardPreviewCircle" class="reward-preview-circle">💎</div>
+        <h3 id="rewardItemName" style="font-size: 1.35rem; font-weight: 900; color: #fff;">Oggetto Sbloccato</h3>
+        <p id="rewardItemDesc" style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;"></p>
+        <div id="rewardDuplicateBanner" style="display:none; margin-top: 10px; padding: 8px 12px; border-radius: 10px; background: rgba(245,158,11,0.18); border: 1px solid rgba(251,191,36,0.45); color: #fbbf24; font-size: 0.82rem; font-weight: 800;"></div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+          <button type="button" id="equipRewardBtn" style="padding: 11px 18px; border-radius: 11px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; font-size: 0.86rem; cursor: pointer;">
+            ⚡ Equipaggia Subito
+          </button>
+          <button type="button" id="closeStageBtn" style="padding: 11px 18px; border-radius: 11px; border: 1px solid rgba(148,163,184,0.35); background: rgba(30,41,59,0.9); color: #f8fafc; font-weight: 800; font-size: 0.86rem; cursor: pointer;">
+            Continua
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { FRAME_STYLES, TITLE_LABELS, BADGE_ICONS } from "../js/xp-cosmetics.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Costruisce il pool completo di oggetti dalle definizioni centrali
+    const POOL_ITEMS = [
+      // Cornici
+      { id: "frame-mint", type: "frame", rarity: "comune", name: "Cornice Menta Fresca", price: 80 },
+      { id: "frame-cobalt", type: "frame", rarity: "comune", name: "Cornice Blu Cobalto", price: 120 },
+      { id: "frame-matrix", type: "frame", rarity: "raro", name: "Cornice Matrix Hacker", price: 180 },
+      { id: "frame-sunset", type: "frame", rarity: "raro", name: "Cornice Tramonto Corallo", price: 220 },
+      { id: "frame-neon", type: "frame", rarity: "raro", name: "Cornice Cyber Neon", price: 280 },
+      { id: "frame-electric", type: "frame", rarity: "epico", name: "Cornice Alta Tensione", price: 350 },
+      { id: "frame-amethyst", type: "frame", rarity: "epico", name: "Cornice Ametista Reale", price: 420 },
+      { id: "frame-fire", type: "frame", rarity: "epico", name: "Cornice Magma Streak", price: 500 },
+      { id: "frame-frost", type: "frame", rarity: "epico", name: "Cornice Ghiaccio Polare", price: 580 },
+      { id: "frame-bloodmoon", type: "frame", rarity: "leggendario", name: "Cornice Luna di Sangue", price: 700 },
+      { id: "frame-vaporwave", type: "frame", rarity: "leggendario", name: "Cornice Vaporwave 80s", price: 820 },
+      { id: "frame-gold", type: "frame", rarity: "leggendario", name: "Cornice Leggenda Oro", price: 950 },
+      { id: "frame-void", type: "frame", rarity: "mitico", name: "Cornice Buco Nero", price: 1200 },
+      { id: "frame-diamond", type: "frame", rarity: "mitico", name: "Cornice Diamante 1BI", price: 1500 },
+      { id: "frame-rgb", type: "frame", rarity: "mitico", name: "Cornice RGB Full Gaming", price: 2000 },
+
+      // Titoli
+      { id: "title-matricola", type: "title", rarity: "comune", name: "Matricola Giorgi-Woolf", price: 60 },
+      { id: "title-coffee", type: "title", rarity: "comune", name: "Alimentato a Caffè", price: 100 },
+      { id: "title-bughunter", type: "title", rarity: "raro", name: "Bug Hunter C++", price: 150 },
+      { id: "title-binary", type: "title", rarity: "raro", name: "Mago del Binario", price: 190 },
+      { id: "title-nightcoder", type: "title", rarity: "raro", name: "Coder Notturno", price: 230 },
+      { id: "title-survivor", type: "title", rarity: "raro", name: "Sopravvissuto alle Verifiche", price: 270 },
+      { id: "title-notes", type: "title", rarity: "epico", name: "Spacciatore di Appunti", price: 320 },
+      { id: "title-secchione", type: "title", rarity: "epico", name: "Re delle Interrogazioni", price: 380 },
+      { id: "title-gamer", type: "title", rarity: "epico", name: "Pro Player 1BI", price: 440 },
+      { id: "title-kahoot", type: "title", rarity: "epico", name: "Campione Kahoot Arena", price: 500 },
+      { id: "title-lim", type: "title", rarity: "leggendario", name: "Signore della LIM", price: 620 },
+      { id: "title-speedrunner", type: "title", rarity: "leggendario", name: "Speedrunner di Compiti", price: 740 },
+      { id: "title-architect", type: "title", rarity: "leggendario", name: "System Architect", price: 880 },
+      { id: "title-ai", type: "title", rarity: "leggendario", name: "Domatore di AI", price: 1000 },
+      { id: "title-cyber", type: "title", rarity: "mitico", name: "Cyber Ghost 1BI", price: 1300 },
+      { id: "title-emperor", type: "title", rarity: "mitico", name: "Imperatore della 1BI", price: 1650 },
+      { id: "title-legend", type: "title", rarity: "mitico", name: "Leggenda Assoluta", price: 2200 },
+
+      // Badge
+      { id: "badge-laptop", type: "badge", rarity: "comune", name: "Badge Dev Laptop", price: 70 },
+      { id: "badge-rocket", type: "badge", rarity: "comune", name: "Badge Razzo", price: 110 },
+      { id: "badge-zap", type: "badge", rarity: "raro", name: "Badge Fulmine", price: 160 },
+      { id: "badge-target", type: "badge", rarity: "raro", name: "Badge Cecchino", price: 210 },
+      { id: "badge-brain", type: "badge", rarity: "raro", name: "Badge Cervellone AI", price: 260 },
+      { id: "badge-alien", type: "badge", rarity: "raro", name: "Badge Pixel Invader", price: 310 },
+      { id: "badge-robot", type: "badge", rarity: "epico", name: "Badge Mecha Bot", price: 380 },
+      { id: "badge-shield", type: "badge", rarity: "epico", name: "Scudo della Classe", price: 450 },
+      { id: "badge-sword", type: "badge", rarity: "epico", name: "Spade Incrociate", price: 520 },
+      { id: "badge-fox", type: "badge", rarity: "epico", name: "Badge Volpe Astuta", price: 600 },
+      { id: "badge-wolf", type: "badge", rarity: "leggendario", name: "Badge Lupo Alfa", price: 750 },
+      { id: "badge-eagle", type: "badge", rarity: "leggendario", name: "Badge Aquila Reale", price: 880 },
+      { id: "badge-fire", type: "badge", rarity: "leggendario", name: "Fiamma Inarrestabile", price: 1000 },
+      { id: "badge-ufo", type: "badge", rarity: "mitico", name: "Badge Navicella UFO", price: 1250 },
+      { id: "badge-crown", type: "badge", rarity: "mitico", name: "Corona Imperiale", price: 1500 },
+      { id: "badge-diamond", type: "badge", rarity: "mitico", name: "Diamante Puro", price: 1800 },
+      { id: "badge-dragon", type: "badge", rarity: "mitico", name: "Drago Mitico 1BI", price: 2500 }
+    ];
+
+    const CRATE_CONFIGS = {
+      std: { cost: 150, weights: { comune: 50, raro: 35, epico: 13, leggendario: 2, mitico: 0 } },
+      epic: { cost: 350, weights: { comune: 0, raro: 40, epico: 40, leggendario: 16, mitico: 4 } },
+      mythic: { cost: 750, weights: { comune: 0, raro: 0, epico: 35, leggendario: 45, mitico: 20 } }
+    };
+
+    const RARITY_COLORS = {
+      comune: "#94a3b8",
+      raro: "#38bdf8",
+      epico: "#a855f7",
+      leggendario: "#fbbf24",
+      mitico: "#f43f5e"
+    };
+
+    let currentUser = null;
+    let userData = {};
+    let isOpening = false;
+    let lastWonItem = null;
+
+    function getUserXp() {
+      return Number(userData.xp ?? userData.punti ?? 0);
+    }
+
+    function getOwnedIds() {
+      const base = ["frame-default", "title-base", "badge-base"];
+      const saved = Array.isArray(userData.shopOwned) ? userData.shopOwned : [];
+      return Array.from(new Set([...base, ...saved]));
+    }
+
+    function pickRandomItem(crateKey) {
+      const weights = CRATE_CONFIGS[crateKey].weights;
+      const roll = Math.random() * 100;
+      let acc = 0;
+      let chosenRarity = "comune";
+
+      for (const [rar, w] of Object.entries(weights)) {
+        acc += w;
+        if (roll <= acc && w > 0) {
+          chosenRarity = rar;
+          break;
+        }
+      }
+
+      const candidates = POOL_ITEMS.filter(i => i.rarity === chosenRarity);
+      return candidates[Math.floor(Math.random() * candidates.length)] || POOL_ITEMS[0];
+    }
+
+    // =========================================================================
+    // ANIMAZIONE APERTURA CASSA
+    // =========================================================================
+    async function openCrateFlow(crateKey) {
+      if (!currentUser || isOpening) return;
+      const cfg = CRATE_CONFIGS[crateKey];
+      const currentXp = getUserXp();
+
+      if (currentXp < cfg.cost) {
+        return alert(`Ti servono ${cfg.cost} XP per aprire questa cassa (hai ${currentXp} XP)!`);
+      }
+
+      isOpening = true;
+      const wonItem = pickRandomItem(crateKey);
+      lastWonItem = wonItem;
+      const rarColor = RARITY_COLORS[wonItem.rarity] || "#38bdf8";
+
+      const owned = getOwnedIds();
+      const isDuplicate = owned.includes(wonItem.id);
+      const refundXp = isDuplicate ? Math.round(wonItem.price * 0.5) : 0;
+      const finalXp = currentXp - cfg.cost + refundXp;
+      const updatedOwned = isDuplicate ? owned : [...owned, wonItem.id];
+
+      // Aggiorna Firestore subito
+      await updateDoc(doc(db, "utenti_registrati", currentUser.uid), {
+        xp: finalXp,
+        punti: finalXp,
+        shopOwned: updatedOwned
+      });
+
+      // Reset palco animazione
+      const overlay = document.getElementById("openingStageOverlay");
+      const chestBox = document.getElementById("animatedChestBox");
+      const aura = document.getElementById("chestAura");
+      const flash = document.getElementById("flashBurst");
+      const card = document.getElementById("rewardRevealCard");
+
+      card.style.display = "none";
+      card.classList.remove("revealed");
+      chestBox.style.display = "block";
+      chestBox.className = "animated-chest-box";
+      aura.style.background = rarColor;
+      aura.style.opacity = "0";
+      aura.style.transform = "translate(-50%, -50%) scale(0.5)";
+
+      overlay.style.display = "flex";
+      requestAnimationFrame(() => overlay.classList.add("visible"));
+
+      // Fase 1: Tremolio & carica energia (1.45s)
+      setTimeout(() => {
+        chestBox.classList.add("shaking");
+        aura.style.opacity = "0.75";
+        aura.style.transform = "translate(-50%, -50%) scale(1.25)";
+      }, 120);
+
+      // Fase 2: Apertura coperchio + Flash di luce
+      setTimeout(() => {
+        chestBox.classList.add("opened");
+        flash.style.background = rarColor;
+        flash.classList.add("active");
+        setTimeout(() => flash.classList.remove("active"), 180);
+      }, 1550);
+
+      // Fase 3: Fade-out cassa -> Fade-in scheda premio
+      setTimeout(() => {
+        chestBox.classList.add("fade-out");
+      }, 2050);
+
+      setTimeout(() => {
+        chestBox.style.display = "none";
+
+        // Popola scheda premio
+        const rarBadge = document.getElementById("rewardRarityBadge");
+        rarBadge.textContent = wonItem.rarity.toUpperCase();
+        rarBadge.style.background = `${rarColor}28`;
+        rarBadge.style.color = rarColor;
+        rarBadge.style.border = `1px solid ${rarColor}`;
+
+        const circle = document.getElementById("rewardPreviewCircle");
+        circle.style.cssText = "";
+        if (wonItem.type === "frame") {
+          circle.style.cssText = FRAME_STYLES[wonItem.id] || "";
+          circle.textContent = "1BI";
+        } else if (wonItem.type === "title") {
+          circle.style.border = `3px solid ${rarColor}`;
+          circle.textContent = "🏷️";
+        } else {
+          circle.style.border = `3px solid ${rarColor}`;
+          circle.textContent = BADGE_ICONS[wonItem.id] || "🏅";
+        }
+
+        document.getElementById("rewardItemName").textContent =
+          wonItem.type === "title" ? (TITLE_LABELS[wonItem.id] || wonItem.name) : wonItem.name;
+        document.getElementById("rewardItemDesc").textContent =
+          wonItem.type === "frame" ? "Nuova Cornice Avatar sbloccata!" :
+          wonItem.type === "title" ? "Nuovo Titolo Speciale sbloccato!" : "Nuovo Badge Raro sbloccato!";
+
+        const dupBanner = document.getElementById("rewardDuplicateBanner");
+        if (isDuplicate) {
+          dupBanner.style.display = "block";
+          dupBanner.textContent = `♻️ Avevi già questo oggetto: rimborsati +${refundXp} XP!`;
+        } else {
+          dupBanner.style.display = "none";
+        }
+
+        card.style.borderColor = rarColor;
+        card.style.boxShadow = `0 20px 60px ${rarColor}44`;
+        card.style.display = "block";
+        requestAnimationFrame(() => card.classList.add("revealed"));
+      }, 2400);
+    }
+
+    document.querySelectorAll("[data-crate]").forEach(btn => {
+      btn.addEventListener("click", () => openCrateFlow(btn.dataset.crate));
+    });
+
+    document.getElementById("equipRewardBtn").addEventListener("click", async () => {
+      if (!currentUser || !lastWonItem) return;
+      const upd = {};
+      if (lastWonItem.type === "frame") upd.equippedFrame = lastWonItem.id;
+      if (lastWonItem.type === "title") upd.equippedTitle = lastWonItem.id;
+      if (lastWonItem.type === "badge") upd.equippedBadge = lastWonItem.id;
+      await updateDoc(doc(db, "utenti_registrati", currentUser.uid), upd);
+      closeStage();
+    });
+
+    function closeStage() {
+      const overlay = document.getElementById("openingStageOverlay");
+      overlay.classList.remove("visible");
+      setTimeout(() => {
+        overlay.style.display = "none";
+        isOpening = false;
+      }, 350);
+    }
+    document.getElementById("closeStageBtn").addEventListener("click", closeStage);
+
+    // =========================================================================
+    // RUOTA DELLA FORTUNA XP (8 SPICCHI)
+    // =========================================================================
+    const WHEEL_PRIZES = [50, 100, 150, 250, 75, 400, 120, 1000];
+    const discEl = document.getElementById("fortuneWheelDisc");
+
+    // Etichette sugli spicchi
+    WHEEL_PRIZES.forEach((val, idx) => {
+      const deg = idx * 45 + 22.5;
+      const lbl = document.createElement("div");
+      lbl.className = "wheel-label";
+      lbl.textContent = `+${val} XP`;
+      lbl.style.transform = `rotate(${deg - 90}deg) translate(46px, -6px)`;
+      discEl.appendChild(lbl);
+    });
+
+    let wheelSpinning = false;
+    let currentWheelDeg = 0;
+
+    function canSpinToday() {
+      const lastSpin = Number(userData.lastWheelSpinAt || 0);
+      return Date.now() - lastSpin >= 24 * 60 * 60 * 1000;
+    }
+
+    function updateWheelUI() {
+      const btn = document.getElementById("spinWheelBtn");
+      const msg = document.getElementById("wheelStatusMsg");
+      if (canSpinToday()) {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.textContent = "🎡 Gira la Ruota Gratis!";
+        msg.textContent = "";
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = "0.55";
+        btn.textContent = "⏳ Giro già usato oggi";
+        const remMs = 24 * 60 * 60 * 1000 - (Date.now() - Number(userData.lastWheelSpinAt || 0));
+        const hrs = Math.max(1, Math.ceil(remMs / (1000 * 60 * 60)));
+        msg.textContent = `Prossimo giro gratuito tra circa ${hrs} ore`;
+      }
+    }
+
+    document.getElementById("spinWheelBtn").addEventListener("click", async () => {
+      if (!currentUser || wheelSpinning || !canSpinToday()) return;
+      wheelSpinning = true;
+
+      const chosenIdx = Math.floor(Math.random() * WHEEL_PRIZES.length);
+      const prizeXp = WHEEL_PRIZES[chosenIdx];
+      const sliceCenter = chosenIdx * 45 + 22.5;
+      const extraSpins = 360 * 6;
+      const targetAngle = extraSpins + (360 - sliceCenter);
+      currentWheelDeg += targetAngle;
+
+      discEl.style.transform = `rotate(${currentWheelDeg}deg)`;
+
+      setTimeout(async () => {
+        const newXp = getUserXp() + prizeXp;
+        await updateDoc(doc(db, "utenti_registrati", currentUser.uid), {
+          xp: newXp,
+          punti: newXp,
+          lastWheelSpinAt: Date.now()
+        });
+        document.getElementById("wheelStatusMsg").textContent = `🎉 HAI VINTO +${prizeXp} XP!`;
+        wheelSpinning = false;
+      }, 4300);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+        userData = snap.exists() ? snap.data() : {};
+        document.getElementById("walletXpDisplay").textContent = `⚡ ${getUserXp()} XP`;
+        updateWheelUI();
+      });
+    });
+  </script>
+</body>
+</html>
