@@ -43,24 +43,9 @@
       </div>
     </div>
 
-    <!-- RIEPILOGO RAPIDO: ULTIMA CIRCOLARE + ULTIMO ANNUNCIO IN BACHECA -->
-    <div class="quick-recap-grid">
-      <!-- Box 1: Ultima Circolare Uscita -->
-      <a href="modules/circolari.html" id="latestCircBox" class="recap-box recap-circ">
-        <div>
-          <span class="recap-label" style="color: #38bdf8;">
-            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Ultima Circolare Istituto
-          </span>
-          <div id="latestCircTitle" class="recap-title" style="margin-top: 6px;">Caricamento ultima circolare...</div>
-        </div>
-        <div class="recap-meta">
-          <span id="latestCircSub">A.S. 2026/2027 • IIS Giorgi-Woolf</span>
-          <span style="color: #38bdf8; font-weight: 800;">Leggi →</span>
-        </div>
-      </a>
-
-      <!-- Box 2: Ultimo Annuncio in Bacheca -->
-      <a href="modules/bacheca.html" id="latestBachecaBox" class="recap-box recap-bacheca">
+    <!-- RIEPILOGO RAPIDO: ULTIMO ANNUNCIO IN BACHECA -->
+    <div style="margin-bottom: 18px;">
+      <a href="modules/bacheca.html" id="latestBachecaBox" class="recap-box recap-bacheca" style="display: block;">
         <div>
           <span class="recap-label" style="color: #f87171;">
             <i data-lucide="megaphone" style="width: 14px; height: 14px;"></i> Ultimo Annuncio Bacheca
@@ -74,27 +59,7 @@
       </a>
     </div>
 
-    <!-- 1. CIRCOLARI ISTITUTO IN EVIDENZA -->
-    <a href="modules/circolari.html" class="featured-circolari">
-      <div class="featured-left">
-        <div class="icon-badge" style="background: rgba(14,165,233,0.18); color: #38bdf8; width: 64px; height: 64px;">
-          <i data-lucide="newspaper" style="width: 30px; height: 30px;"></i>
-        </div>
-        <div>
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; text-transform: uppercase;">Circolari IIS Giorgi-Woolf</h3>
-            <span class="featured-badge-cyan">Auto-Sync</span>
-          </div>
-          <p style="font-size: 0.88rem; color: var(--text-muted);">Tutte le circolari ufficiali dell'istituto A.S. 2026/2027 aggiornate in automatico</p>
-        </div>
-      </div>
-      <div style="display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.88rem; color: #38bdf8;">
-        <span>Apri Circolari</span>
-        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-      </div>
-    </a>
-
-    <!-- 2. ORARIO SCOLASTICO IN EVIDENZA (SOTTO LE CIRCOLARI) -->
+    <!-- 1. ORARIO SCOLASTICO IN EVIDENZA -->
     <a href="modules/orario.html" class="featured-circolari" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(6, 182, 212, 0.08));">
       <div class="featured-left">
         <div class="icon-badge" style="background: rgba(16,185,129,0.18); color: #34d399; width: 64px; height: 64px;">
@@ -114,7 +79,7 @@
       </div>
     </a>
 
-    <!-- 3. BACHECA DI CLASSE IN EVIDENZA -->
+    <!-- 2. BACHECA DI CLASSE IN EVIDENZA -->
     <a href="modules/bacheca.html" class="featured-bacheca">
       <div class="featured-left">
         <div class="icon-badge" style="background: rgba(220,38,38,0.18); color: #ef4444; width: 64px; height: 64px;">
@@ -290,29 +255,7 @@
     // Avvia widget flottante Rubrica Compagni 1BI (in basso a sinistra)
     initCompagniWidget();
 
-    // 1. Ultima Circolare Istituto
-    const qCirc = query(collection(db, "circolari_scuola"), orderBy("ordine", "asc"), limit(1));
-    onSnapshot(qCirc, (snap) => {
-      const titleEl = document.getElementById("latestCircTitle");
-      const subEl = document.getElementById("latestCircSub");
-      const boxEl = document.getElementById("latestCircBox");
-
-      if (snap.empty) {
-        titleEl.textContent = "Nessuna circolare presente al momento";
-        return;
-      }
-
-      const data = snap.docs[0].data();
-      titleEl.textContent = data.titolo || "Nuova circolare pubblicata";
-      if (data.descrizione) subEl.textContent = data.descrizione;
-      if (data.url) {
-        boxEl.href = data.url;
-        boxEl.target = "_blank";
-        boxEl.rel = "noopener noreferrer";
-      }
-    });
-
-    // 2. Ultimo Annuncio in Bacheca
+    // 1. Ultimo Annuncio in Bacheca
     const qBach = query(collection(db, "bacheca_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qBach, (snap) => {
       const titleEl = document.getElementById("latestBachecaTitle");
@@ -330,7 +273,7 @@
       subEl.textContent = dataStr ? `Pubblicato da ${autore} il ${dataStr}` : `Pubblicato da ${autore}`;
     });
 
-    // 3. Controllo nuovi messaggi non letti nella Chat 1BI
+    // 2. Controllo nuovi messaggi non letti nella Chat 1BI
     const qLastMsg = query(collection(db, "chat_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qLastMsg, (snap) => {
       if (snap.empty) return;
