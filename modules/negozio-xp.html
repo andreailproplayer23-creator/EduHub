@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Negozio XP & Customizzazione Profilo 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    .profile-showcase {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .showcase-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .custom-avatar-ring {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #fff;
+      position: relative;
+    }
+
+    /* Cornici Avatar Sbloccabili */
+    .frame-default { border: 3px solid #38bdf8; }
+    .frame-gold { border: 4px solid #fbbf24; box-shadow: 0 0 18px rgba(251, 191, 36, 0.65); }
+    .frame-neon { border: 4px solid #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.75); }
+    .frame-matrix { border: 4px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.75); }
+    .frame-fire { border: 4px solid #f97316; box-shadow: 0 0 22px rgba(249, 115, 22, 0.8); }
+    .frame-diamond { border: 4px solid #22d3ee; box-shadow: 0 0 24px rgba(34, 211, 238, 0.9); }
+
+    .xp-wallet-box {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(234, 179, 8, 0.1));
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      border-radius: 16px;
+      padding: 14px 20px;
+      text-align: right;
+    }
+
+    .shop-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .shop-tab {
+      padding: 9px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    .shop-tab.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-color: #fbbf24;
+      color: #0f172a;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+    .shop-item-card {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .shop-item-card.equipped {
+      border-color: #34d399;
+      box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.35);
+    }
+
+    .item-preview-area {
+      height: 86px;
+      border-radius: 12px;
+      background: var(--solid-sub);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+
+    .btn-shop-buy {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    .btn-shop-equip {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #38bdf8;
+      background: rgba(56, 189, 248, 0.16);
+      color: #38bdf8;
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    .btn-shop-equipped {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #34d399;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      font-weight: 900;
+      font-size: 0.84rem;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Negozio XP & Customizzazione Profilo</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ANTEPRIMA LIVE PROFILO PERSONALIZZATO -->
+    <div class="profile-showcase">
+      <div class="showcase-left">
+        <div id="previewAvatarRing" class="custom-avatar-ring frame-default">S</div>
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <h2 id="previewFullName" style="font-size:1.3rem; font-weight:900;">Studente 1BI</h2>
+            <span id="previewBadgeIcon" style="font-size:1.25rem;">🎓</span>
+          </div>
+          <div id="previewTitlePill" style="display:inline-block; margin-top:5px; padding:3px 11px; border-radius:999px; background:rgba(56,189,248,0.18); color:#38bdf8; font-size:0.78rem; font-weight:800;">
+            Studente 1BI Informatica
+          </div>
+        </div>
+      </div>
+
+      <div class="xp-wallet-box">
+        <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; color:#fbbf24;">Il Tuo Saldo Punti</div>
+        <div id="userXpBalance" style="font-size:1.85rem; font-weight:900; color:#fff;">0 XP</div>
+        <div style="font-size:0.74rem; color:var(--text-muted);">Guadagna XP con Interrogazioni AI, Appunti e Quiz</div>
+      </div>
+    </div>
+
+    <!-- CATEGORIE NEGOZIO -->
+    <div class="shop-tabs">
+      <button type="button" class="shop-tab active" data-cat="all">✨ Tutto il Catalogo</button>
+      <button type="button" class="shop-tab" data-cat="frame">⭕ Cornici Avatar</button>
+      <button type="button" class="shop-tab" data-cat="title">🏷️ Titoli Speciali</button>
+      <button type="button" class="shop-tab" data-cat="badge">🏅 Badge Rari</button>
+    </div>
+
+    <div id="shopGrid" class="shop-grid"></div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const SHOP_ITEMS = [
+      // CORNICI
+      { id: "frame-default", type: "frame", name: "Cornice Sky Base", desc: "Bordo azzurro standard EduHub", price: 0, cssClass: "frame-default" },
+      { id: "frame-matrix", type: "frame", name: "Cornice Matrix Hacker", desc: "Bagliore verde terminale 1BI", price: 150, cssClass: "frame-matrix" },
+      { id: "frame-neon", type: "frame", name: "Cornice Cyber Neon", desc: "Aura fucsia ad alta luminosità", price: 250, cssClass: "frame-neon" },
+      { id: "frame-fire", type: "frame", name: "Cornice Magma Streak", desc: "Bordo infuocato per i più attivi", price: 400, cssClass: "frame-fire" },
+      { id: "frame-gold", type: "frame", name: "Cornice Leggenda Oro", desc: "Finitura dorata brillante", price: 600, cssClass: "frame-gold" },
+      { id: "frame-diamond", type: "frame", name: "Cornice Diamante 1BI", desc: "Il bordo più raro dell'intera classe", price: 1000, cssClass: "frame-diamond" },
+
+      // TITOLI
+      { id: "title-base", type: "title", name: "Studente 1BI Informatica", desc: "Titolo classico della classe", price: 0, label: "Studente 1BI Informatica" },
+      { id: "title-bughunter", type: "title", name: "Bug Hunter C++", desc: "Per chi scova ogni errore di sintassi", price: 120, label: "🐛 Bug Hunter C++" },
+      { id: "title-secchione", type: "title", name: "Re delle Interrogazioni", desc: "Pronto per qualsiasi domanda alla LIM", price: 220, label: "👑 Re delle Interrogazioni" },
+      { id: "title-gamer", type: "title", name: "Pro Player 1BI", desc: "Campione indiscusso di Kahoot Arena", price: 300, label: "🎮 Pro Player 1BI" },
+      { id: "title-architect", type: "title", name: "System Architect", desc: "Maestro di reti, hardware e binario", price: 500, label: "⚡ System Architect" },
+
+      // BADGE
+      { id: "badge-base", type: "badge", name: "Badge Matricola 1BI", desc: "Il simbolo di partenza", price: 0, icon: "🎓" },
+      { id: "badge-rocket", type: "badge", name: "Badge Razzo", desc: "Sempre sul pezzo con appunti e compiti", price: 100, icon: "🚀" },
+      { id: "badge-brain", type: "badge", name: "Badge Cervellone AI", desc: "Sbloccato dai veterani del Tutor AI", price: 200, icon: "🧠" },
+      { id: "badge-crown", type: "badge", name: "Corona Imperiale", desc: "Simbolo di prestigio nella Classifica 1BI", price: 450, icon: "👑" },
+      { id: "badge-dragon", type: "badge", name: "Drago Mitico 1BI", desc: "Badge leggendario da collezione", price: 850, icon: "🐉" }
+    ];
+
+    let currentUser = null;
+    let userData = {};
+    let currentCat = "all";
+
+    document.querySelectorAll(".shop-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".shop-tab").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCat = btn.dataset.cat;
+        renderShop();
+      });
+    });
+
+    function getUserXp() {
+      return Number(userData.xp ?? userData.punti ?? 0);
+    }
+
+    function getOwnedIds() {
+      const base = ["frame-default", "title-base", "badge-base"];
+      const saved = Array.isArray(userData.shopOwned) ? userData.shopOwned : [];
+      return Array.from(new Set([...base, ...saved]));
+    }
+
+    function getEquipped() {
+      return {
+        frame: userData.equippedFrame || "frame-default",
+        title: userData.equippedTitle || "title-base",
+        badge: userData.equippedBadge || "badge-base"
+      };
+    }
+
+    function updateShowcase() {
+      const name = userData.nomeCompleto || currentUser?.displayName || "Studente 1BI";
+      const initial = name.charAt(0).toUpperCase();
+      const eq = getEquipped();
+
+      const frameObj = SHOP_ITEMS.find(i => i.id === eq.frame) || SHOP_ITEMS[0];
+      const titleObj = SHOP_ITEMS.find(i => i.id === eq.title) || SHOP_ITEMS.find(i => i.id === "title-base");
+      const badgeObj = SHOP_ITEMS.find(i => i.id === eq.badge) || SHOP_ITEMS.find(i => i.id === "badge-base");
+
+      const ring = document.getElementById("previewAvatarRing");
+      ring.textContent = initial;
+      ring.className = `custom-avatar-ring ${frameObj.cssClass}`;
+
+      document.getElementById("previewFullName").textContent = name;
+      document.getElementById("previewTitlePill").textContent = titleObj.label;
+      document.getElementById("previewBadgeIcon").textContent = badgeObj.icon;
+      document.getElementById("userXpBalance").textContent = `${getUserXp()} XP`;
+    }
+
+    function renderShop() {
+      const grid = document.getElementById("shopGrid");
+      const owned = getOwnedIds();
+      const eq = getEquipped();
+      const xp = getUserXp();
+
+      const filtered = SHOP_ITEMS.filter(item => currentCat === "all" || item.type === currentCat);
+
+      grid.innerHTML = filtered.map(item => {
+        const isOwned = owned.includes(item.id);
+        const isEq = (item.type === "frame" && eq.frame === item.id) ||
+                     (item.type === "title" && eq.title === item.id) ||
+                     (item.type === "badge" && eq.badge === item.id);
+
+        let previewHtml = "";
+        if (item.type === "frame") {
+          previewHtml = `<div class="custom-avatar-ring ${item.cssClass}" style="width:56px;height:56px;font-size:1.2rem;">1BI</div>`;
+        } else if (item.type === "title") {
+          previewHtml = `<span style="padding:5px 12px; border-radius:999px; background:rgba(56,189,248,0.18); color:#38bdf8; font-size:0.84rem;">${item.label}</span>`;
+        } else {
+          previewHtml = `<span style="font-size:2.4rem;">${item.icon}</span>`;
+        }
+
+        let btnHtml = "";
+        if (isEq) {
+          btnHtml = `<button type="button" class="btn-shop-equipped">✓ Equipaggiato</button>`;
+        } else if (isOwned) {
+          btnHtml = `<button type="button" class="btn-shop-equip" data-equip-id="${item.id}">Equipaggia</button>`;
+        } else {
+          btnHtml = `<button type="button" class="btn-shop-buy" data-buy-id="${item.id}">Sblocca per ${item.price} XP</button>`;
+        }
+
+        return `
+          <div class="shop-item-card ${isEq ? "equipped" : ""}">
+            <div>
+              <div class="item-preview-area">${previewHtml}</div>
+              <div style="font-weight:800; font-size:0.95rem; margin-top:12px;">${item.name}</div>
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">${item.desc}</div>
+            </div>
+            <div>${btnHtml}</div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-buy-id]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const item = SHOP_ITEMS.find(i => i.id === btn.dataset.buyId);
+          if (!item || !currentUser) return;
+          if (xp < item.price) {
+            return alert(`Ti servono ${item.price} XP (hai ${xp} XP). Completa interrogazioni AI o attività per guadagnarne altri!`);
+          }
+          const newXp = xp - item.price;
+          const newOwned = Array.from(new Set([...owned, item.id]));
+          const updateObj = {
+            xp: newXp,
+            punti: newXp,
+            shopOwned: newOwned
+          };
+          if (item.type === "frame") updateObj.equippedFrame = item.id;
+          if (item.type === "title") updateObj.equippedTitle = item.id;
+          if (item.type === "badge") updateObj.equippedBadge = item.id;
+
+          await updateDoc(doc(db, "utenti_registrati", currentUser.uid), updateObj);
+        });
+      });
+
+      grid.querySelectorAll("[data-equip-id]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const item = SHOP_ITEMS.find(i => i.id === btn.dataset.equipId);
+          if (!item || !currentUser) return;
+          const updateObj = {};
+          if (item.type === "frame") updateObj.equippedFrame = item.id;
+          if (item.type === "title") updateObj.equippedTitle = item.id;
+          if (item.type === "badge") updateObj.equippedBadge = item.id;
+          await updateDoc(doc(db, "utenti_registrati", currentUser.uid), updateObj);
+        });
+      });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+        userData = snap.exists() ? snap.data() : {};
+        updateShowcase();
+        renderShop();
+      });
+    });
+  </script>
+</body>
+</html>

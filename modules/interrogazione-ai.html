@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Simulatore Interrogazione Orale AI (Gemini Pro)</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    .oral-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .oral-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel-box {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .form-lbl {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin: 12px 0 5px;
+    }
+    .form-ctrl {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      box-sizing: border-box;
+    }
+
+    .book-upload-zone {
+      border: 2px dashed #38bdf8;
+      background: var(--solid-sub);
+      border-radius: 14px;
+      padding: 18px 14px;
+      text-align: center;
+      cursor: pointer;
+      display: block;
+      margin-top: 6px;
+      transition: background 0.15s ease;
+    }
+    .book-upload-zone:hover {
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .pages-thumbs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .page-thumb-item {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--solid-border);
+      aspect-ratio: 3/4;
+      background: #020617;
+    }
+    .page-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .page-thumb-badge {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(2, 6, 23, 0.85);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .page-thumb-del {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: #ef4444;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+
+    .q-count-pills {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+    .q-pill {
+      padding: 9px;
+      border-radius: 10px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .q-pill.active {
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .btn-start-exam {
+      width: 100%;
+      margin-top: 16px;
+      padding: 13px;
+      border-radius: 13px;
+      border: none;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.94rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+    }
+    .btn-start-exam:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* AREA INTERROGAZIONE LIVE */
+    .exam-header-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--solid-border);
+      margin-bottom: 14px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--solid-sub);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .chat-exam-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 52vh;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 14px;
+    }
+    .msg-prof {
+      background: var(--solid-card);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-left: 4px solid #38bdf8;
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .msg-student {
+      background: rgba(37, 99, 235, 0.16);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 14px;
+      padding: 12px 16px;
+      align-self: flex-end;
+      max-width: 88%;
+    }
+    .prof-tag {
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .answer-composer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--solid-card);
+      border: 1px solid var(--solid-border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .composer-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-mic {
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(236, 72, 153, 0.45);
+      background: rgba(236, 72, 153, 0.14);
+      color: #f472b6;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .btn-mic.recording {
+      background: #ef4444;
+      color: #fff;
+      border-color: #f87171;
+    }
+    .btn-send-ans {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      background: #10b981;
+      color: #042f2e;
+      font-weight: 900;
+      font-size: 0.86rem;
+      cursor: pointer;
+    }
+
+    /* PAGELINA VOTO FINALE */
+    .grade-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(59, 130, 246, 0.16));
+      border: 2px solid #34d399;
+      border-radius: 18px;
+      padding: 22px;
+      text-align: center;
+      margin-top: 12px;
+    }
+    .grade-big-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #34d399;
+      line-height: 1.1;
+    }
+
+    .api-bar {
+      background: var(--solid-card);
+      border: 1px solid var(--solid-border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Simulatore Interrogazione Orale AI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome-banner" style="margin-bottom: 16px;">
+      <div>
+        <h2>🎓 Modalità Prof — Interrogazione dalle Pagine del Libro</h2>
+        <p>Carica le foto del libro: <strong>Gemini Pro</strong> analizza ogni singola riga e ti interroga in tempo reale</p>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span style="background:rgba(139,92,246,0.2); border:1px solid #a78bfa; color:#c4b5fd; font-weight:800; font-size:0.78rem; padding:6px 12px; border-radius:999px;">
+          ✨ Motore: Gemini Pro
+        </span>
+      </div>
+    </div>
+
+    <!-- BARRA STATO API KEY GEMINI PRO -->
+    <div class="api-bar">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span id="apiStatusPill" style="font-size:0.8rem; font-weight:800; color:#fbbf24;">⏳ Verifica connessione Gemini Pro...</span>
+        <select id="geminiModelSelect" class="form-ctrl" style="width:auto; padding:6px 10px; font-size:0.8rem;">
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro (Massima Precisione Libro)</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash (Ultra Rapido)</option>
+          <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <input type="password" id="apiKeyInput" class="form-ctrl" style="width:230px; padding:6px 10px; font-size:0.8rem;" placeholder="Incolla API Key Google AI Studio..." />
+        <button type="button" id="saveApiKeyBtn" style="padding:7px 12px; border-radius:9px; border:none; background:#2563eb; color:#fff; font-weight:800; font-size:0.78rem; cursor:pointer;">
+          Salva Key
+        </button>
+      </div>
+    </div>
+
+    <div class="oral-grid">
+      <!-- COLONNA SINISTRA: IMPOSTAZIONI E FOTO PAGINE LIBRO -->
+      <aside class="panel-box">
+        <strong style="font-size:0.95rem;">1. Carica Pagine & Configura</strong>
+
+        <label class="form-lbl">Foto delle Pagine del Libro *</label>
+        <label for="bookPagesInput" class="book-upload-zone">
+          <div style="font-size:1.8rem; margin-bottom:4px;">📸</div>
+          <div style="font-weight:800; font-size:0.86rem;">Carica 1 o più foto del libro</div>
+          <div style="font-size:0.74rem; color:var(--text-muted); margin-top:2px;">Gemini leggerà riga per riga tutte le pagine</div>
+          <input type="file" id="bookPagesInput" accept="image/*" multiple style="display:none;" />
+        </label>
+        <div id="pagesThumbsGrid" class="pages-thumbs-grid"></div>
+
+        <label class="form-lbl">Materia</label>
+        <select id="subjectSelect" class="form-ctrl">
+          <option value="Informatica">💻 Informatica</option>
+          <option value="Sistemi e Reti / Tecnologie">🔌 Tecnologie Informatiche</option>
+          <option value="Storia">🏛️ Storia</option>
+          <option value="Scienze / Biologia / Chimica">🧪 Scienze / Chimica / Fisica</option>
+          <option value="Italiano / Letteratura">📖 Italiano / Letteratura</option>
+          <option value="Diritto ed Economia">⚖️ Diritto ed Economia</option>
+          <option value="Inglese">🇬🇧 Inglese</option>
+          <option value="Altra Materia">📚 Altra Materia</option>
+        </select>
+
+        <label class="form-lbl">Argomento Specifico (Opzionale)</label>
+        <input type="text" id="topicInput" class="form-ctrl" placeholder="Lascia vuoto = Riconoscimento automatico" />
+
+        <label class="form-lbl">Numero di Domande</label>
+        <div class="q-count-pills" id="qCountPills">
+          <button type="button" class="q-pill" data-q="3">3 Dom.</button>
+          <button type="button" class="q-pill active" data-q="5">5 Dom.</button>
+          <button type="button" class="q-pill" data-q="7">7 Dom.</button>
+          <button type="button" class="q-pill" data-q="10">10 Dom.</button>
+        </div>
+
+        <label class="form-lbl">Stile del Professore</label>
+        <select id="profStyleSelect" class="form-ctrl">
+          <option value="equilibrato">👨‍🏫 Prof Equilibrato (Spiega e valuta con chiarezza)</option>
+          <option value="pignolo">🧐 Prof Esigente & Pignolo (Chiede dettagli esatti riga per riga)</option>
+          <option value="incoraggiante">🤝 Prof Incoraggiante (Ti dà indizi se ti blocchi)</option>
+        </select>
+
+        <label style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:0.82rem; font-weight:700; cursor:pointer;">
+          <input type="checkbox" id="askFollowupCheck" checked />
+          Includi domande di ragionamento ("Perché?", "Fai un esempio")
+        </label>
+
+        <button type="button" id="startExamBtn" class="btn-start-exam">
+          <span>🎬 Inizia Interrogazione</span>
+        </button>
+      </aside>
+
+      <!-- COLONNA DESTRA: AULA INTERROGAZIONE LIVE -->
+      <section class="panel-box">
+        <div class="exam-header-strip">
+          <div>
+            <strong id="examStatusTitle" style="font-size:1rem;">In attesa delle pagine del libro...</strong>
+            <div id="detectedTopicBadge" style="font-size:0.78rem; color:#38bdf8; font-weight:700; margin-top:2px;"></div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span id="questionCounterBadge" style="background:var(--solid-sub); padding:5px 12px; border-radius:999px; font-size:0.8rem; font-weight:800;">
+              Domanda 0 / 5
+            </span>
+            <button type="button" id="resetExamBtn" style="display:none; padding:6px 12px; border-radius:9px; border:1px solid var(--solid-border); background:var(--solid-sub); color:#f87171; font-weight:800; font-size:0.78rem; cursor:pointer;">
+              ↺ Nuova Prova
+            </button>
+          </div>
+        </div>
+
+        <div class="progress-track">
+          <div id="examProgressFill" class="progress-fill"></div>
+        </div>
+
+        <div id="examStream" class="chat-exam-stream">
+          <div class="msg-prof">
+            <div class="prof-tag">👨‍🏫 IL PROFESSORE AI</div>
+            <div style="font-size:0.9rem; line-height:1.55;">
+              Buongiorno! Carica qui a sinistra le <strong>foto delle pagine del libro</strong> che devi studiare (puoi caricarne anche più di una insieme).<br><br>
+              Analizzerò attentamente <strong>ogni singola riga, parola chiave e schema</strong> delle pagine caricate e ti farò il numero esatto di domande che hai scelto, proprio come durante un'interrogazione vera alla cattedra!
+            </div>
+          </div>
+        </div>
+
+        <div id="finalGradeArea"></div>
+
+        <div id="answerComposerBox" class="answer-composer" style="display:none;">
+          <textarea id="studentAnswerInput" class="form-ctrl" rows="3" placeholder="Scrivi qui la tua risposta come se stessi parlando al Prof... (oppure usa il microfono)"></textarea>
+          <div class="composer-actions">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" id="micRecordBtn" class="btn-mic">🎤 Rispondi a Voce</button>
+              <button type="button" id="dontKnowBtn" style="padding:9px 12px; border-radius:10px; border:1px solid var(--solid-border); background:var(--solid-sub); color:var(--text-muted); font-weight:800; font-size:0.8rem; cursor:pointer;">
+                🤷 Non me lo ricordo
+              </button>
+            </div>
+            <button type="button" id="sendAnswerBtn" class="btn-send-ans">Invia Risposta ➡</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      increment
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const REP_EMAILS = [
+      "andrea.ilproplayer23@gmail.com",
+      "alessandromoreschi.712@gmail.com"
+    ];
+
+    let currentUser = null;
+    let isRepUser = false;
+    let geminiApiKey = localStorage.getItem("eduhub_gemini_key") || "";
+    let uploadedPages = []; // { base64, mimeType, previewUrl }
+    let totalQuestions = 5;
+    let currentQuestionNum = 0;
+    let examActive = false;
+    let conversationHistory = [];
+
+    // Scelta numero domande
+    document.querySelectorAll(".q-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".q-pill").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        totalQuestions = Number(btn.dataset.q);
+        if (!examActive) {
+          document.getElementById("questionCounterBadge").textContent = `Domanda 0 / ${totalQuestions}`;
+        }
+      });
+    });
+
+    // Salva API Key (su Firestore se Rappresentante, e comunque in localStorage)
+    document.getElementById("saveApiKeyBtn").addEventListener("click", async () => {
+      const val = document.getElementById("apiKeyInput").value.trim();
+      if (!val) return alert("Incolla prima la API Key di Google AI Studio.");
+      geminiApiKey = val;
+      localStorage.setItem("eduhub_gemini_key", val);
+
+      if (isRepUser) {
+        await setDoc(doc(db, "ai_config_1bi", "gemini"), {
+          apiKey: val,
+          aggiornatoDa: currentUser.email,
+          aggiornatoIl: Date.now()
+        }, { merge: true });
+        updateApiStatus(true, "✓ API Key Gemini Pro salvata per tutta la 1BI!");
+      } else {
+        updateApiStatus(true, "✓ API Key Gemini Pro salvata sul tuo browser!");
+      }
+      document.getElementById("apiKeyInput").value = "";
+    });
+
+    function updateApiStatus(ok, text) {
+      const el = document.getElementById("apiStatusPill");
+      el.textContent = text;
+      el.style.color = ok ? "#34d399" : "#fbbf24";
+    }
+
+    // Upload e compressione nitida pagine del libro
+    document.getElementById("bookPagesInput").addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) continue;
+        const processed = await compressBookPage(file, 1650, 0.88);
+        uploadedPages.push(processed);
+      }
+      e.target.value = "";
+      renderPagesThumbs();
+    });
+
+    function compressBookPage(file, maxSide, quality) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL("image/jpeg", quality);
+            resolve({
+              previewUrl: dataUrl,
+              base64: dataUrl.split(",")[1],
+              mimeType: "image/jpeg"
+            });
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderPagesThumbs() {
+      const grid = document.getElementById("pagesThumbsGrid");
+      grid.innerHTML = uploadedPages.map((p, idx) => `
+        <div class="page-thumb-item">
+          <img src="${p.previewUrl}" alt="Pagina ${idx + 1}" />
+          <span class="page-thumb-badge">Pag. ${idx + 1}</span>
+          <button type="button" class="page-thumb-del" data-del-page="${idx}">✕</button>
+        </div>
+      `).join("");
+
+      grid.querySelectorAll("[data-del-page]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          uploadedPages.splice(Number(btn.dataset.delPage), 1);
+          renderPagesThumbs();
+        });
+      });
+    }
+
+    // Avvio Interrogazione
+    document.getElementById("startExamBtn").addEventListener("click", async () => {
+      if (!geminiApiKey) {
+        return alert("Inserisci prima la API Key di Gemini Pro nella barra in alto!");
+      }
+      if (uploadedPages.length === 0) {
+        return alert("Carica almeno una foto di una pagina del libro!");
+      }
+
+      const subject = document.getElementById("subjectSelect").value;
+      const customTopic = document.getElementById("topicInput").value.trim();
+      const style = document.getElementById("profStyleSelect").value;
+      const includeReasoning = document.getElementById("askFollowupCheck").checked;
+
+      examActive = true;
+      currentQuestionNum = 1;
+      conversationHistory = [];
+      document.getElementById("finalGradeArea").innerHTML = "";
+      document.getElementById("startExamBtn").disabled = true;
+      document.getElementById("resetExamBtn").style.display = "inline-block";
+      document.getElementById("examStatusTitle").textContent = `Interrogazione in corso — ${subject}`;
+      document.getElementById("questionCounterBadge").textContent = `Domanda 1 / ${totalQuestions}`;
+      document.getElementById("examProgressFill").style.width = `${(1 / totalQuestions) * 100}%`;
+
+      const stream = document.getElementById("examStream");
+      stream.innerHTML = `
+        <div class="msg-prof" id="loadingProfMsg">
+          <div class="prof-tag">👨‍🏫 IL PROFESSORE AI (GEMINI PRO)</div>
+          <div>🔍 Sto leggendo e analizzando riga per riga le ${uploadedPages.length} pagine caricate...</div>
+        </div>
+      `;
+
+      const systemPrompt = `Sei un professore delle scuole superiori italiane (classe 1BI) che sta svolgendo un'interrogazione orale realistica basata ESCLUSIVAMENTE sulle foto delle pagine del libro caricate dallo studente.
+REGOLE FONDAMENTALI:
+1. Analizza minuziosamente OGNI SINGOLA RIGA, paragrafo, definizione, schema, didascalia e parola chiave presente nelle immagini delle pagine del libro.
+2. Materia: ${subject}. ${customTopic ? `Argomento indicato dallo studente: "${customTopic}".` : "Riconosci automaticamente tutti gli argomenti e sotto-argomenti presenti nelle pagine e dichiarali brevemente all'inizio."}
+3. Stile del professore: ${style === "pignolo" ? "Molto esigente e pignolo: pretendi i termini esatti e i dettagli precisi scritti sul libro." : style === "incoraggiante" ? "Incoraggiante e chiaro: se lo studente sbaglia o è incompleto, correggilo con gentilezza." : "Equilibrato, autorevole ma giusto, come un vero docente di scuola superiore."}
+4. L'interrogazione è composta in totale da esattamente ${totalQuestions} domande, fatte UNA ALLA VOLTA.
+5. ${includeReasoning ? "Alterna domande nozionistiche precise sul testo a domande di collegamento/ragionamento." : "Concentrati su domande precise relative ai concetti spiegati nelle righe del libro."}
+6. NON dare mai la risposta prima che lo studente risponda.
+7. Adesso inizia: indica in una riga l'argomento riconosciuto dalle pagine, poi fai subito la DOMANDA 1 di ${totalQuestions}.`;
+
+      const firstUserParts = [
+        { text: systemPrompt },
+        ...uploadedPages.map(p => ({
+          inline_data: { mime_type: p.mimeType, data: p.base64 }
+        }))
+      ];
+
+      conversationHistory.push({ role: "user", parts: firstUserParts });
+
+      try {
+        const reply = await callGeminiPro(conversationHistory);
+        conversationHistory.push({ role: "model", parts: [{ text: reply }] });
+        document.getElementById("loadingProfMsg")?.remove();
+        appendProfMessage(reply, `Domanda 1 di ${totalQuestions}`);
+        document.getElementById("answerComposerBox").style.display = "flex";
+        document.getElementById("studentAnswerInput").focus();
+      } catch (err) {
+        document.getElementById("loadingProfMsg").innerHTML = `<div style="color:#f87171; font-weight:800;">Errore Gemini API: ${escapeHtml(err.message)}</div>`;
+        document.getElementById("startExamBtn").disabled = false;
+      }
+    });
+
+    // Invio Risposta dello Studente
+    document.getElementById("sendAnswerBtn").addEventListener("click", () => submitStudentAnswer());
+    document.getElementById("dontKnowBtn").addEventListener("click", () => {
+      document.getElementById("studentAnswerInput").value = "Non me lo ricordo / non lo so.";
+      submitStudentAnswer();
+    });
+
+    async function submitStudentAnswer() {
+      const inputEl = document.getElementById("studentAnswerInput");
+      const answer = inputEl.value.trim();
+      if (!answer || !examActive) return;
+
+      inputEl.value = "";
+      document.getElementById("sendAnswerBtn").disabled = true;
+      appendStudentMessage(answer);
+
+      const isLastQuestion = currentQuestionNum >= totalQuestions;
+      const nextNum = currentQuestionNum + 1;
+
+      const followPrompt = isLastQuestion
+        ? `Questa era la risposta alla DOMANDA ${currentQuestionNum} di ${totalQuestions} (l'ultima).
+Valuta con precisione questa risposta confrontandola con le righe delle pagine del libro caricate, poi stila la PAGELINA FINALE DELL'INTERROGAZIONE con:
+- **VOTO FINALE: X/10** (in decimi, es. 7.5/10 o 8/10)
+- **Punti di forza:** cosa ha dimostrato di aver studiato bene
+- **Da ripassare sulle pagine:** i concetti o le righe esatte del libro che mancavano o erano imprecise.`
+        : `Valuta brevemente e con precisione questa risposta confrontandola con le righe delle pagine del libro caricate (indicando se è corretta, parziale o errata e integrando eventuali dettagli mancanti del testo). Subito dopo, fai la **DOMANDA ${nextNum} di ${totalQuestions}** su un altro punto delle pagine caricate.`;
+
+      conversationHistory.push({
+        role: "user",
+        parts: [{ text: `Risposta dello studente: "${answer}"\n\n${followPrompt}` }]
+      });
+
+      const thinkingId = "prof_think_" + Date.now();
+      appendProfMessage("Sto confrontando la tua risposta con il testo del libro...", "Valutazione in corso", thinkingId);
+
+      try {
+        const reply = await callGeminiPro(conversationHistory);
+        conversationHistory.push({ role: "model", parts: [{ text: reply }] });
+        document.getElementById(thinkingId)?.remove();
+
+        if (isLastQuestion) {
+          examActive = false;
+          document.getElementById("answerComposerBox").style.display = "none";
+          document.getElementById("startExamBtn").disabled = false;
+          document.getElementById("examStatusTitle").textContent = "Interrogazione Completata!";
+          appendProfMessage(reply, "Valutazione & Giudizio Finale");
+          showFinalGradeBox(reply);
+        } else {
+          currentQuestionNum = nextNum;
+          document.getElementById("questionCounterBadge").textContent = `Domanda ${currentQuestionNum} / ${totalQuestions}`;
+          document.getElementById("examProgressFill").style.width = `${(currentQuestionNum / totalQuestions) * 100}%`;
+          appendProfMessage(reply, `Correzione + Domanda ${currentQuestionNum} di ${totalQuestions}`);
+          document.getElementById("sendAnswerBtn").disabled = false;
+          inputEl.focus();
+        }
+      } catch (err) {
+        document.getElementById(thinkingId).innerHTML = `<div style="color:#f87171;">Errore: ${escapeHtml(err.message)}</div>`;
+        document.getElementById("sendAnswerBtn").disabled = false;
+      }
+    }
+
+    async function showFinalGradeBox(finalText) {
+      const match = finalText.match(/(\d+(?:[.,]\d+)?)\s*\/\s*10/);
+      const gradeStr = match ? `${match[1]}/10` : "Completata";
+      const numericGrade = match ? parseFloat(match[1].replace(",", ".")) : 7;
+      const xpEarned = numericGrade >= 6 ? Math.round(numericGrade * 15) : 30;
+
+      document.getElementById("finalGradeArea").innerHTML = `
+        <div class="grade-card">
+          <div style="font-size:0.8rem; font-weight:800; text-transform:uppercase; color:var(--text-muted);">Esito Interrogazione Orale</div>
+          <div class="grade-big-number">${gradeStr}</div>
+          <div style="margin-top:8px; font-weight:800; color:#fbbf24;">+${xpEarned} XP accreditati sul tuo profilo EduHub!</div>
+        </div>
+      `;
+
+      if (currentUser) {
+        try {
+          await updateDoc(doc(db, "utenti_registrati", currentUser.uid), {
+            xp: increment(xpEarned),
+            punti: increment(xpEarned)
+          });
+        } catch (_) {}
+      }
+    }
+
+    async function callGeminiPro(contents) {
+      const model = document.getElementById("geminiModelSelect").value || "gemini-2.5-pro";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 1400
+          }
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Errore nella risposta di Gemini Pro");
+      }
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Nessuna risposta ricevuta.";
+    }
+
+    function appendProfMessage(text, label, id = "") {
+      const stream = document.getElementById("examStream");
+      const div = document.createElement("div");
+      div.className = "msg-prof";
+      if (id) div.id = id;
+      div.innerHTML = `
+        <div class="prof-tag">👨‍🏫 PROFESSORE AI • ${escapeHtml(label)}</div>
+        <div style="font-size:0.92rem; line-height:1.6; white-space:pre-line;">${formatBold(escapeHtml(text))}</div>
+      `;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendStudentMessage(text) {
+      const stream = document.getElementById("examStream");
+      const div = document.createElement("div");
+      div.className = "msg-student";
+      div.innerHTML = `
+        <div style="font-size:0.7rem; font-weight:800; color:#93c5fd; margin-bottom:4px;">LA TUA RISPOSTA</div>
+        <div style="font-size:0.9rem; line-height:1.5; white-space:pre-line;">${escapeHtml(text)}</div>
+      `;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    document.getElementById("resetExamBtn").addEventListener("click", () => {
+      examActive = false;
+      currentQuestionNum = 0;
+      conversationHistory = [];
+      document.getElementById("answerComposerBox").style.display = "none";
+      document.getElementById("finalGradeArea").innerHTML = "";
+      document.getElementById("startExamBtn").disabled = false;
+      document.getElementById("resetExamBtn").style.display = "none";
+      document.getElementById("examProgressFill").style.width = "0%";
+      document.getElementById("questionCounterBadge").textContent = `Domanda 0 / ${totalQuestions}`;
+      document.getElementById("examStatusTitle").textContent = "Pronto per una nuova interrogazione";
+    });
+
+    // Riconoscimento Vocale (Microfono)
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      const rec = new SpeechRec();
+      rec.lang = "it-IT";
+      rec.interimResults = false;
+      const micBtn = document.getElementById("micRecordBtn");
+
+      micBtn.addEventListener("click", () => {
+        micBtn.classList.add("recording");
+        micBtn.textContent = "🔴 Sto ascoltando...";
+        rec.start();
+      });
+      rec.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        const box = document.getElementById("studentAnswerInput");
+        box.value = (box.value ? box.value + " " : "") + transcript;
+      };
+      rec.onend = () => {
+        micBtn.classList.remove("recording");
+        micBtn.textContent = "🎤 Rispondi a Voce";
+      };
+    } else {
+      document.getElementById("micRecordBtn").style.display = "none";
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function formatBold(str) {
+      return str.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      currentUser = user;
+      isRepUser = REP_EMAILS.includes((user.email || "").toLowerCase());
+
+      try {
+        const cfgSnap = await getDoc(doc(db, "ai_config_1bi", "gemini"));
+        if (cfgSnap.exists()) {
+          const data = cfgSnap.data();
+          const savedKey = data.apiKey || data.geminiKey || data.key || "";
+          if (savedKey) {
+            geminiApiKey = savedKey;
+            updateApiStatus(true, "✓ Gemini Pro Connesso (Chiave 1BI attiva)");
+            return;
+          }
+        }
+      } catch (_) {}
+
+      if (geminiApiKey) {
+        updateApiStatus(true, "✓ Gemini Pro Connesso (Chiave salvata)");
+      } else {
+        updateApiStatus(false, "⚠️ Incolla la API Key Gemini Pro qui a destra per attivare il Prof");
+      }
+    });
+  </script>
+</body>
+</html>
