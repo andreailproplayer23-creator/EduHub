@@ -8,120 +8,217 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="../js/theme.js"></script>
   <style>
-    .ai-layout {
+    .tutor-workspace {
       display: grid;
-      grid-template-columns: 1.45fr 1fr;
-      gap: 20px;
-      align-items: start;
+      grid-template-columns: 270px 1fr 310px;
+      gap: 16px;
+      align-items: stretch;
+      min-height: 76vh;
     }
-    @media (max-width: 960px) {
-      .ai-layout {
+    @media (max-width: 1180px) {
+      .tutor-workspace {
+        grid-template-columns: 250px 1fr;
+      }
+      .shared-sidebar {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 820px) {
+      .tutor-workspace {
         grid-template-columns: 1fr;
       }
     }
-    .ai-card {
+
+    .panel-box {
       background: var(--card-bg);
       border: 1px solid var(--table-border, rgba(255,255,255,0.1));
-      border-radius: 20px;
-      padding: 20px;
-    }
-    /* SELETTORE MODELLI AI */
-    .models-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .model-chip {
+      border-radius: 18px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
-      background: var(--surface-sub, rgba(255,255,255,0.04));
-      color: var(--text-main);
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.18s ease;
-    }
-    .model-chip:hover {
-      border-color: rgba(139, 92, 246, 0.55);
-      transform: translateY(-1px);
-    }
-    .model-chip.active {
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(37, 99, 235, 0.25));
-      border-color: #8b5cf6;
-      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25);
-    }
-    .model-chip strong {
-      font-size: 0.84rem;
-      font-weight: 800;
-    }
-    .model-chip small {
-      font-size: 0.7rem;
-      color: var(--text-muted);
+      overflow: hidden;
     }
 
-    /* MODALITÀ DIDATTICHE */
-    .modes-row {
+    /* 1. COLONNA SINISTRA: CRONOLOGIA CHAT */
+    .history-header {
+      padding: 14px;
+      border-bottom: 1px solid var(--table-border, rgba(255,255,255,0.08));
       display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-new-chat {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.45);
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(37, 99, 235, 0.25));
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.2s ease;
+    }
+    .btn-new-chat:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 64vh;
+    }
+    .history-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: var(--surface-sub, rgba(255,255,255,0.03));
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .history-item.active {
+      background: rgba(124, 58, 237, 0.18);
+      border-color: #8b5cf6;
+    }
+    .history-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 22px;
+    }
+    .history-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .ai-model-tag {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      letter-spacing: 0.2px;
+    }
+    .tag-openai { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .tag-gemini { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .tag-claude { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .tag-deepseek { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+    .tag-llama { background: rgba(139, 92, 246, 0.22); color: #c4b5fd; }
+    .tag-mistral { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+
+    .del-chat-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.95rem;
+      padding: 2px 5px;
+      border-radius: 6px;
+      opacity: 0.65;
+    }
+    .del-chat-btn:hover {
+      opacity: 1;
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    /* 2. COLONNA CENTRALE: AREA CHAT PULITA */
+    .chat-topbar {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--table-border, rgba(255,255,255,0.08));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .selectors-cluster {
+      display: flex;
+      align-items: center;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 14px;
     }
-    .mode-pill {
-      padding: 6px 12px;
-      border-radius: 999px;
+    .clean-select {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
+      background: var(--surface-sub, rgba(255,255,255,0.06));
+      color: var(--text-main);
+      font-size: 0.83rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .clean-select:focus {
+      border-color: #8b5cf6;
+    }
+    .key-toggle-btn {
+      padding: 7px 11px;
+      border-radius: 10px;
       border: 1px solid var(--table-border, rgba(255,255,255,0.12));
-      background: var(--surface-sub, rgba(255,255,255,0.04));
+      background: transparent;
       color: var(--text-muted);
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
     }
-    .mode-pill.active {
-      background: rgba(16, 185, 129, 0.18);
-      border-color: #10b981;
-      color: #34d399;
+    .key-toggle-btn:hover {
+      color: var(--text-main);
+      border-color: #8b5cf6;
     }
 
-    /* AREA CHAT */
-    .chat-box {
-      height: 410px;
+    .messages-viewport {
+      flex: 1;
       overflow-y: auto;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding: 14px;
-      border-radius: 16px;
-      background: var(--surface-sub, rgba(255,255,255,0.03));
-      border: 1px solid var(--table-border, rgba(255,255,255,0.08));
-      margin-bottom: 14px;
+      gap: 14px;
+      min-height: 430px;
+      max-height: 58vh;
     }
-    .msg-bubble {
-      max-width: 88%;
-      padding: 12px 15px;
+    .bubble {
+      max-width: 85%;
+      padding: 13px 16px;
       border-radius: 16px;
-      font-size: 0.9rem;
-      line-height: 1.52;
+      font-size: 0.92rem;
+      line-height: 1.55;
       word-break: break-word;
     }
-    .msg-user {
+    .bubble-user {
       align-self: flex-end;
       background: linear-gradient(135deg, #2563eb, #4f46e5);
       color: #fff;
       border-bottom-right-radius: 4px;
     }
-    .msg-ai {
+    .bubble-ai {
       align-self: flex-start;
-      background: var(--card-bg);
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--surface-sub, rgba(255,255,255,0.05));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
       color: var(--text-main);
       border-bottom-left-radius: 4px;
     }
-    .msg-ai pre {
+    .bubble-ai pre {
       background: rgba(0, 0, 0, 0.45);
       padding: 10px 12px;
       border-radius: 10px;
@@ -130,160 +227,134 @@
       margin: 8px 0;
       border: 1px solid rgba(255,255,255,0.1);
     }
-    .msg-ai code {
+    .bubble-ai code {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       background: rgba(139, 92, 246, 0.16);
       padding: 2px 5px;
       border-radius: 5px;
       font-size: 0.84rem;
     }
-    .msg-ai pre code {
-      background: transparent;
-      padding: 0;
-    }
-    .msg-meta {
+    .bubble-ai pre code { background: transparent; padding: 0; }
+
+    .bubble-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 10px;
       padding-top: 8px;
       border-top: 1px solid rgba(255,255,255,0.08);
       font-size: 0.74rem;
       color: var(--text-muted);
     }
-    .btn-share-ai {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(245, 158, 11, 0.16);
+    .btn-share-gold {
+      background: rgba(245, 158, 11, 0.15);
       color: #fbbf24;
       border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 999px;
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       font-weight: 800;
       cursor: pointer;
     }
-    .btn-share-ai:hover {
-      background: rgba(245, 158, 11, 0.28);
-    }
+    .btn-share-gold:hover { background: rgba(245, 158, 11, 0.28); }
 
-    /* INPUT PROMPT */
-    .prompt-controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-    .ai-select, .ai-input {
-      padding: 10px 13px;
-      border-radius: 12px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
-      background: var(--surface-sub, rgba(255,255,255,0.05));
-      color: var(--text-main);
-      font-size: 0.88rem;
-      outline: none;
-      font-family: inherit;
-    }
-    .prompt-row {
+    .composer-area {
+      padding: 12px 16px;
+      border-top: 1px solid var(--table-border, rgba(255,255,255,0.08));
       display: flex;
       gap: 10px;
       align-items: flex-end;
+      background: rgba(255, 255, 255, 0.02);
     }
-    .prompt-textarea {
+    .composer-input {
       flex: 1;
-      min-height: 54px;
-      max-height: 150px;
+      min-height: 46px;
+      max-height: 140px;
       resize: vertical;
-      padding: 12px 14px;
-      border-radius: 14px;
+      padding: 11px 14px;
+      border-radius: 13px;
       border: 1px solid var(--table-border, rgba(255,255,255,0.14));
       background: var(--surface-sub, rgba(255,255,255,0.05));
       color: var(--text-main);
       font-size: 0.92rem;
-      outline: none;
       font-family: inherit;
+      outline: none;
     }
-    .prompt-textarea:focus {
-      border-color: #8b5cf6;
-    }
-    .btn-send-ai {
+    .composer-input:focus { border-color: #8b5cf6; }
+    .btn-ask {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
+      gap: 7px;
+      padding: 12px 18px;
+      border-radius: 13px;
+      border: none;
       background: linear-gradient(135deg, #7c3aed, #2563eb);
       color: #fff;
-      border: none;
-      padding: 14px 20px;
-      border-radius: 14px;
       font-weight: 800;
       font-size: 0.9rem;
       cursor: pointer;
       white-space: nowrap;
     }
-    .btn-send-ai:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn-ask:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* BACHECA SPIEGAZIONI CONDIVISE */
-    .shared-list {
+    /* 3. COLONNA DESTRA: SPIEGAZIONI CONDIVISE */
+    .shared-header {
+      padding: 14px;
+      border-bottom: 1px solid var(--table-border, rgba(255,255,255,0.08));
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      max-height: 640px;
-      overflow-y: auto;
+      gap: 8px;
     }
-    .shared-item {
-      padding: 14px;
-      border-radius: 14px;
+    .shared-feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 64vh;
+    }
+    .shared-card {
+      padding: 12px;
+      border-radius: 13px;
       background: var(--surface-sub, rgba(255,255,255,0.04));
-      border: 1px solid var(--table-border, rgba(255,255,255,0.09));
+      border: 1px solid var(--table-border, rgba(255,255,255,0.08));
     }
     .shared-q {
+      font-size: 0.86rem;
       font-weight: 800;
-      font-size: 0.92rem;
       margin: 6px 0;
       color: var(--text-main);
     }
     .shared-a {
-      font-size: 0.84rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      line-height: 1.48;
-      max-height: 170px;
+      line-height: 1.45;
+      max-height: 140px;
       overflow-y: auto;
-      padding-right: 4px;
     }
-    .like-mini-pill {
+    .like-chip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
+      gap: 5px;
+      padding: 3px 9px;
       border-radius: 999px;
       border: 1px solid var(--table-border, rgba(255,255,255,0.14));
       background: rgba(255,255,255,0.04);
       color: var(--text-muted);
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 800;
       cursor: pointer;
     }
-    .like-mini-pill.liked {
+    .like-chip.liked {
       background: rgba(37, 99, 235, 0.25);
       border-color: #3b82f6;
       color: #60a5fa;
     }
-    .typing-dots {
-      display: inline-flex;
-      gap: 5px;
-      padding: 6px 4px;
-    }
+    .typing-dots { display: inline-flex; gap: 5px; padding: 4px 2px; }
     .typing-dots span {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #a78bfa;
+      width: 7px; height: 7px; border-radius: 50%; background: #a78bfa;
       animation: bounceDot 0.9s infinite alternate;
     }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -312,120 +383,104 @@
     </div>
   </header>
 
-  <main class="container">
-    <div class="welcome-banner">
+  <main class="container" style="max-width: 1440px;">
+    <div class="welcome-banner" style="margin-bottom: 18px; padding: 18px 22px;">
       <div>
-        <h2>Assistente AI & Tutor di Studio 1BI</h2>
-        <p>Scegli tra più Intelligenze Artificiali, fatti spiegare esercizi o codice passo-passo e condividi le risposte migliori!</p>
+        <h2 style="font-size: 1.35rem;">Assistente AI & Tutor di Studio 1BI</h2>
+        <p style="font-size: 0.86rem;">Tutte le tue chat salvate con il modello AI utilizzato • Spiegazioni passo-passo e condivisione con la classe</p>
       </div>
       <div class="live-status">
         <span class="live-dot"></span>
-        <span id="activeModelBadge">GPT-4o Mini</span>
+        <span id="currentChatModelBadge">OpenAI GPT-4o</span>
       </div>
     </div>
 
-    <div class="ai-layout">
-      <!-- COLONNA SINISTRA: CHAT TUTOR MULTI-AI -->
-      <section class="ai-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-          <span style="font-size:0.8rem; font-weight:800; color:#c4b5fd; text-transform:uppercase;">1. Scegli il motore AI</span>
-          <button type="button" id="toggleApiKeyDrawer" class="mode-pill" style="font-size:0.74rem;">
-            🔑 Chiavi API Opzionali (Gemini / Groq)
+    <div class="tutor-workspace">
+      <!-- 1. SIDEBAR SINISTRA: CRONOLOGIA CHAT CREATE -->
+      <aside class="panel-box">
+        <div class="history-header">
+          <button type="button" id="newChatBtn" class="btn-new-chat">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            <span>Nuova Chat AI</span>
           </button>
-        </div>
-
-        <!-- PANNELLO OPZIONALE API KEY (GRATUITO DI DEFAULT ANCHE SENZA CHIAVI) -->
-        <div id="apiKeyDrawer" style="display:none; padding:12px; border-radius:12px; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.28); margin-bottom:12px;">
-          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
-            I 6 modelli sopra funzionano <strong>già gratis senza chiavi</strong>. Se vuoi usare anche una tua chiave personale (es. Google AI Studio o Groq), incollala qui (resta salvata solo nel tuo browser):
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:8px;">
-            <input type="password" id="geminiKeyInput" class="ai-input" placeholder="Google Gemini API Key (AIza...)" />
-            <input type="password" id="groqKeyInput" class="ai-input" placeholder="Groq API Key (gsk_...)" />
-            <button type="button" id="saveLocalKeysBtn" class="mode-pill active">Salva</button>
+          <div style="font-size:0.74rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px;">
+            Le tue chat (<span id="chatsCount">0</span>)
           </div>
         </div>
+        <div id="chatHistoryList" class="history-list">
+          <div style="text-align:center; color:var(--text-muted); font-size:0.82rem; padding:20px;">
+            Nessuna chat salvata.<br />Scrivi la tua prima domanda!
+          </div>
+        </div>
+      </aside>
 
-        <!-- GRIGLIA MOTORI AI -->
-        <div class="models-bar" id="modelsBar">
-          <button type="button" class="model-chip active" data-provider="pollinations" data-model="openai" data-label="OpenAI GPT-4o">
-            <strong>OpenAI GPT-4o</strong>
-            <small>Versatile & Rapido</small>
-          </button>
-          <button type="button" class="model-chip" data-provider="pollinations" data-model="gemini" data-label="Google Gemini">
-            <strong>Google Gemini</strong>
-            <small>Studio & Sintesi</small>
-          </button>
-          <button type="button" class="model-chip" data-provider="pollinations" data-model="claude" data-label="Anthropic Claude">
-            <strong>Anthropic Claude</strong>
-            <small>Spiegazioni Chiare</small>
-          </button>
-          <button type="button" class="model-chip" data-provider="pollinations" data-model="deepseek-reasoning" data-label="DeepSeek R1">
-            <strong>DeepSeek R1</strong>
-            <small>Matematica & Logica</small>
-          </button>
-          <button type="button" class="model-chip" data-provider="pollinations" data-model="llama" data-label="Meta Llama 3.3">
-            <strong>Meta Llama 3.3</strong>
-            <small>Open-Source 70B</small>
-          </button>
-          <button type="button" class="model-chip" data-provider="pollinations" data-model="mistral" data-label="Mistral Large">
-            <strong>Mistral Large</strong>
-            <small>Codice & Lingue</small>
+      <!-- 2. AREA CENTRALE: CHAT CON SELETTORI COMPATTI IN ALTO -->
+      <section class="panel-box">
+        <div class="chat-topbar">
+          <div class="selectors-cluster">
+            <select id="modelSelect" class="clean-select" title="Motore Intelligenza Artificiale">
+              <option value="openai">🤖 OpenAI GPT-4o</option>
+              <option value="gemini">✨ Google Gemini</option>
+              <option value="claude">🧠 Anthropic Claude</option>
+              <option value="deepseek-reasoning">🧮 DeepSeek R1 (Logica)</option>
+              <option value="llama">🦙 Meta Llama 3.3 70B</option>
+              <option value="mistral">⚡ Mistral Large</option>
+            </select>
+
+            <select id="modeSelect" class="clean-select" title="Modalità di risposta">
+              <option value="Spiegazione Passo-Passo">📘 Spiega Passo-Passo</option>
+              <option value="Tutor Informatica & Codice">💻 Codice & Debug</option>
+              <option value="Riassunto per Verifica">📝 Riassunto Verifica</option>
+              <option value="Simulazione Interrogazione">🎤 Interrogami tu</option>
+              <option value="Risolvi Esercizio">🧮 Risolvi Esercizio</option>
+            </select>
+
+            <select id="subjectSelect" class="clean-select" title="Materia">
+              <option value="Informatica & Sistemi">Informatica & Sistemi</option>
+              <option value="Matematica">Matematica</option>
+              <option value="Fisica">Fisica</option>
+              <option value="Chimica & Scienze">Chimica & Scienze</option>
+              <option value="Storia & Geografia">Storia & Geografia</option>
+              <option value="Italiano">Italiano</option>
+              <option value="Inglese">Inglese</option>
+              <option value="Altro">Altra Materia</option>
+            </select>
+          </div>
+
+          <button type="button" id="toggleKeysBtn" class="key-toggle-btn" title="Configura chiavi API opzionali">
+            🔑 API Key
           </button>
         </div>
 
-        <!-- MODALITÀ TUTOR -->
-        <div style="font-size:0.8rem; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:8px;">2. Modalità Tutor</div>
-        <div class="modes-row" id="modesRow">
-          <button type="button" class="mode-pill active" data-mode="Spiegazione Passo-Passo">📘 Spiega Passo-Passo</button>
-          <button type="button" class="mode-pill" data-mode="Tutor Informatica & Codice">💻 Codice & Debug</button>
-          <button type="button" class="mode-pill" data-mode="Riassunto per Verifica">📝 Riassunto Verifica</button>
-          <button type="button" class="mode-pill" data-mode="Simulazione Interrogazione">🎤 Interrogami tu</button>
-          <button type="button" class="mode-pill" data-mode="Risolvi Esercizio">🧮 Risolvi Esercizio</button>
-        </div>
-
-        <!-- FINESTRA MESSAGGI -->
-        <div id="aiChatBox" class="chat-box">
-          <div class="msg-bubble msg-ai">
-            Ciao! Sono il <strong>Tutor Multi-AI della 1BI</strong> 🤖<br />
-            Scegli in alto il modello AI che preferisci (GPT-4o, Gemini, Claude, DeepSeek, Llama o Mistral), imposta la materia e chiedimi qualsiasi cosa: esercizi di matematica, programmi in C++/HTML/Python, riassunti di storia o simulazioni di interrogazione!
+        <!-- CASSETTO OPZIONALE CHIAVI API -->
+        <div id="apiKeysDrawer" style="display:none; padding:10px 16px; background:rgba(139,92,246,0.08); border-bottom:1px solid rgba(139,92,246,0.25);">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input type="password" id="geminiKeyInput" class="clean-select" style="flex:1; min-width:170px;" placeholder="Google Gemini API Key (opzionale)" />
+            <input type="password" id="groqKeyInput" class="clean-select" style="flex:1; min-width:170px;" placeholder="Groq API Key (opzionale)" />
+            <button type="button" id="saveKeysBtn" class="btn-ask" style="padding:8px 14px; font-size:0.8rem;">Salva</button>
           </div>
         </div>
 
-        <!-- CONTROLLI INVIO -->
-        <div class="prompt-controls">
-          <select id="subjectSelect" class="ai-select">
-            <option value="Informatica & Sistemi">Informatica & Sistemi</option>
-            <option value="Matematica">Matematica</option>
-            <option value="Fisica">Fisica</option>
-            <option value="Chimica & Scienze">Chimica & Scienze</option>
-            <option value="Storia & Geografia">Storia & Geografia</option>
-            <option value="Italiano">Italiano</option>
-            <option value="Inglese">Inglese</option>
-            <option value="Altro">Altra Materia</option>
-          </select>
-          <button type="button" id="clearChatBtn" class="mode-pill" title="Pulisci la tua chat corrente">
-            Nuova Chat
-          </button>
-        </div>
+        <!-- MESSAGGI -->
+        <div id="messagesViewport" class="messages-viewport"></div>
 
-        <div class="prompt-row">
-          <textarea id="aiPromptInput" class="prompt-textarea" placeholder="Scrivi qui la tua domanda, incolla un esercizio o un pezzo di codice (Invio per inviare, Shift+Invio a capo)..."></textarea>
-          <button type="button" id="sendAiBtn" class="btn-send-ai">
-            <i data-lucide="sparkles" style="width:17px;height:17px;"></i>
-            <span>Chiedi</span>
+        <!-- COMPOSER IN BASSO -->
+        <div class="composer-area">
+          <textarea id="promptInput" class="composer-input" placeholder="Scrivi qui la tua domanda, un esercizio o del codice... (Invio per inviare)"></textarea>
+          <button type="button" id="sendBtn" class="btn-ask">
+            <i data-lucide="send" style="width:16px;height:16px;"></i>
+            <span>Invia</span>
           </button>
         </div>
       </section>
 
-      <!-- COLONNA DESTRA: SPIEGAZIONI CONDIVISE CON LA CLASSE -->
-      <aside class="ai-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-          <div>
-            <h3 style="margin:0; font-size:1.05rem; font-weight:800;">✨ Spiegazioni d'Oro 1BI</h3>
-            <small style="color:var(--text-muted);">Le risposte AI migliori condivise dai compagni</small>
+      <!-- 3. SIDEBAR DESTRA: SPIEGAZIONI CONDIVISE CON LA CLASSE -->
+      <aside class="panel-box shared-sidebar">
+        <div class="shared-header">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:0.95rem;">✨ Spiegazioni d'Oro 1BI</strong>
           </div>
-          <select id="filterSharedSubject" class="ai-select" style="padding:6px 10px; font-size:0.8rem;">
+          <select id="filterSharedSubject" class="clean-select" style="width:100%; font-size:0.8rem;">
             <option value="TUTTE">Tutte le materie</option>
             <option value="Informatica & Sistemi">Informatica & Sistemi</option>
             <option value="Matematica">Matematica</option>
@@ -437,10 +492,9 @@
             <option value="Altro">Altra Materia</option>
           </select>
         </div>
-
-        <div id="sharedAiList" class="shared-list">
-          <div style="text-align:center; color:var(--text-muted); padding:24px; font-size:0.88rem;">
-            Nessuna spiegazione condivisa ancora. Chiedi qualcosa all'AI e clicca "Condividi con la 1BI"!
+        <div id="sharedFeed" class="shared-feed">
+          <div style="text-align:center; color:var(--text-muted); font-size:0.82rem; padding:20px;">
+            Nessuna spiegazione condivisa ancora.
           </div>
         </div>
       </aside>
@@ -460,111 +514,164 @@
       doc,
       onSnapshot,
       query,
+      where,
       orderBy,
       arrayUnion,
       arrayRemove
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+    const MODEL_META = {
+      "openai": { label: "OpenAI GPT-4o", badgeClass: "tag-openai" },
+      "gemini": { label: "Google Gemini", badgeClass: "tag-gemini" },
+      "claude": { label: "Anthropic Claude", badgeClass: "tag-claude" },
+      "deepseek-reasoning": { label: "DeepSeek R1", badgeClass: "tag-deepseek" },
+      "llama": { label: "Meta Llama 3.3", badgeClass: "tag-llama" },
+      "mistral": { label: "Mistral Large", badgeClass: "tag-mistral" }
+    };
+
     let currentUser = null;
     let userIsRep = false;
-    let selectedModel = "openai";
-    let selectedModelLabel = "OpenAI GPT-4o";
-    let selectedMode = "Spiegazione Passo-Passo";
-    let conversationHistory = [];
+    let myChats = [];
+    let activeChatId = null;
+    let draftMessages = []; // Messaggi di una nuova chat non ancora salvata su Firestore
     let allSharedItems = [];
 
-    // Gestione Chiavi API Locali Opzionali
+    const modelSelect = document.getElementById("modelSelect");
+    const modeSelect = document.getElementById("modeSelect");
+    const subjectSelect = document.getElementById("subjectSelect");
+
+    // Chiavi API Opzionali
     const geminiInput = document.getElementById("geminiKeyInput");
     const groqInput = document.getElementById("groqKeyInput");
     geminiInput.value = localStorage.getItem("eduhub_gemini_key") || "";
     groqInput.value = localStorage.getItem("eduhub_groq_key") || "";
 
-    document.getElementById("toggleApiKeyDrawer").addEventListener("click", () => {
-      const box = document.getElementById("apiKeyDrawer");
-      box.style.display = box.style.display === "none" ? "block" : "none";
+    document.getElementById("toggleKeysBtn").addEventListener("click", () => {
+      const dr = document.getElementById("apiKeysDrawer");
+      dr.style.display = dr.style.display === "none" ? "block" : "none";
     });
-
-    document.getElementById("saveLocalKeysBtn").addEventListener("click", () => {
+    document.getElementById("saveKeysBtn").addEventListener("click", () => {
       localStorage.setItem("eduhub_gemini_key", geminiInput.value.trim());
       localStorage.setItem("eduhub_groq_key", groqInput.value.trim());
-      alert("Chiavi salvate nel tuo browser! Se presenti verranno usate automaticamente.");
+      alert("Chiavi API salvate nel browser!");
     });
 
-    // Selezione Modello AI
-    document.querySelectorAll("#modelsBar .model-chip").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#modelsBar .model-chip").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        selectedModel = btn.dataset.model;
-        selectedModelLabel = btn.dataset.label;
-        document.getElementById("activeModelBadge").textContent = selectedModelLabel;
-      });
+    modelSelect.addEventListener("change", () => {
+      const m = MODEL_META[modelSelect.value] || MODEL_META["openai"];
+      document.getElementById("currentChatModelBadge").textContent = m.label;
     });
 
-    // Selezione Modalità Tutor
-    document.querySelectorAll("#modesRow .mode-pill").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#modesRow .mode-pill").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        selectedMode = btn.dataset.mode;
-      });
-    });
-
-    // Pulisci Chat
-    document.getElementById("clearChatBtn").addEventListener("click", () => {
-      conversationHistory = [];
-      document.getElementById("aiChatBox").innerHTML = `
-        <div class="msg-bubble msg-ai">
-          Chat azzerata! Sono pronto con <strong>${escapeHtml(selectedModelLabel)}</strong>. Cosa studiamo adesso?
-        </div>
-      `;
-    });
-
-    // Formattazione leggera Markdown -> HTML sicuro
-    function formatAiMarkdown(raw) {
-      let safe = escapeHtml(raw);
-      // Blocchi di codice ```...```
-      safe = safe.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code.trim()}</code></pre>`);
-      // Codice inline `...`
-      safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
-      // Grassetto **...**
-      safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-      // Corsivo *...*
-      safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-      // A capo fuori dai <pre>
-      const parts = safe.split(/(<pre>[\s\S]*?<\/pre>)/g);
-      return parts.map(part => part.startsWith("<pre>") ? part : part.replace(/\n/g, "<br />")).join("");
+    // Avvia Nuova Chat
+    function startNewChat() {
+      activeChatId = null;
+      draftMessages = [];
+      renderHistorySidebar();
+      renderMessagesViewport();
+      document.getElementById("promptInput").focus();
     }
+    document.getElementById("newChatBtn").addEventListener("click", startNewChat);
 
-    function appendMessage(role, text, metaInfo = null) {
-      const box = document.getElementById("aiChatBox");
-      const div = document.createElement("div");
-      div.className = `msg-bubble ${role === "user" ? "msg-user" : "msg-ai"}`;
+    // Render Sidebar Cronologia Chat
+    function renderHistorySidebar() {
+      const listEl = document.getElementById("chatHistoryList");
+      document.getElementById("chatsCount").textContent = myChats.length;
 
-      if (role === "user") {
-        div.innerHTML = escapeHtml(text).replace(/\n/g, "<br />");
-      } else {
-        div.innerHTML = `
-          <div>${formatAiMarkdown(text)}</div>
-          ${metaInfo ? `
-            <div class="msg-meta">
-              <span>🤖 ${escapeHtml(metaInfo.modelLabel)} • ${escapeHtml(metaInfo.materia)}</span>
-              <button type="button" class="btn-share-ai">★ Condividi con la 1BI</button>
-            </div>
-          ` : ""}
+      if (myChats.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.82rem; padding:20px;">Nessuna chat salvata.<br />Scrivi la tua prima domanda!</div>`;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      myChats.forEach(chat => {
+        const meta = MODEL_META[chat.modelId] || { label: chat.modelLabel || "AI", badgeClass: "tag-openai" };
+        const dateStr = chat.aggiornatoIl
+          ? new Date(chat.aggiornatoIl).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" })
+          : "";
+
+        const item = document.createElement("div");
+        item.className = `history-item ${chat.id === activeChatId ? "active" : ""}`;
+        item.innerHTML = `
+          <div class="history-title" title="${escapeHtml(chat.titolo)}">${escapeHtml(chat.titolo)}</div>
+          <button type="button" class="del-chat-btn" title="Elimina chat">&times;</button>
+          <div class="history-footer">
+            <span class="ai-model-tag ${meta.badgeClass}">${escapeHtml(meta.label)}</span>
+            <small style="font-size:0.7rem; color:var(--text-muted);">${dateStr}</small>
+          </div>
         `;
 
-        if (metaInfo) {
-          const shareBtn = div.querySelector(".btn-share-ai");
-          shareBtn.addEventListener("click", async () => {
+        item.addEventListener("click", (e) => {
+          if (e.target.closest(".del-chat-btn")) return;
+          activeChatId = chat.id;
+          if (chat.modelId && MODEL_META[chat.modelId]) {
+            modelSelect.value = chat.modelId;
+            document.getElementById("currentChatModelBadge").textContent = MODEL_META[chat.modelId].label;
+          }
+          if (chat.materia) subjectSelect.value = chat.materia;
+          renderHistorySidebar();
+          renderMessagesViewport();
+        });
+
+        item.querySelector(".del-chat-btn").addEventListener("click", async (e) => {
+          e.stopPropagation();
+          if (!confirm("Eliminare questa chat dalla cronologia?")) return;
+          if (activeChatId === chat.id) {
+            activeChatId = null;
+            draftMessages = [];
+          }
+          await deleteDoc(doc(db, "ai_chats_1bi", chat.id));
+        });
+
+        listEl.appendChild(item);
+      });
+    }
+
+    // Render Messaggi della Chat Attiva
+    function renderMessagesViewport() {
+      const vp = document.getElementById("messagesViewport");
+      const activeChat = myChats.find(c => c.id === activeChatId);
+      const msgs = activeChat ? (activeChat.messaggi || []) : draftMessages;
+
+      if (msgs.length === 0) {
+        const currentMeta = MODEL_META[modelSelect.value] || MODEL_META["openai"];
+        vp.innerHTML = `
+          <div class="bubble bubble-ai">
+            Ciao! Hai selezionato <strong>${escapeHtml(currentMeta.label)}</strong>.<br />
+            Fai una domanda, incolla un esercizio o un codice: la chat verrà salvata automaticamente nella barra a sinistra con il nome dell'AI usata!
+          </div>
+        `;
+        return;
+      }
+
+      vp.innerHTML = "";
+      msgs.forEach((m, idx) => {
+        const div = document.createElement("div");
+        div.className = `bubble ${m.role === "user" ? "bubble-user" : "bubble-ai"}`;
+
+        if (m.role === "user") {
+          div.innerHTML = escapeHtml(m.content).replace(/\n/g, "<br />");
+        } else {
+          const prevQuestion = idx > 0 && msgs[idx - 1].role === "user" ? msgs[idx - 1].content : "Domanda di studio";
+          const usedModel = m.modelLabel || (activeChat ? activeChat.modelLabel : "AI");
+          const usedMateria = m.materia || (activeChat ? activeChat.materia : subjectSelect.value);
+
+          div.innerHTML = `
+            <div>${formatAiMarkdown(m.content)}</div>
+            <div class="bubble-footer">
+              <span>🤖 ${escapeHtml(usedModel)} • ${escapeHtml(usedMateria)}</span>
+              <button type="button" class="btn-share-gold">★ Condividi con la 1BI</button>
+            </div>
+          `;
+
+          div.querySelector(".btn-share-gold").addEventListener("click", async (e) => {
             if (!currentUser) return;
-            shareBtn.disabled = true;
-            shareBtn.textContent = "Condivisa ✓";
+            const btn = e.currentTarget;
+            btn.disabled = true;
+            btn.textContent = "Condivisa ✓";
             await addDoc(collection(db, "ai_spiegazioni_1bi"), {
-              domanda: metaInfo.question,
-              risposta: text,
-              materia: metaInfo.materia,
-              modello: metaInfo.modelLabel,
+              domanda: prevQuestion,
+              risposta: m.content,
+              materia: usedMateria,
+              modello: usedModel,
               autore: currentUser.displayName || "Studente 1BI",
               autoreUid: currentUser.uid,
               likes: [currentUser.uid],
@@ -572,33 +679,31 @@
             });
           });
         }
-      }
+        vp.appendChild(div);
+      });
 
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-      return div;
+      vp.scrollTop = vp.scrollHeight;
     }
 
-    // Chiamata Multi-AI (con fallback automatico tra motori)
-    async function queryMultiAI(userPrompt, materia, mode) {
+    // Chiamata Multi-AI
+    async function queryMultiAI(historyMsgs, modelId, materia, mode) {
       const systemPrompt =
-        `Sei il Tutor AI ufficiale della classe 1BI (Istituto Tecnico Informatico IIS Giorgi-Woolf). ` +
-        `Rispondi sempre in italiano chiaro, preciso e adatto a studenti delle superiori. ` +
-        `Materia attuale: ${materia}. Modalità richiesta: ${mode}. ` +
-        `Spiega i passaggi logici in modo comprensibile senza saltare gli step importanti.`;
+        `Sei il Tutor AI della classe 1BI (Istituto Tecnico Informatico IIS Giorgi-Woolf). ` +
+        `Rispondi in italiano chiaro, preciso e ben strutturato. ` +
+        `Materia: ${materia}. Modalità: ${mode}.`;
 
       const customGeminiKey = localStorage.getItem("eduhub_gemini_key");
       const customGroqKey = localStorage.getItem("eduhub_groq_key");
+      const lastUserText = historyMsgs[historyMsgs.length - 1]?.content || "";
 
-      // 1. Se l'utente ha inserito una chiave Google Gemini ufficiale ed ha scelto Gemini
-      if (selectedModel === "gemini" && customGeminiKey) {
+      if (modelId === "gemini" && customGeminiKey) {
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(customGeminiKey)}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: `${systemPrompt}\n\nDomanda studente: ${userPrompt}` }] }]
+              contents: [{ parts: [{ text: `${systemPrompt}\n\n${lastUserText}` }] }]
             })
           }
         );
@@ -609,8 +714,7 @@
         }
       }
 
-      // 2. Se l'utente ha inserito una chiave Groq ufficiale ed ha scelto Llama
-      if (selectedModel === "llama" && customGroqKey) {
+      if (modelId === "llama" && customGroqKey) {
         const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -621,8 +725,7 @@
             model: "llama-3.3-70b-versatile",
             messages: [
               { role: "system", content: systemPrompt },
-              ...conversationHistory.slice(-6),
-              { role: "user", content: userPrompt }
+              ...historyMsgs.slice(-8).map(m => ({ role: m.role, content: m.content }))
             ]
           })
         });
@@ -633,124 +736,156 @@
         }
       }
 
-      // 3. Motore Multi-AI Gratuito Integrato (OpenAI / Gemini / Claude / DeepSeek / Llama / Mistral)
-      const messagesPayload = [
-        { role: "system", content: systemPrompt },
-        ...conversationHistory.slice(-6),
-        { role: "user", content: userPrompt }
-      ];
-
       const res = await fetch("https://text.pollinations.ai/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: messagesPayload,
-          model: selectedModel,
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...historyMsgs.slice(-8).map(m => ({ role: m.role, content: m.content }))
+          ],
+          model: modelId,
           private: true
         })
       });
 
-      if (!res.ok) {
-        throw new Error("Il modello selezionato è momentaneamente occupato. Prova a cambiare modello AI in alto!");
-      }
-
-      const replyText = await res.text();
-      if (!replyText || !replyText.trim()) {
-        throw new Error("Risposta vuota dal server AI. Riprova tra qualche secondo.");
-      }
-      return replyText.trim();
+      if (!res.ok) throw new Error("Server AI momentaneamente occupato. Prova un altro modello dal menu!");
+      const text = await res.text();
+      if (!text || !text.trim()) throw new Error("Risposta vuota. Riprova tra un attimo.");
+      return text.trim();
     }
 
-    async function handleSendPrompt() {
-      const input = document.getElementById("aiPromptInput");
-      const sendBtn = document.getElementById("sendAiBtn");
-      const promptText = input.value.trim();
-      const materia = document.getElementById("subjectSelect").value;
+    async function sendPrompt() {
+      if (!currentUser) return;
+      const input = document.getElementById("promptInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const text = input.value.trim();
+      if (!text) return;
 
-      if (!promptText) return;
+      const modelId = modelSelect.value;
+      const modelLabel = (MODEL_META[modelId] || MODEL_META["openai"]).label;
+      const materia = subjectSelect.value;
+      const mode = modeSelect.value;
 
       input.value = "";
       sendBtn.disabled = true;
-      appendMessage("user", promptText);
 
-      // Fumetto caricamento
-      const box = document.getElementById("aiChatBox");
-      const loadingDiv = document.createElement("div");
-      loadingDiv.className = "msg-bubble msg-ai";
-      loadingDiv.innerHTML = `<div style="font-size:0.78rem; color:#c4b5fd; margin-bottom:4px;">${escapeHtml(selectedModelLabel)} sta elaborando...</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
-      box.appendChild(loadingDiv);
-      box.scrollTop = box.scrollHeight;
+      const activeChat = myChats.find(c => c.id === activeChatId);
+      const currentList = activeChat ? [...(activeChat.messaggi || [])] : [...draftMessages];
+      currentList.push({ role: "user", content: text });
+
+      if (!activeChat) {
+        draftMessages = currentList;
+      }
+      renderMessagesViewport();
+
+      // Bolla caricamento
+      const vp = document.getElementById("messagesViewport");
+      const loader = document.createElement("div");
+      loader.className = "bubble bubble-ai";
+      loader.innerHTML = `<div style="font-size:0.76rem; color:#c4b5fd; margin-bottom:4px;">${escapeHtml(modelLabel)} sta scrivendo...</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
+      vp.appendChild(loader);
+      vp.scrollTop = vp.scrollHeight;
 
       try {
-        const aiReply = await queryMultiAI(promptText, materia, selectedMode);
-        loadingDiv.remove();
+        const reply = await queryMultiAI(currentList, modelId, materia, mode);
+        loader.remove();
 
-        conversationHistory.push({ role: "user", content: promptText });
-        conversationHistory.push({ role: "assistant", content: aiReply });
-
-        appendMessage("ai", aiReply, {
-          question: promptText,
-          materia,
-          modelLabel: selectedModelLabel
+        currentList.push({
+          role: "assistant",
+          content: reply,
+          modelId,
+          modelLabel,
+          materia
         });
+
+        if (activeChat) {
+          await updateDoc(doc(db, "ai_chats_1bi", activeChat.id), {
+            messaggi: currentList,
+            modelId,
+            modelLabel,
+            materia,
+            aggiornatoIl: Date.now()
+          });
+        } else {
+          const shortTitle = text.length > 42 ? text.slice(0, 42) + "..." : text;
+          const docRef = await addDoc(collection(db, "ai_chats_1bi"), {
+            titolo: shortTitle,
+            modelId,
+            modelLabel,
+            materia,
+            messaggi: currentList,
+            autoreUid: currentUser.uid,
+            creatoIl: Date.now(),
+            aggiornatoIl: Date.now()
+          });
+          activeChatId = docRef.id;
+          draftMessages = [];
+        }
       } catch (err) {
-        loadingDiv.remove();
-        appendMessage("ai", `⚠️ **Errore:** ${err.message}`);
+        loader.remove();
+        currentList.push({
+          role: "assistant",
+          content: `⚠️ **Errore:** ${err.message}`,
+          modelId,
+          modelLabel,
+          materia
+        });
+        if (!activeChat) draftMessages = currentList;
+        renderMessagesViewport();
       } finally {
         sendBtn.disabled = false;
         input.focus();
       }
     }
 
-    document.getElementById("sendAiBtn").addEventListener("click", handleSendPrompt);
-    document.getElementById("aiPromptInput").addEventListener("keydown", (e) => {
+    document.getElementById("sendBtn").addEventListener("click", sendPrompt);
+    document.getElementById("promptInput").addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        handleSendPrompt();
+        sendPrompt();
       }
     });
 
-    // Render Spiegazioni Condivise
-    document.getElementById("filterSharedSubject").addEventListener("change", renderSharedList);
+    // Spiegazioni Condivise
+    document.getElementById("filterSharedSubject").addEventListener("change", renderSharedFeed);
 
-    function renderSharedList() {
-      const container = document.getElementById("sharedAiList");
+    function renderSharedFeed() {
+      const feed = document.getElementById("sharedFeed");
       const filter = document.getElementById("filterSharedSubject").value;
-
       const filtered = allSharedItems.filter(it => filter === "TUTTE" || it.materia === filter);
+
       if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:24px; font-size:0.86rem;">Nessuna spiegazione condivisa per questa materia.</div>`;
+        feed.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.82rem; padding:20px;">Nessuna spiegazione condivisa per questa materia.</div>`;
         return;
       }
 
-      container.innerHTML = "";
+      feed.innerHTML = "";
       filtered.forEach(item => {
         const likes = Array.isArray(item.likes) ? item.likes : [];
         const hasLiked = currentUser && likes.includes(currentUser.uid);
         const canDel = userIsRep || (currentUser && item.autoreUid === currentUser.uid);
 
         const card = document.createElement("div");
-        card.className = "shared-item";
+        card.className = "shared-card";
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span style="font-size:0.72rem; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(139,92,246,0.18); color:#c4b5fd;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span style="font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(139,92,246,0.18); color:#c4b5fd;">
               ${escapeHtml(item.materia || "Studio")} • ${escapeHtml(item.modello || "AI")}
             </span>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <button type="button" class="like-mini-pill ${hasLiked ? "liked" : ""}">
-                👍 <span>${likes.length}</span>
-              </button>
-              ${canDel ? `<button type="button" class="like-mini-pill del-shared-btn" style="color:#f87171; border-color:rgba(239,68,68,0.35);">&times;</button>` : ""}
+            <div style="display:flex; align-items:center; gap:5px;">
+              <button type="button" class="like-chip ${hasLiked ? "liked" : ""}">👍 ${likes.length}</button>
+              ${canDel ? `<button type="button" class="like-chip del-shared" style="color:#f87171;">&times;</button>` : ""}
             </div>
           </div>
           <div class="shared-q">❓ ${escapeHtml(item.domanda)}</div>
           <div class="shared-a">${formatAiMarkdown(item.risposta)}</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:8px;">
-            Condivisa da <strong>${escapeHtml(item.autore || "Studente 1BI")}</strong>
+          <div style="font-size:0.7rem; color:var(--text-muted); margin-top:6px;">
+            Da <strong>${escapeHtml(item.autore || "Studente 1BI")}</strong>
           </div>
         `;
 
-        card.querySelector(".like-mini-pill").addEventListener("click", async () => {
+        card.querySelector(".like-chip").addEventListener("click", async () => {
           if (!currentUser) return;
           await updateDoc(doc(db, "ai_spiegazioni_1bi", item.id), {
             likes: hasLiked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
@@ -758,14 +893,14 @@
         });
 
         if (canDel) {
-          card.querySelector(".del-shared-btn")?.addEventListener("click", async () => {
+          card.querySelector(".del-shared")?.addEventListener("click", async () => {
             if (confirm("Eliminare questa spiegazione condivisa?")) {
               await deleteDoc(doc(db, "ai_spiegazioni_1bi", item.id));
             }
           });
         }
 
-        container.appendChild(card);
+        feed.appendChild(card);
       });
     }
 
@@ -773,21 +908,39 @@
       if (!user) return;
       currentUser = user;
       userIsRep = isRappresentante(user);
+      renderMessagesViewport();
 
+      // 1. Cronologia Chat dell'utente corrente
+      const qMyChats = query(collection(db, "ai_chats_1bi"), where("autoreUid", "==", user.uid));
+      onSnapshot(qMyChats, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => (b.aggiornatoIl || 0) - (a.aggiornatoIl || 0));
+        myChats = list;
+        renderHistorySidebar();
+        renderMessagesViewport();
+      });
+
+      // 2. Spiegazioni condivise della classe
       const qShared = query(collection(db, "ai_spiegazioni_1bi"), orderBy("creatoIl", "desc"));
       onSnapshot(qShared, (snap) => {
         const list = [];
         snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-        list.sort((a, b) => {
-          const lA = Array.isArray(a.likes) ? a.likes.length : 0;
-          const lB = Array.isArray(b.likes) ? b.likes.length : 0;
-          if (lB !== lA) return lB - lA;
-          return (b.creatoIl || 0) - (a.creatoIl || 0);
-        });
+        list.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
         allSharedItems = list;
-        renderSharedList();
+        renderSharedFeed();
       });
     });
+
+    function formatAiMarkdown(raw) {
+      let safe = escapeHtml(raw);
+      safe = safe.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code.trim()}</code></pre>`);
+      safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+      safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      const parts = safe.split(/(<pre>[\s\S]*?<\/pre>)/g);
+      return parts.map(p => p.startsWith("<pre>") ? p : p.replace(/\n/g, "<br />")).join("");
+    }
 
     function escapeHtml(str) {
       return String(str)
