@@ -5,32 +5,67 @@ import {
   collection,
   doc,
   onSnapshot,
-  updateDoc,
-  increment
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 export const FRAME_STYLES = {
-  "frame-default": "border: 2px solid #38bdf8;",
-  "frame-gold": "border: 3px solid #fbbf24; box-shadow: 0 0 14px rgba(251, 191, 36, 0.75);",
-  "frame-neon": "border: 3px solid #ec4899; box-shadow: 0 0 15px rgba(236, 72, 153, 0.8);",
-  "frame-matrix": "border: 3px solid #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);",
-  "frame-fire": "border: 3px solid #f97316; box-shadow: 0 0 16px rgba(249, 115, 22, 0.85);",
-  "frame-diamond": "border: 3px solid #22d3ee; box-shadow: 0 0 18px rgba(34, 211, 238, 0.95);"
+  "frame-default": "border: 3px solid #38bdf8;",
+  "frame-mint": "border: 3px solid #34d399; box-shadow: 0 0 12px rgba(52, 211, 153, 0.55);",
+  "frame-cobalt": "border: 3px solid #3b82f6; box-shadow: 0 0 14px rgba(59, 130, 246, 0.7);",
+  "frame-matrix": "border: 3px solid #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.8);",
+  "frame-sunset": "border: 3px solid #fb7185; box-shadow: 0 0 16px rgba(251, 113, 133, 0.75);",
+  "frame-neon": "border: 3px solid #ec4899; box-shadow: 0 0 18px rgba(236, 72, 153, 0.85);",
+  "frame-electric": "border: 3px solid #facc15; box-shadow: 0 0 18px rgba(250, 204, 21, 0.85);",
+  "frame-amethyst": "border: 3px solid #a855f7; box-shadow: 0 0 18px rgba(168, 85, 247, 0.85);",
+  "frame-fire": "border: 3px solid #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.9);",
+  "frame-frost": "border: 3px solid #7dd3fc; box-shadow: 0 0 20px rgba(125, 211, 252, 0.9);",
+  "frame-bloodmoon": "border: 3px solid #ef4444; box-shadow: 0 0 22px rgba(239, 68, 68, 0.95);",
+  "frame-vaporwave": "border: 3px solid #c084fc; box-shadow: -3px 0 16px rgba(236, 72, 153, 0.85), 3px 0 16px rgba(34, 211, 238, 0.85);",
+  "frame-gold": "border: 3px solid #fbbf24; box-shadow: 0 0 22px rgba(251, 191, 36, 0.9);",
+  "frame-void": "border: 3px solid #818cf8; box-shadow: 0 0 24px rgba(79, 70, 229, 0.95), inset 0 0 10px rgba(129, 140, 248, 0.6);",
+  "frame-diamond": "border: 3px solid #22d3ee; box-shadow: 0 0 25px rgba(34, 211, 238, 1);",
+  "frame-rgb": "border: 3px solid #f43f5e; box-shadow: 0 0 18px rgba(244, 63, 94, 0.9), 0 0 28px rgba(56, 189, 248, 0.8);"
 };
 
 export const TITLE_LABELS = {
   "title-base": "Studente 1BI Informatica",
+  "title-matricola": "🎒 Matricola Giorgi-Woolf",
+  "title-coffee": "☕ Alimentato a Caffè",
   "title-bughunter": "🐛 Bug Hunter C++",
+  "title-binary": "🔢 Mago del Binario",
+  "title-nightcoder": "🌙 Coder Notturno",
+  "title-survivor": "🛡️ Sopravvissuto alle Verifiche",
+  "title-notes": "📚 Spacciatore di Appunti",
   "title-secchione": "👑 Re delle Interrogazioni",
   "title-gamer": "🎮 Pro Player 1BI",
-  "title-architect": "⚡ System Architect"
+  "title-kahoot": "🏆 Campione Kahoot Arena",
+  "title-lim": "🖥️ Signore della LIM",
+  "title-speedrunner": "⏱️ Speedrunner di Compiti",
+  "title-architect": "⚡ System Architect",
+  "title-ai": "🤖 Domatore di Intelligenze Artificiali",
+  "title-cyber": "🕵️ Cyber Ghost 1BI",
+  "title-emperor": "👑 Imperatore della 1BI",
+  "title-legend": "🌌 Leggenda Assoluta Giorgi-Woolf"
 };
 
 export const BADGE_ICONS = {
   "badge-base": "🎓",
+  "badge-laptop": "💻",
   "badge-rocket": "🚀",
+  "badge-zap": "⚡",
+  "badge-target": "🎯",
   "badge-brain": "🧠",
+  "badge-alien": "👾",
+  "badge-robot": "🤖",
+  "badge-shield": "🛡️",
+  "badge-sword": "⚔️",
+  "badge-fox": "🦊",
+  "badge-wolf": "🐺",
+  "badge-eagle": "🦅",
+  "badge-fire": "🔥",
+  "badge-ufo": "🛸",
   "badge-crown": "👑",
+  "badge-diamond": "💎",
   "badge-dragon": "🐉"
 };
 
@@ -47,7 +82,6 @@ export function getUserCosmetics(userData = {}) {
   };
 }
 
-// Restituisce l'HTML compatto (Badge + Pillola Titolo) da mettere accanto al nome in Classifica, Chat e Profilo
 export function renderCosmeticInlineHtml(userData = {}, showTitle = true) {
   const { titleText, badgeIcon } = getUserCosmetics(userData);
   const badgePart = badgeIcon
@@ -59,10 +93,6 @@ export function renderCosmeticInlineHtml(userData = {}, showTitle = true) {
   return `${badgePart} ${titlePart}`;
 }
 
-/**
- * Monta il Pannello Admin XP (solo per Rappresentanti, nascosto in Vista Studente)
- * dentro qualsiasi contenitore HTML (es. Negozio XP o Classifica).
- */
 export function mountRepXpAdminPanel(targetContainer, currentUser) {
   if (!targetContainer || !currentUser || !isRappresentante(currentUser)) return;
   if (document.getElementById("repXpAdminCard")) return;

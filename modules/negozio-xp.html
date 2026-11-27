@@ -61,13 +61,30 @@
       object-fit: cover;
     }
 
-    /* Cornici Avatar Sbloccabili */
+    @keyframes rgbPulse {
+      0% { border-color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.9); }
+      33% { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.9); }
+      66% { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.9); }
+      100% { border-color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.9); }
+    }
+
+    /* 16 Cornici Avatar Sbloccabili */
     .frame-default { border: 3px solid #38bdf8; }
-    .frame-gold { border: 4px solid #fbbf24; box-shadow: 0 0 18px rgba(251, 191, 36, 0.65); }
-    .frame-neon { border: 4px solid #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.75); }
-    .frame-matrix { border: 4px solid #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.75); }
-    .frame-fire { border: 4px solid #f97316; box-shadow: 0 0 22px rgba(249, 115, 22, 0.8); }
-    .frame-diamond { border: 4px solid #22d3ee; box-shadow: 0 0 24px rgba(34, 211, 238, 0.9); }
+    .frame-mint { border: 3px solid #34d399; box-shadow: 0 0 14px rgba(52, 211, 153, 0.6); }
+    .frame-cobalt { border: 3px solid #3b82f6; box-shadow: 0 0 16px rgba(59, 130, 246, 0.75); }
+    .frame-matrix { border: 4px solid #10b981; box-shadow: 0 0 18px rgba(16, 185, 129, 0.8); }
+    .frame-sunset { border: 4px solid #fb7185; box-shadow: 0 0 18px rgba(251, 113, 133, 0.8); }
+    .frame-neon { border: 4px solid #ec4899; box-shadow: 0 0 20px rgba(236, 72, 153, 0.85); }
+    .frame-electric { border: 4px solid #facc15; box-shadow: 0 0 20px rgba(250, 204, 21, 0.85); }
+    .frame-amethyst { border: 4px solid #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.85); }
+    .frame-fire { border: 4px solid #f97316; box-shadow: 0 0 22px rgba(249, 115, 22, 0.9); }
+    .frame-frost { border: 4px solid #7dd3fc; box-shadow: 0 0 22px rgba(125, 211, 252, 0.9); }
+    .frame-bloodmoon { border: 4px solid #ef4444; box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
+    .frame-vaporwave { border: 4px solid #c084fc; box-shadow: -4px 0 18px rgba(236, 72, 153, 0.85), 4px 0 18px rgba(34, 211, 238, 0.85); }
+    .frame-gold { border: 4px solid #fbbf24; box-shadow: 0 0 24px rgba(251, 191, 36, 0.9); }
+    .frame-void { border: 4px solid #818cf8; box-shadow: 0 0 25px rgba(79, 70, 229, 0.95), inset 0 0 12px rgba(129, 140, 248, 0.65); }
+    .frame-diamond { border: 4px solid #22d3ee; box-shadow: 0 0 26px rgba(34, 211, 238, 1); }
+    .frame-rgb { border: 4px solid #f43f5e; animation: rgbPulse 2.4s infinite linear; }
 
     .xp-wallet-box {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(234, 179, 8, 0.1));
@@ -77,20 +94,28 @@
       text-align: right;
     }
 
+    .shop-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
     .shop-tabs {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 16px;
     }
     .shop-tab {
-      padding: 9px 16px;
+      padding: 9px 15px;
       border-radius: 12px;
       border: 1px solid var(--solid-border);
       background: var(--solid-panel);
       color: var(--text-muted);
       font-weight: 800;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       cursor: pointer;
     }
     .shop-tab.active {
@@ -101,23 +126,46 @@
 
     .shop-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
       gap: 14px;
     }
     .shop-item-card {
       background: var(--solid-panel);
       border: 1px solid var(--solid-border);
       border-radius: 16px;
-      padding: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .shop-item-card:hover {
+      transform: translateY(-3px);
     }
     .shop-item-card.equipped {
       border-color: #34d399;
       box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.35);
     }
+
+    .rarity-pill {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.65rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      z-index: 2;
+    }
+    .rar-comune { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.35); }
+    .rar-raro { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .rar-epico { background: rgba(168, 85, 247, 0.22); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.45); }
+    .rar-leggendario { background: rgba(251, 191, 36, 0.22); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.5); }
+    .rar-mitico { background: linear-gradient(135deg, rgba(244, 63, 94, 0.28), rgba(34, 211, 238, 0.28)); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.55); }
 
     .item-preview-area {
       height: 86px;
@@ -127,6 +175,8 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
+      padding: 0 10px;
+      text-align: center;
     }
 
     .btn-shop-buy {
@@ -196,10 +246,13 @@
         <div>
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <h2 id="previewFullName" style="font-size:1.3rem; font-weight:900;">Studente 1BI</h2>
-            <span id="previewBadgeIcon" style="font-size:1.25rem;">🎓</span>
+            <span id="previewBadgeIcon" style="font-size:1.3rem;">🎓</span>
           </div>
           <div id="previewTitlePill" style="display:inline-block; margin-top:5px; padding:3px 11px; border-radius:999px; background:rgba(56,189,248,0.18); color:#38bdf8; font-size:0.78rem; font-weight:800;">
             Studente 1BI Informatica
+          </div>
+          <div id="ownedCounterText" style="font-size:0.75rem; color:var(--text-muted); margin-top:6px; font-weight:700;">
+            Collezione sbloccata: 3 / 52 oggetti
           </div>
         </div>
       </div>
@@ -211,12 +264,23 @@
       </div>
     </div>
 
-    <!-- CATEGORIE NEGOZIO -->
-    <div class="shop-tabs">
-      <button type="button" class="shop-tab active" data-cat="all">✨ Tutto il Catalogo</button>
-      <button type="button" class="shop-tab" data-cat="frame">⭕ Cornici Avatar</button>
-      <button type="button" class="shop-tab" data-cat="title">🏷️ Titoli Speciali</button>
-      <button type="button" class="shop-tab" data-cat="badge">🏅 Badge Rari</button>
+    <!-- CATEGORIE NEGOZIO & FILTRO RARITÀ -->
+    <div class="shop-controls-bar">
+      <div class="shop-tabs">
+        <button type="button" class="shop-tab active" data-cat="all">✨ Tutto (52)</button>
+        <button type="button" class="shop-tab" data-cat="frame">⭕ Cornici (16)</button>
+        <button type="button" class="shop-tab" data-cat="title">🏷️ Titoli (18)</button>
+        <button type="button" class="shop-tab" data-cat="badge">🏅 Badge (18)</button>
+      </div>
+
+      <select id="rarityFilterSelect" style="padding:9px 14px; border-radius:12px; border:1px solid var(--solid-border); background:var(--solid-panel); color:var(--text-main); font-weight:800; font-size:0.82rem;">
+        <option value="all">Tutte le Rarità</option>
+        <option value="comune">⚪ Comune</option>
+        <option value="raro">🔵 Raro</option>
+        <option value="epico">🟣 Epico</option>
+        <option value="leggendario">🟡 Leggendario</option>
+        <option value="mitico">🌈 Mitico</option>
+      </select>
     </div>
 
     <div id="shopGrid" class="shop-grid"></div>
@@ -230,32 +294,77 @@
     import { doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const SHOP_ITEMS = [
-      // CORNICI
-      { id: "frame-default", type: "frame", name: "Cornice Sky Base", desc: "Bordo azzurro standard EduHub", price: 0, cssClass: "frame-default" },
-      { id: "frame-matrix", type: "frame", name: "Cornice Matrix Hacker", desc: "Bagliore verde terminale 1BI", price: 150, cssClass: "frame-matrix" },
-      { id: "frame-neon", type: "frame", name: "Cornice Cyber Neon", desc: "Aura fucsia ad alta luminosità", price: 250, cssClass: "frame-neon" },
-      { id: "frame-fire", type: "frame", name: "Cornice Magma Streak", desc: "Bordo infuocato per i più attivi", price: 400, cssClass: "frame-fire" },
-      { id: "frame-gold", type: "frame", name: "Cornice Leggenda Oro", desc: "Finitura dorata brillante", price: 600, cssClass: "frame-gold" },
-      { id: "frame-diamond", type: "frame", name: "Cornice Diamante 1BI", desc: "Il bordo più raro dell'intera classe", price: 1000, cssClass: "frame-diamond" },
+      // ==================== 16 CORNICI AVATAR ====================
+      { id: "frame-default", type: "frame", rarity: "comune", name: "Cornice Sky Base", desc: "Bordo azzurro standard EduHub", price: 0, cssClass: "frame-default" },
+      { id: "frame-mint", type: "frame", rarity: "comune", name: "Cornice Menta Fresca", desc: "Bagliore verde chiaro pulito", price: 80, cssClass: "frame-mint" },
+      { id: "frame-cobalt", type: "frame", rarity: "comune", name: "Cornice Blu Cobalto", desc: "Azzurro elettrico ad alto contrasto", price: 120, cssClass: "frame-cobalt" },
+      { id: "frame-matrix", type: "frame", rarity: "raro", name: "Cornice Matrix Hacker", desc: "Bagliore verde terminale 1BI", price: 180, cssClass: "frame-matrix" },
+      { id: "frame-sunset", type: "frame", rarity: "raro", name: "Cornice Tramonto Corallo", desc: "Aura rosa-corallo calda", price: 220, cssClass: "frame-sunset" },
+      { id: "frame-neon", type: "frame", rarity: "raro", name: "Cornice Cyber Neon", desc: "Aura fucsia ad alta luminosità", price: 280, cssClass: "frame-neon" },
+      { id: "frame-electric", type: "frame", rarity: "epico", name: "Cornice Alta Tensione", desc: "Scintilla giallo elettrico", price: 350, cssClass: "frame-electric" },
+      { id: "frame-amethyst", type: "frame", rarity: "epico", name: "Cornice Ametista Reale", desc: "Bagliore viola cristallino", price: 420, cssClass: "frame-amethyst" },
+      { id: "frame-fire", type: "frame", rarity: "epico", name: "Cornice Magma Streak", desc: "Bordo infuocato per i più attivi", price: 500, cssClass: "frame-fire" },
+      { id: "frame-frost", type: "frame", rarity: "epico", name: "Cornice Ghiaccio Polare", desc: "Aura glaciale ultra luminosa", price: 580, cssClass: "frame-frost" },
+      { id: "frame-bloodmoon", type: "frame", rarity: "leggendario", name: "Cornice Luna di Sangue", desc: "Bagliore rosso cremisi intenso", price: 700, cssClass: "frame-bloodmoon" },
+      { id: "frame-vaporwave", type: "frame", rarity: "leggendario", name: "Cornice Vaporwave 80s", desc: "Doppio bagliore neon rosa & ciano", price: 820, cssClass: "frame-vaporwave" },
+      { id: "frame-gold", type: "frame", rarity: "leggendario", name: "Cornice Leggenda Oro", desc: "Finitura dorata brillante", price: 950, cssClass: "frame-gold" },
+      { id: "frame-void", type: "frame", rarity: "mitico", name: "Cornice Buco Nero", desc: "Aura cosmica indaco profondo", price: 1200, cssClass: "frame-void" },
+      { id: "frame-diamond", type: "frame", rarity: "mitico", name: "Cornice Diamante 1BI", desc: "Pura luce azzurra cristallina", price: 1500, cssClass: "frame-diamond" },
+      { id: "frame-rgb", type: "frame", rarity: "mitico", name: "Cornice RGB Full Gaming", desc: "Bordo animato che cambia colore live!", price: 2000, cssClass: "frame-rgb" },
 
-      // TITOLI
-      { id: "title-base", type: "title", name: "Studente 1BI Informatica", desc: "Titolo classico della classe", price: 0, label: "Studente 1BI Informatica" },
-      { id: "title-bughunter", type: "title", name: "Bug Hunter C++", desc: "Per chi scova ogni errore di sintassi", price: 120, label: "🐛 Bug Hunter C++" },
-      { id: "title-secchione", type: "title", name: "Re delle Interrogazioni", desc: "Pronto per qualsiasi domanda alla LIM", price: 220, label: "👑 Re delle Interrogazioni" },
-      { id: "title-gamer", type: "title", name: "Pro Player 1BI", desc: "Campione indiscusso di Kahoot Arena", price: 300, label: "🎮 Pro Player 1BI" },
-      { id: "title-architect", type: "title", name: "System Architect", desc: "Maestro di reti, hardware e binario", price: 500, label: "⚡ System Architect" },
+      // ==================== 18 TITOLI SPECIALI ====================
+      { id: "title-base", type: "title", rarity: "comune", name: "Studente 1BI Informatica", desc: "Titolo classico della classe", price: 0, label: "Studente 1BI Informatica" },
+      { id: "title-matricola", type: "title", rarity: "comune", name: "Matricola Giorgi-Woolf", desc: "Pronto per il primo anno di informatica", price: 60, label: "🎒 Matricola Giorgi-Woolf" },
+      { id: "title-coffee", type: "title", rarity: "comune", name: "Alimentato a Caffè", desc: "Sopravvive alle prime ore del mattino", price: 100, label: "☕ Alimentato a Caffè" },
+      { id: "title-bughunter", type: "title", rarity: "raro", name: "Bug Hunter C++", desc: "Per chi scova ogni errore di sintassi", price: 150, label: "🐛 Bug Hunter C++" },
+      { id: "title-binary", type: "title", rarity: "raro", name: "Mago del Binario", desc: "Pensa direttamente in 0 e 1", price: 190, label: "🔢 Mago del Binario" },
+      { id: "title-nightcoder", type: "title", rarity: "raro", name: "Coder Notturno", desc: "Programma e studia fino a tardi", price: 230, label: "🌙 Coder Notturno" },
+      { id: "title-survivor", type: "title", rarity: "raro", name: "Sopravvissuto alle Verifiche", desc: "Esce vivo da ogni settimana di fuoco", price: 270, label: "🛡️ Sopravvissuto alle Verifiche" },
+      { id: "title-notes", type: "title", rarity: "epico", name: "Spacciatore di Appunti", desc: "Salva la classe prima di ogni compito", price: 320, label: "📚 Spacciatore di Appunti" },
+      { id: "title-secchione", type: "title", rarity: "epico", name: "Re delle Interrogazioni", desc: "Pronto per qualsiasi domanda alla LIM", price: 380, label: "👑 Re delle Interrogazioni" },
+      { id: "title-gamer", type: "title", rarity: "epico", name: "Pro Player 1BI", desc: "Campione indiscusso dei tornei", price: 440, label: "🎮 Pro Player 1BI" },
+      { id: "title-kahoot", type: "title", rarity: "epico", name: "Campione Kahoot Arena", desc: "Sempre sul podio nei quiz live", price: 500, label: "🏆 Campione Kahoot Arena" },
+      { id: "title-lim", type: "title", rarity: "leggendario", name: "Signore della LIM", desc: "Domina lavagna, proiettore e PC", price: 620, label: "🖥️ Signore della LIM" },
+      { id: "title-speedrunner", type: "title", rarity: "leggendario", name: "Speedrunner di Compiti", desc: "Consegna sempre a tempo record", price: 740, label: "⏱️ Speedrunner di Compiti" },
+      { id: "title-architect", type: "title", rarity: "leggendario", name: "System Architect", desc: "Maestro di reti, hardware e sistemi", price: 880, label: "⚡ System Architect" },
+      { id: "title-ai", type: "title", rarity: "leggendario", name: "Domatore di AI", desc: "Sfrutta Gemini e GPT al massimo", price: 1000, label: "🤖 Domatore di Intelligenze Artificiali" },
+      { id: "title-cyber", type: "title", rarity: "mitico", name: "Cyber Ghost 1BI", desc: "Ombra digitale del laboratorio", price: 1300, label: "🕵️ Cyber Ghost 1BI" },
+      { id: "title-emperor", type: "title", rarity: "mitico", name: "Imperatore della 1BI", desc: "Autorità suprema della classifica", price: 1650, label: "👑 Imperatore della 1BI" },
+      { id: "title-legend", type: "title", rarity: "mitico", name: "Leggenda Assoluta", desc: "Il titolo più prestigioso di EduHub", price: 2200, label: "🌌 Leggenda Assoluta Giorgi-Woolf" },
 
-      // BADGE
-      { id: "badge-base", type: "badge", name: "Badge Matricola 1BI", desc: "Il simbolo di partenza", price: 0, icon: "🎓" },
-      { id: "badge-rocket", type: "badge", name: "Badge Razzo", desc: "Sempre sul pezzo con appunti e compiti", price: 100, icon: "🚀" },
-      { id: "badge-brain", type: "badge", name: "Badge Cervellone AI", desc: "Sbloccato dai veterani del Tutor AI", price: 200, icon: "🧠" },
-      { id: "badge-crown", type: "badge", name: "Corona Imperiale", desc: "Simbolo di prestigio nella Classifica 1BI", price: 450, icon: "👑" },
-      { id: "badge-dragon", type: "badge", name: "Drago Mitico 1BI", desc: "Badge leggendario da collezione", price: 850, icon: "🐉" }
+      // ==================== 18 BADGE RARI ====================
+      { id: "badge-base", type: "badge", rarity: "comune", name: "Badge Matricola 1BI", desc: "Il simbolo di partenza", price: 0, icon: "🎓" },
+      { id: "badge-laptop", type: "badge", rarity: "comune", name: "Badge Dev Laptop", desc: "Per chi ha sempre il PC pronto", price: 70, icon: "💻" },
+      { id: "badge-rocket", type: "badge", rarity: "comune", name: "Badge Razzo", desc: "Sempre sul pezzo con appunti e compiti", price: 110, icon: "🚀" },
+      { id: "badge-zap", type: "badge", rarity: "raro", name: "Badge Fulmine", desc: "Risposte lampo in chat e quiz", price: 160, icon: "⚡" },
+      { id: "badge-target", type: "badge", rarity: "raro", name: "Badge Cecchino", desc: "100% di precisione nelle risposte", price: 210, icon: "🎯" },
+      { id: "badge-brain", type: "badge", rarity: "raro", name: "Badge Cervellone AI", desc: "Sbloccato dai veterani del Tutor AI", price: 260, icon: "🧠" },
+      { id: "badge-alien", type: "badge", rarity: "raro", name: "Badge Pixel Invader", desc: "Classico arcade per veri informatici", price: 310, icon: "👾" },
+      { id: "badge-robot", type: "badge", rarity: "epico", name: "Badge Mecha Bot", desc: "Potenza di calcolo pura", price: 380, icon: "🤖" },
+      { id: "badge-shield", type: "badge", rarity: "epico", name: "Scudo della Classe", desc: "Sempre pronto ad aiutare i compagni", price: 450, icon: "🛡️" },
+      { id: "badge-sword", type: "badge", rarity: "epico", name: "Spade Incrociate", desc: "Guerriero delle sfide 1BI", price: 520, icon: "⚔️" },
+      { id: "badge-fox", type: "badge", rarity: "epico", name: "Badge Volpe Astuta", desc: "Trova sempre la soluzione più furba", price: 600, icon: "🦊" },
+      { id: "badge-wolf", type: "badge", rarity: "leggendario", name: "Badge Lupo Alfa", desc: "Leader del branco in classifica", price: 750, icon: "🐺" },
+      { id: "badge-eagle", type: "badge", rarity: "leggendario", name: "Badge Aquila Reale", desc: "Vista acuta su ogni dettaglio", price: 880, icon: "🦅" },
+      { id: "badge-fire", type: "badge", rarity: "leggendario", name: "Fiamma Inarrestabile", desc: "Streak di studio infuocata", price: 1000, icon: "🔥" },
+      { id: "badge-ufo", type: "badge", rarity: "mitico", name: "Badge Navicella UFO", desc: "Voti di un altro pianeta", price: 1250, icon: "🛸" },
+      { id: "badge-crown", type: "badge", rarity: "mitico", name: "Corona Imperiale", desc: "Simbolo di prestigio nella Classifica 1BI", price: 1500, icon: "👑" },
+      { id: "badge-diamond", type: "badge", rarity: "mitico", name: "Diamante Puro", desc: "Rarità assoluta da collezione", price: 1800, icon: "💎" },
+      { id: "badge-dragon", type: "badge", rarity: "mitico", name: "Drago Mitico 1BI", desc: "Il badge più leggendario del portale", price: 2500, icon: "🐉" }
     ];
+
+    const RARITY_LABELS = {
+      comune: "Comune",
+      raro: "Raro",
+      epico: "Epico",
+      leggendario: "Leggendario",
+      mitico: "Mitico"
+    };
 
     let currentUser = null;
     let userData = {};
     let currentCat = "all";
+    let currentRarity = "all";
 
     document.querySelectorAll(".shop-tab").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -264,6 +373,11 @@
         currentCat = btn.dataset.cat;
         renderShop();
       });
+    });
+
+    document.getElementById("rarityFilterSelect").addEventListener("change", (e) => {
+      currentRarity = e.target.value;
+      renderShop();
     });
 
     function getUserXp() {
@@ -289,6 +403,7 @@
       const initial = name.charAt(0).toUpperCase();
       const photoUrl = userData.photoURL || currentUser?.photoURL || "";
       const eq = getEquipped();
+      const owned = getOwnedIds();
 
       const frameObj = SHOP_ITEMS.find(i => i.id === eq.frame) || SHOP_ITEMS[0];
       const titleObj = SHOP_ITEMS.find(i => i.id === eq.title) || SHOP_ITEMS.find(i => i.id === "title-base");
@@ -306,6 +421,7 @@
       document.getElementById("previewTitlePill").textContent = titleObj.label;
       document.getElementById("previewBadgeIcon").textContent = badgeObj.icon;
       document.getElementById("userXpBalance").textContent = `${getUserXp()} XP`;
+      document.getElementById("ownedCounterText").textContent = `Collezione sbloccata: ${owned.length} / ${SHOP_ITEMS.length} oggetti`;
     }
 
     function renderShop() {
@@ -314,7 +430,16 @@
       const eq = getEquipped();
       const xp = getUserXp();
 
-      const filtered = SHOP_ITEMS.filter(item => currentCat === "all" || item.type === currentCat);
+      const filtered = SHOP_ITEMS.filter(item => {
+        const matchCat = currentCat === "all" || item.type === currentCat;
+        const matchRar = currentRarity === "all" || item.rarity === currentRarity;
+        return matchCat && matchRar;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1; text-align:center; padding:24px;">Nessun oggetto trovato con questo filtro.</p>`;
+        return;
+      }
 
       grid.innerHTML = filtered.map(item => {
         const isOwned = owned.includes(item.id);
@@ -326,7 +451,7 @@
         if (item.type === "frame") {
           previewHtml = `<div class="custom-avatar-ring ${item.cssClass}" style="width:56px;height:56px;font-size:1.2rem;">1BI</div>`;
         } else if (item.type === "title") {
-          previewHtml = `<span style="padding:5px 12px; border-radius:999px; background:rgba(56,189,248,0.18); color:#38bdf8; font-size:0.84rem;">${item.label}</span>`;
+          previewHtml = `<span style="padding:5px 12px; border-radius:999px; background:rgba(56,189,248,0.18); color:#38bdf8; font-size:0.82rem;">${item.label}</span>`;
         } else {
           previewHtml = `<span style="font-size:2.4rem;">${item.icon}</span>`;
         }
@@ -342,6 +467,7 @@
 
         return `
           <div class="shop-item-card ${isEq ? "equipped" : ""}">
+            <span class="rarity-pill rar-${item.rarity}">${RARITY_LABELS[item.rarity] || item.rarity}</span>
             <div>
               <div class="item-preview-area">${previewHtml}</div>
               <div style="font-weight:800; font-size:0.95rem; margin-top:12px;">${item.name}</div>
@@ -391,7 +517,6 @@
       if (!user) return;
       currentUser = user;
 
-      // Monta il Pannello Admin XP (visibile SOLO ai Rappresentanti, nascosto in Vista Studente)
       mountRepXpAdminPanel(document.getElementById("shopMainContainer"), user);
 
       onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
