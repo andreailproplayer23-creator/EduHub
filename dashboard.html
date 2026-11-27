@@ -99,183 +99,223 @@
       </div>
     </a>
 
-    <!-- GRIGLIA STRUMENTI -->
-    <div class="cards-grid">
-      <a href="modules/countdown.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
-          <i data-lucide="hourglass"></i>
-        </div>
-        <h3>Countdown & Ponti</h3>
-        <p>Conto alla rovescia per feste, ponti e fine anno scolastico</p>
-      </a>
-      
-      <a href="modules/appello.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #0ea5e9;">
-          <i data-lucide="users"></i>
-        </div>
-        <h3>Appello di Classe</h3>
-        <p>Elenco ufficiale numerato degli studenti della 1BI</p>
-      </a>
+    <!-- BARRA FILTRO RAPIDO SEZIONI -->
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin: 20px 0 16px; align-items:center;">
+      <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:7px 15px; border-radius:999px; border:1px solid #38bdf8; background:rgba(56,189,248,0.18); color:#38bdf8; font-weight:800; font-size:0.78rem; cursor:pointer;">
+        Tutte (21)
+      </button>
+      <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
+        📚 Didattica & Studio
+      </button>
+      <button type="button" class="dash-filter-btn" data-cat="tech" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
+        💻 Laboratori & Tech
+      </button>
+      <button type="button" class="dash-filter-btn" data-cat="classe" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
+        🏫 Vita di Classe
+      </button>
+      <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
+        🎮 Arena & Svago
+      </button>
+    </div>
 
-      <a href="modules/presentazioni.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #60a5fa;">
-          <i data-lucide="presentation"></i>
-        </div>
-        <h3>Presentazioni & LIM</h3>
-        <p>Crea slide, importa PDF/PPTX e controlla la LIM dal telefono in tempo reale</p>
-      </a>
+    <!-- SEZIONE 1: DIDATTICA & STUDIO (6 CARD = 2 RIGHE COMPLETE DA 3) -->
+    <div class="dash-section" data-section="studio" style="margin-bottom: 26px;">
+      <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
+        📚 Didattica & Studio
+      </div>
+      <div class="cards-grid">
+        <a href="modules/verifiche.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
+            <i data-lucide="calendar-check"></i>
+          </div>
+          <h3>Verifiche & Interrogazioni</h3>
+          <p>Calendario condiviso delle prove 1BI con conto alla rovescia</p>
+        </a>
 
-      <a href="modules/posti.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(56,189,248,0.16); color: #38bdf8;">
-          <i data-lucide="layout-grid"></i>
-        </div>
-        <h3>Mappa Posti Aula</h3>
-        <p>Piantina interattiva dei banchi e disposizione della 1BI</p>
-      </a>
+        <a href="modules/interrogazioni.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #60a5fa;">
+            <i data-lucide="hand"></i>
+          </div>
+          <h3>Turni Interrogazioni</h3>
+          <p>Prenotati come volontario in ordine cronologico per le interrogazioni</p>
+        </a>
 
-      <a href="modules/sondaggi.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(99,102,241,0.16); color: #818cf8;">
-          <i data-lucide="vote"></i>
-        </div>
-        <h3>Sondaggi Rapidi</h3>
-        <p>Votazioni della 1BI in tempo reale su proposte, felpe e attività</p>
-      </a>
+        <a href="modules/appunti.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
+            <i data-lucide="folder-git-2"></i>
+          </div>
+          <h3>Appunti & Progetti</h3>
+          <p>Schemi per materia e cartelle condivise con ogni tipo di file</p>
+        </a>
 
-      <a href="modules/proposte.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
-          <i data-lucide="lightbulb"></i>
-        </div>
-        <h3>Proposte & Idee</h3>
-        <p>Suggerisci idee per assemblee, eventi o EduHub e vota le migliori</p>
-      </a>
+        <a href="modules/tutor-ai.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #c4b5fd;">
+            <i data-lucide="bot"></i>
+          </div>
+          <h3>Tutor Multi-AI 1BI</h3>
+          <p>Chiedi aiuto a GPT-4o, Gemini, Claude, DeepSeek e condividi le spiegazioni</p>
+        </a>
 
-      <a href="modules/verifiche.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
-          <i data-lucide="calendar-check"></i>
-        </div>
-        <h3>Verifiche & Interrogazioni</h3>
-        <p>Calendario condiviso delle prove 1BI con conto alla rovescia</p>
-      </a>
+        <a href="modules/mindmap.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #f472b6;">
+            <i data-lucide="network"></i>
+          </div>
+          <h3>Mind Map Studio</h3>
+          <p>Mappe concettuali a nodi e bacheche stile Padlet illimitate salvate per te</p>
+        </a>
 
-      <a href="modules/interrogazioni.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #60a5fa;">
-          <i data-lucide="hand"></i>
-        </div>
-        <h3>Turni Interrogazioni</h3>
-        <p>Prenotati come volontario in ordine cronologico per le interrogazioni</p>
-      </a>
+        <a href="modules/tutoraggio.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #38bdf8;">
+            <i data-lucide="graduation-cap"></i>
+          </div>
+          <h3>Tutoraggio tra Pari</h3>
+          <p>Cerco o offro aiuto su materie e verifiche con i compagni della 1BI</p>
+        </a>
+      </div>
+    </div>
 
-      <a href="modules/appunti.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
-          <i data-lucide="folder-git-2"></i>
-        </div>
-        <h3>Appunti & Progetti</h3>
-        <p>Schemi per materia e cartelle condivise con ogni tipo di file</p>
-      </a>
+    <!-- SEZIONE 2: LABORATORI & STRUMENTI TECH (6 CARD = 2 RIGHE COMPLETE DA 3) -->
+    <div class="dash-section" data-section="tech" style="margin-bottom: 26px;">
+      <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
+        💻 Laboratori & Strumenti Tech
+      </div>
+      <div class="cards-grid">
+        <a href="modules/presentazioni.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #60a5fa;">
+            <i data-lucide="presentation"></i>
+          </div>
+          <h3>Presentazioni & LIM</h3>
+          <p>Crea slide, importa PDF/PPTX e controlla la LIM dal telefono in tempo reale</p>
+        </a>
 
-      <a href="modules/tutor-ai.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #c4b5fd;">
-          <i data-lucide="bot"></i>
-        </div>
-        <h3>Tutor Multi-AI 1BI</h3>
-        <p>Chiedi aiuto a GPT-4o, Gemini, Claude, DeepSeek e condividi le spiegazioni</p>
-      </a>
+        <a href="modules/convertitore-basi.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #3b82f6;">
+            <i data-lucide="binary"></i>
+          </div>
+          <h3>Convertitore Basi</h3>
+          <p>Binario, Esadecimale e Decimale con passaggi spiegati</p>
+        </a>
 
-      <a href="modules/mindmap.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #f472b6;">
-          <i data-lucide="network"></i>
-        </div>
-        <h3>Mind Map Studio</h3>
-        <p>Mappe concettuali a nodi e bacheche stile Padlet illimitate salvate per te</p>
-      </a>
+        <a href="modules/porte-logiche.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
+            <i data-lucide="cpu"></i>
+          </div>
+          <h3>Porte Logiche</h3>
+          <p>Simulatore interattivo AND, OR, NOT, XOR e tabella verità</p>
+        </a>
 
-      <a href="modules/tutoraggio.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #38bdf8;">
-          <i data-lucide="graduation-cap"></i>
-        </div>
-        <h3>Tutoraggio tra Pari</h3>
-        <p>Cerco o offro aiuto su materie e verifiche con i compagni della 1BI</p>
-      </a>
+        <a href="modules/convertitore-unita.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(139,92,246,0.16); color: #8b5cf6;">
+            <i data-lucide="flask-conical"></i>
+          </div>
+          <h3>Fisica & Chimica</h3>
+          <p>Convertitore unità di misura e formule di 1ª superiore</p>
+        </a>
 
-      <a href="modules/kahoot.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #a78bfa;">
-          <i data-lucide="gamepad-2"></i>
-        </div>
-        <h3>Kahoot Arena 1BI</h3>
-        <p>Quiz multiplayer dal vivo in classe, PIN Kahoot e Albo d'Oro</p>
-      </a>
+        <a href="modules/guida-laboratori.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
+            <i data-lucide="terminal"></i>
+          </div>
+          <h3>Manuali & Tips</h3>
+          <p>Guide complete e trucchetti per Word, Excel, PowerPoint e AutoCAD</p>
+        </a>
 
-      <a href="modules/risorse.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #34d399;">
-          <i data-lucide="bookmark"></i>
-        </div>
-        <h3>Risorse & Tool Utili</h3>
-        <p>Archivio organizzato di siti, compilatori e strumenti selezionati per la 1BI</p>
-      </a>
+        <a href="modules/risorse.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #34d399;">
+            <i data-lucide="bookmark"></i>
+          </div>
+          <h3>Risorse & Tool Utili</h3>
+          <p>Archivio organizzato di siti, compilatori e strumenti selezionati per la 1BI</p>
+        </a>
+      </div>
+    </div>
 
-      <a href="modules/convertitore-basi.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(59,130,246,0.16); color: #3b82f6;">
-          <i data-lucide="binary"></i>
-        </div>
-        <h3>Convertitore Basi</h3>
-        <p>Binario, Esadecimale e Decimale con passaggi spiegati</p>
-      </a>
+    <!-- SEZIONE 3: VITA DI CLASSE & RAPPRESENTANTI (6 CARD = 2 RIGHE COMPLETE DA 3) -->
+    <div class="dash-section" data-section="classe" style="margin-bottom: 26px;">
+      <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
+        🏫 Vita di Classe & Rappresentanti
+      </div>
+      <div class="cards-grid">
+        <a href="modules/appello.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(14,165,233,0.16); color: #0ea5e9;">
+            <i data-lucide="users"></i>
+          </div>
+          <h3>Appello di Classe</h3>
+          <p>Elenco ufficiale numerato degli studenti della 1BI</p>
+        </a>
 
-      <a href="modules/porte-logiche.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #f59e0b;">
-          <i data-lucide="cpu"></i>
-        </div>
-        <h3>Porte Logiche</h3>
-        <p>Simulatore interattivo AND, OR, NOT, XOR e tabella verità</p>
-      </a>
+        <a href="modules/posti.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(56,189,248,0.16); color: #38bdf8;">
+            <i data-lucide="layout-grid"></i>
+          </div>
+          <h3>Mappa Posti Aula</h3>
+          <p>Piantina interattiva dei banchi e disposizione della 1BI</p>
+        </a>
 
-      <a href="modules/guida-laboratori.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(16,185,129,0.16); color: #10b981;">
-          <i data-lucide="terminal"></i>
-        </div>
-        <h3>Manuali & Tips</h3>
-        <p>Guide complete e trucchetti per Word, Excel, PowerPoint e AutoCAD</p>
-      </a>
+        <a href="modules/sondaggi.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(99,102,241,0.16); color: #818cf8;">
+            <i data-lucide="vote"></i>
+          </div>
+          <h3>Sondaggi Rapidi</h3>
+          <p>Votazioni della 1BI in tempo reale su proposte, felpe e attività</p>
+        </a>
 
-      <a href="modules/assemblee.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(239,68,68,0.16); color: #ef4444;">
-          <i data-lucide="megaphone"></i>
-        </div>
-        <h3>Assemblee di Classe</h3>
-        <p>Calendario assemblee programmate, svolte e registro presenze</p>
-      </a>
+        <a href="modules/proposte.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
+            <i data-lucide="lightbulb"></i>
+          </div>
+          <h3>Proposte & Idee</h3>
+          <p>Suggerisci idee per assemblee, eventi o EduHub e vota le migliori</p>
+        </a>
 
-      <a href="modules/convertitore-unita.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(139,92,246,0.16); color: #8b5cf6;">
-          <i data-lucide="flask-conical"></i>
-        </div>
-        <h3>Fisica & Chimica</h3>
-        <p>Convertitore unità di misura e formule di 1ª superiore</p>
-      </a>
+        <a href="modules/assemblee.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(239,68,68,0.16); color: #ef4444;">
+            <i data-lucide="megaphone"></i>
+          </div>
+          <h3>Assemblee di Classe</h3>
+          <p>Calendario assemblee programmate, svolte e registro presenze</p>
+        </a>
 
-      <a href="modules/lavagna.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(6,182,212,0.16); color: #22d3ee;">
-          <i data-lucide="pen-tool"></i>
-        </div>
-        <h3>Lavagna Condivisa</h3>
-        <p>Disegna, traccia forme e fai schemi in tempo reale con tutta la 1BI</p>
-      </a>
+        <a href="modules/countdown.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(245,158,11,0.16); color: #fbbf24;">
+            <i data-lucide="hourglass"></i>
+          </div>
+          <h3>Countdown & Ponti</h3>
+          <p>Conto alla rovescia per feste, ponti e fine anno scolastico</p>
+        </a>
+      </div>
+    </div>
 
-      <a href="modules/compleanni.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #ec4899;">
-          <i data-lucide="cake"></i>
-        </div>
-        <h3>Compleanni & Auguri</h3>
-        <p>Calendario dei compleanni 1BI e biglietto d'auguri digitale firmato da tutti</p>
-      </a>
+    <!-- SEZIONE 4: ARENA, LAVAGNA & SVAGO (3 CARD IN FONDO = 1 RIGA COMPLETA DA 3, SENZA DOPPIONI) -->
+    <div class="dash-section" data-section="svago" style="margin-bottom: 24px;">
+      <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
+        🎮 Arena, Lavagna & Compleanni
+      </div>
+      <div class="cards-grid">
+        <a href="modules/kahoot.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #a78bfa;">
+            <i data-lucide="gamepad-2"></i>
+          </div>
+          <h3>Kahoot Arena 1BI</h3>
+          <p>Quiz multiplayer dal vivo in classe, PIN Kahoot e Albo d'Oro</p>
+        </a>
 
-      <a href="modules/lavagna.html" class="hub-card">
-        <div class="icon-badge" style="background: rgba(6,182,212,0.16); color: #22d3ee;">
-          <i data-lucide="pen-tool"></i>
-        </div>
-        <h3>Lavagna Condivisa</h3>
-        <p>Disegna, traccia forme e fai schemi in tempo reale con tutta la 1BI</p>
-      </a>
+        <a href="modules/lavagna.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(6,182,212,0.16); color: #22d3ee;">
+            <i data-lucide="pen-tool"></i>
+          </div>
+          <h3>Lavagna Condivisa</h3>
+          <p>Disegna, traccia forme e fai schemi in tempo reale con tutta la 1BI</p>
+        </a>
+
+        <a href="modules/compleanni.html" class="hub-card">
+          <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #ec4899;">
+            <i data-lucide="cake"></i>
+          </div>
+          <h3>Compleanni & Auguri</h3>
+          <p>Calendario dei compleanni 1BI e biglietto d'auguri digitale firmato da tutti</p>
+        </a>
+      </div>
     </div>
 
     <!-- PULSANTE FLUTTUANTE CHAT & Q&A IN BASSO A DESTRA -->
@@ -291,6 +331,25 @@
     import { db } from "./js/firebase-config.js";
     import { initCompagniWidget } from "./js/compagni-widget.js";
     import { collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Filtro rapido sezioni dashboard
+    document.querySelectorAll(".dash-filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".dash-filter-btn").forEach(b => {
+          b.style.borderColor = "var(--table-border, rgba(255,255,255,0.12))";
+          b.style.background = "var(--card-bg)";
+          b.style.color = "var(--text-muted)";
+        });
+        btn.style.borderColor = "#38bdf8";
+        btn.style.background = "rgba(56,189,248,0.18)";
+        btn.style.color = "#38bdf8";
+
+        const cat = btn.dataset.cat;
+        document.querySelectorAll(".dash-section").forEach(sec => {
+          sec.style.display = (cat === "all" || sec.dataset.section === cat) ? "block" : "none";
+        });
+      });
+    });
 
     // Avvia widget flottante Rubrica Compagni 1BI (in basso a sinistra)
     initCompagniWidget();
