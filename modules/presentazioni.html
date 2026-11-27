@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub - Presentazioni & Slide Live LIM 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <!-- Librerie client-side per importare PDF e PPTX direttamente nel browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    .pres-top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .tab-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pres-tab-btn {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .pres-tab-btn.active {
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .btn-primary-pres {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-import-pres {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-remote-join {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* Griglia Presentazioni */
+    .decks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .deck-card {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+    .deck-card:hover {
+      transform: translateY(-3px);
+      border-color: #38bdf8;
+    }
+    .deck-preview-box {
+      height: 135px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .deck-count-pill {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(2, 6, 23, 0.78);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .deck-card-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      justify-content: space-between;
+    }
+    .deck-actions-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .mini-action-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+    }
+    .mini-action-btn.lim {
+      background: #10b981;
+      border-color: #34d399;
+      color: #042f2e;
+    }
+
+    /* EDITOR SLIDE */
+    .editor-layout {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .editor-layout.active { display: flex; }
+
+    .editor-header-bar {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .editor-workspace {
+      display: grid;
+      grid-template-columns: 220px 1fr 310px;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .editor-workspace { grid-template-columns: 1fr; }
+    }
+
+    .slides-sidebar, .slide-inspector {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 14px;
+      max-height: 74vh;
+      overflow-y: auto;
+    }
+    .slide-thumb {
+      background: var(--solid-sub);
+      border: 2px solid transparent;
+      border-radius: 11px;
+      padding: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .slide-thumb.active {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.14);
+    }
+
+    /* CANVAS SLIDE 16:9 */
+    .slide-stage-container {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .slide-canvas-16-9 {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 14px;
+      padding: 32px 38px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.4);
+    }
+
+    /* Temi Slide */
+    .theme-tech { background: linear-gradient(135deg, #0f172a, #1e293b); color: #f8fafc; border: 2px solid #38bdf8; }
+    .theme-board { background: #143628; color: #f8fafc; border: 4px solid #92400e; }
+    .theme-clean { background: #ffffff; color: #0f172a; border: 2px solid #cbd5e1; }
+    .theme-neon { background: linear-gradient(135deg, #1e1b4b, #311042); color: #f8fafc; border: 2px solid #ec4899; }
+    .theme-sunset { background: linear-gradient(135deg, #431407, #7c2d12); color: #fff7ed; border: 2px solid #f59e0b; }
+
+    .slide-content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: center;
+      height: 100%;
+    }
+    .slide-content-grid.has-media {
+      grid-template-columns: 1.15fr 0.85fr;
+    }
+    .slide-h1 {
+      font-size: clamp(1.3rem, 2.5vw, 2.2rem);
+      font-weight: 900;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .slide-body-text {
+      font-size: clamp(0.92rem, 1.35vw, 1.2rem);
+      line-height: 1.55;
+      white-space: pre-line;
+    }
+    .slide-code-box {
+      background: #020617;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.85rem;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56,189,248,0.35);
+      margin-top: 10px;
+      white-space: pre-wrap;
+      text-align: left;
+    }
+    .slide-media-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      margin: 0 auto;
+      display: block;
+    }
+    .slide-full-img-mode {
+      padding: 0 !important;
+      background: #000 !important;
+    }
+    .slide-full-img-mode img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* MODAL IMPORTAZIONE FILE & MODAL TELECOMANDO */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+    .drop-zone-box {
+      border: 2px dashed #38bdf8;
+      background: var(--solid-sub);
+      border-radius: 16px;
+      padding: 28px 18px;
+      text-align: center;
+      cursor: pointer;
+      margin: 14px 0;
+      transition: background 0.15s ease;
+    }
+    .drop-zone-box:hover {
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    /* PROIEZIONE LIM A SCHERMO INTERO + TELECOMANDO SMARTPHONE */
+    .lim-presenter-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: #020617;
+      display: none;
+      flex-direction: column;
+    }
+    .lim-presenter-overlay.active { display: flex; }
+    .lim-topbar {
+      background: #0f172a;
+      border-bottom: 1px solid rgba(148,163,184,0.2);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .lim-stage-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow: hidden;
+    }
+    .lim-stage-area .slide-canvas-16-9 {
+      max-width: 1380px;
+      max-height: 82vh;
+      width: auto;
+      height: 100%;
+    }
+    .lim-controls-bar {
+      background: #0f172a;
+      border-top: 1px solid rgba(148,163,184,0.2);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Vista Telecomando Smartphone */
+    .remote-phone-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px;
+      max-width: 540px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .remote-notes-card {
+      background: #162033;
+      border: 1px solid #38bdf8;
+      border-radius: 16px;
+      padding: 18px;
+      flex: 1;
+      margin: 14px 0;
+      overflow-y: auto;
+    }
+    .remote-big-btns {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 12px;
+    }
+    .remote-nav-btn {
+      padding: 20px;
+      border-radius: 16px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .insp-label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin: 10px 0 4px;
+    }
+    .insp-input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Presentazioni & Slide Live LIM</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HOME PRESENTAZIONI -->
+    <div id="homeView">
+      <div class="welcome-banner" style="margin-bottom: 18px;">
+        <div>
+          <h2>Presentazioni & Slide Live per la LIM</h2>
+          <p>Crea slide, importa PDF/PPTX/immagini e controlla la LIM dal telefono con codice stanza</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="openRemoteModalBtn" class="btn-remote-join">
+            <i data-lucide="smartphone" style="width:16px;height:16px;"></i>
+            <span>Telecomando / Codice LIM</span>
+          </button>
+          <button id="openImportModalBtn" class="btn-import-pres">
+            <i data-lucide="file-up" style="width:16px;height:16px;"></i>
+            <span>Importa PDF / PPTX / File</span>
+          </button>
+          <button id="createNewDeckBtn" class="btn-primary-pres">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            <span>Nuova Presentazione</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pres-top-actions">
+        <div class="tab-group">
+          <button type="button" class="pres-tab-btn active" data-tab="mine">
+            <i data-lucide="presentation" style="width:16px;height:16px;"></i> Le Mie Presentazioni
+          </button>
+          <button type="button" class="pres-tab-btn" data-tab="class">
+            <i data-lucide="users" style="width:16px;height:16px;"></i> Archivio Ricerche 1BI
+          </button>
+        </div>
+        <span id="decksCounter" style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">0 presentazioni</span>
+      </div>
+
+      <div id="decksGrid" class="decks-grid"></div>
+    </div>
+
+    <!-- EDITOR SLIDE -->
+    <div id="editorView" class="editor-layout">
+      <div class="editor-header-bar">
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
+          <button type="button" id="backHomeBtn" class="mini-action-btn" style="flex:none; padding:8px 12px;">← Indietro</button>
+          <input type="text" id="deckTitleInput" class="insp-input" style="width:240px; font-weight:800; font-size:0.98rem;" value="Titolo Presentazione" />
+          <span id="savePill" style="font-size:0.75rem; font-weight:800; color:#34d399; background:rgba(16,185,129,0.15); padding:4px 10px; border-radius:999px;">✓ Salvato</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <button type="button" id="importInsideEditorBtn" class="btn-import-pres" style="padding:8px 12px; font-size:0.8rem;">
+            📥 Importa PDF/PPTX/Foto
+          </button>
+          <button type="button" id="togglePublicBtn" class="mini-action-btn" style="flex:none; padding:8px 12px;">
+            🔒 Privata
+          </button>
+          <button type="button" id="startLimModeBtn" class="mini-action-btn lim" style="flex:none; padding:8px 14px;">
+            🖥️ Proietta su LIM
+          </button>
+          <button type="button" id="deleteDeckBtn" class="mini-action-btn" style="flex:none; padding:8px 10px; color:#f87171;">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <div class="editor-workspace">
+        <!-- COLONNA 1: ELENCO SLIDE -->
+        <aside class="slides-sidebar">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="font-size:0.86rem;">Diapositive</strong>
+            <button type="button" id="addSlideBtn" class="btn-primary-pres" style="padding:5px 10px; font-size:0.76rem;">+ Slide</button>
+          </div>
+          <div id="slidesThumbList"></div>
+        </aside>
+
+        <!-- COLONNA 2: ANTEPRIMA SLIDE 16:9 -->
+        <section class="slide-stage-container">
+          <div id="editorSlidePreview" class="slide-canvas-16-9 theme-tech"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-muted);">
+            <span id="slideIndicatorLabel">Slide 1 di 1</span>
+            <span>Formato 16:9 ottimizzato per LIM di classe</span>
+          </div>
+        </section>
+
+        <!-- COLONNA 3: PROPRIETÀ & NOTE RELATORE -->
+        <aside class="slide-inspector">
+          <strong style="font-size:0.88rem;">Modifica Slide Corrente</strong>
+
+          <label class="insp-label">Tema Grafico</label>
+          <select id="slideThemeSelect" class="insp-input">
+            <option value="theme-tech">🌌 Tech Dark (EduHub)</option>
+            <option value="theme-board">🟩 Lavagna Scolastica</option>
+            <option value="theme-clean">⬜ Minimal Bianco</option>
+            <option value="theme-neon">💜 Cyber Neon</option>
+            <option value="theme-sunset">🌅 Tramonto Caldo</option>
+          </select>
+
+          <label class="insp-label">Titolo Diapositiva</label>
+          <input type="text" id="slideTitleInput" class="insp-input" placeholder="Titolo della slide..." />
+
+          <label class="insp-label">Testo / Punti Elenco</label>
+          <textarea id="slideBodyInput" class="insp-input" rows="4" placeholder="• Primo punto&#10;• Secondo punto"></textarea>
+
+          <label class="insp-label">Codice Informatica (Opzionale)</label>
+          <textarea id="slideCodeInput" class="insp-input" rows="3" style="font-family:monospace; font-size:0.78rem;" placeholder="#include <iostream>..."></textarea>
+
+          <label class="insp-label">URL Immagine o Carica Foto</label>
+          <input type="text" id="slideImgInput" class="insp-input" placeholder="https://... oppure carica sotto" />
+          <input type="file" id="singleImgFileInput" accept="image/*" style="margin-top:6px; font-size:0.75rem; color:var(--text-muted); width:100%;" />
+
+          <label class="insp-label" style="color:#fbbf24;">🤫 Note Segrete Relatore (Solo sul tuo telefono)</label>
+          <textarea id="slideNotesInput" class="insp-input" rows="3" placeholder="Scrivi qui cosa dire a voce davanti alla classe..."></textarea>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL IMPORTAZIONE UNIVERSALE FILE (PDF, PPTX, IMMAGINI, TXT/MD/JSON) -->
+  <div id="importModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 style="font-size:1.12rem; font-weight:800;">📥 Importa File in Presentazione</h3>
+        <button type="button" id="closeImportModalBtn" class="mini-action-btn" style="flex:none; padding:6px 10px;">✕</button>
+      </div>
+      <p style="font-size:0.84rem; color:var(--text-muted); line-height:1.45;">
+        Supporta <strong>PDF</strong> (ogni pagina diventa una slide HD), <strong>PPTX / PowerPoint</strong>, <strong>Immagini (PNG, JPG, WEBP)</strong> e file di testo/codice (<strong>TXT, MD, JSON</strong>).
+      </p>
+
+      <label for="universalFileInput" class="drop-zone-box" style="display:block;">
+        <div style="font-size:2.2rem; margin-bottom:6px;">📂</div>
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px;">Clicca per scegliere uno o più file</div>
+        <div style="font-size:0.78rem; color:var(--text-muted);">.pdf • .pptx • .png • .jpg • .webp • .txt • .md • .json</div>
+        <input type="file" id="universalFileInput" accept=".pdf,.pptx,.png,.jpg,.jpeg,.webp,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/*,text/plain" multiple style="display:none;" />
+      </label>
+
+      <div id="importStatusBox" style="font-size:0.84rem; font-weight:800; color:#38bdf8; text-align:center; min-height:22px;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL COLLEGAMENTO CODICE LIM / TELECOMANDO TELEFONO -->
+  <div id="remoteModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:1.12rem; font-weight:800;">📱 Collega Telefono o LIM con Codice</h3>
+        <button type="button" id="closeRemoteModalBtn" class="mini-action-btn" style="flex:none; padding:6px 10px;">✕</button>
+      </div>
+      <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:14px;">
+        Inserisci il <strong>Codice a 4 cifre</strong> mostrato sullo schermo della LIM per usare il tuo smartphone come telecomando e leggere le tue note segrete!
+      </p>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="roomCodeInput" maxlength="4" placeholder="Es. 4821" class="insp-input" style="font-size:1.3rem; font-weight:900; text-align:center; letter-spacing:4px;" />
+        <button type="button" id="joinAsRemoteBtn" class="btn-remote-join" style="white-space:nowrap;">📱 Apri Telecomando</button>
+        <button type="button" id="joinAsLimBtn" class="btn-primary-pres" style="white-space:nowrap;">🖥️ Apri su LIM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY PROIEZIONE LIM & MODALITÀ TELECOMANDO LIVE -->
+  <div id="limOverlay" class="lim-presenter-overlay">
+    <div class="lim-topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-weight:900; color:#38bdf8;">EDUHUB LIVE LIM</span>
+        <span id="liveRoomCodeBadge" style="background:#10b981; color:#042f2e; font-weight:900; padding:4px 12px; border-radius:999px; font-size:0.85rem;">
+          CODICE TELECOMANDO: ----
+        </span>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" id="switchRemoteViewBtn" class="mini-action-btn" style="flex:none;">📱 Passa a Vista Telecomando</button>
+        <button type="button" id="browserFullBtn" class="mini-action-btn" style="flex:none;">⛶ Schermo Intero</button>
+        <button type="button" id="exitLimBtn" class="mini-action-btn" style="flex:none; color:#f87171;">✕ Chiudi</button>
+      </div>
+    </div>
+
+    <!-- Vista Schermo LIM -->
+    <div id="limScreenView" class="lim-stage-area">
+      <div id="limSlideRender" class="slide-canvas-16-9 theme-tech"></div>
+    </div>
+
+    <!-- Vista Telecomando Smartphone -->
+    <div id="remotePhoneView" class="remote-phone-panel" style="display:none;">
+      <div style="text-align:center;">
+        <div id="remoteSlideCounter" style="font-size:1.1rem; font-weight:900; color:#38bdf8;">Slide 1 / 1</div>
+        <div id="remoteSlideTitlePreview" style="font-size:0.9rem; color:#94a3b8; margin-top:4px;">Titolo slide</div>
+      </div>
+
+      <div class="remote-notes-card">
+        <div style="font-size:0.75rem; font-weight:800; color:#fbbf24; text-transform:uppercase; margin-bottom:8px;">
+          🤫 Le Tue Note del Relatore (Visibili solo qui)
+        </div>
+        <div id="remoteSpeakerNotes" style="font-size:1.05rem; line-height:1.55; color:#f8fafc; white-space:pre-line;">
+          Nessuna nota scritta per questa slide.
+        </div>
+      </div>
+
+      <div class="remote-big-btns">
+        <button type="button" id="remotePrevBtn" class="remote-nav-btn" style="background:#1e293b; color:#fff;">⬅ Indietro</button>
+        <button type="button" id="remoteNextBtn" class="remote-nav-btn" style="background:#10b981; color:#042f2e;">Avanti ➡</button>
+      </div>
+    </div>
+
+    <div id="limFooterControls" class="lim-controls-bar">
+      <button type="button" id="limPrevBtn" class="mini-action-btn" style="flex:none; padding:9px 18px;">⬅ Precedente</button>
+      <span id="limCounterLabel" style="font-weight:800; color:#fff;">1 / 1</span>
+      <button type="button" id="limNextBtn" class="mini-action-btn lim" style="flex:none; padding:9px 18px;">Successiva ➡</button>
+    </div>
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
+    let currentUser = null;
+    let activeTab = "mine";
+    let myDecks = [];
+    let classDecks = [];
+    let activeDeck = null;
+    let currentSlideIdx = 0;
+    let saveTimer = null;
+
+    // Stato Live LIM & Telecomando
+    let liveRoomCode = null;
+    let liveUnsub = null;
+    let liveSlides = [];
+    let liveSlideIndex = 0;
+    let isRemotePhoneMode = false;
+
+    // Tabs Home
+    document.querySelectorAll(".pres-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".pres-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeTab = btn.dataset.tab;
+        renderDecksGrid();
+      });
+    });
+
+    // Crea Nuova Presentazione
+    document.getElementById("createNewDeckBtn").addEventListener("click", () => {
+      createDeck("Nuova Ricerca 1BI", [
+        {
+          theme: "theme-tech",
+          title: "Titolo della Presentazione",
+          body: "• Sottotitolo o argomento della ricerca\n• Classe 1BI Informatica",
+          code: "",
+          img: "",
+          fullImage: false,
+          notes: "Saluta la classe e presenta l'argomento principale."
+        }
+      ]);
+    });
+
+    function createDeck(title, slides) {
+      if (!currentUser) return;
+      const id = "pres_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+      const deck = {
+        id,
+        title,
+        slides,
+        autoreUid: currentUser.uid,
+        autoreNome: currentUser.displayName || "Studente 1BI",
+        pubblica: false,
+        aggiornatoIl: Date.now()
+      };
+      myDecks.unshift(deck);
+      saveDeckNow(deck);
+      openEditor(deck);
+    }
+
+    function saveDeckNow(deck) {
+      if (!deck || !currentUser) return;
+      deck.aggiornatoIl = Date.now();
+      const pill = document.getElementById("savePill");
+      if (pill) pill.textContent = "Salvataggio...";
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        if (deck.autoreUid === currentUser.uid) {
+          await setDoc(doc(db, "presentazioni_1bi", deck.id), deck);
+        }
+        if (pill) pill.textContent = "✓ Salvato";
+      }, 350);
+    }
+
+    function renderDecksGrid() {
+      const grid = document.getElementById("decksGrid");
+      const list = activeTab === "mine" ? myDecks : classDecks;
+      document.getElementById("decksCounter").textContent = `${list.length} presentazioni`;
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="deck-card" style="grid-column: 1 / -1; padding: 34px; text-align: center;">
+            <div style="font-size:2rem; margin-bottom:8px;">🖥️</div>
+            <div style="font-weight:800; margin-bottom:4px;">Nessuna presentazione qui</div>
+            <div style="font-size:0.84rem; color:var(--text-muted);">
+              Clicca su <strong>Nuova Presentazione</strong> oppure importa un file <strong>PDF, PPTX o Immagini</strong>!
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = list.map(d => {
+        const first = (d.slides && d.slides[0]) || { theme: "theme-tech", title: d.title };
+        const count = (d.slides || []).length;
+        const isOwner = currentUser && d.autoreUid === currentUser.uid;
+        return `
+          <div class="deck-card">
+            <div class="deck-preview-box ${first.theme || "theme-tech"}" data-open-id="${d.id}">
+              <span class="deck-count-pill">${count} slide</span>
+              <div style="font-weight:900; font-size:1.05rem; line-height:1.25;">${escapeHtml(first.title || d.title)}</div>
+              <div style="font-size:0.74rem; opacity:0.8; margin-top:6px;">di ${escapeHtml(d.autoreNome || "Studente 1BI")}</div>
+            </div>
+            <div class="deck-card-body">
+              <div style="font-weight:800; font-size:0.95rem;">${escapeHtml(d.title)}</div>
+              <div class="deck-actions-row">
+                <button type="button" class="mini-action-btn" data-open-id="${d.id}">${isOwner ? "✏️ Modifica" : "👁️ Sfoglia"}</button>
+                <button type="button" class="mini-action-btn lim" data-lim-id="${d.id}">🖥️ LIM Live</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-open-id]").forEach(el => {
+        el.addEventListener("click", () => {
+          const found = list.find(x => x.id === el.dataset.openId);
+          if (found) openEditor(found);
+        });
+      });
+
+      grid.querySelectorAll("[data-lim-id]").forEach(el => {
+        el.addEventListener("click", () => {
+          const found = list.find(x => x.id === el.dataset.limId);
+          if (found) startLiveLimSession(found);
+        });
+      });
+    }
+
+    function openEditor(deck) {
+      activeDeck = deck;
+      currentSlideIdx = 0;
+      document.getElementById("homeView").style.display = "none";
+      document.getElementById("editorView").classList.add("active");
+
+      const isOwner = currentUser && deck.autoreUid === currentUser.uid;
+      document.getElementById("deckTitleInput").value = deck.title;
+      document.getElementById("deckTitleInput").readOnly = !isOwner;
+      document.getElementById("togglePublicBtn").textContent = deck.pubblica ? "🌐 Pubblica 1BI" : "🔒 Privata";
+      document.getElementById("togglePublicBtn").style.display = isOwner ? "inline-block" : "none";
+      document.getElementById("deleteDeckBtn").style.display = isOwner ? "inline-block" : "none";
+      document.getElementById("addSlideBtn").style.display = isOwner ? "inline-block" : "none";
+      document.getElementById("importInsideEditorBtn").style.display = isOwner ? "inline-flex" : "none";
+
+      renderEditor();
+    }
+
+    document.getElementById("backHomeBtn").addEventListener("click", () => {
+      activeDeck = null;
+      document.getElementById("editorView").classList.remove("active");
+      document.getElementById("homeView").style.display = "block";
+      renderDecksGrid();
+    });
+
+    document.getElementById("deckTitleInput").addEventListener("input", (e) => {
+      if (!activeDeck) return;
+      activeDeck.title = e.target.value;
+      saveDeckNow(activeDeck);
+    });
+
+    document.getElementById("togglePublicBtn").addEventListener("click", () => {
+      if (!activeDeck) return;
+      activeDeck.pubblica = !activeDeck.pubblica;
+      document.getElementById("togglePublicBtn").textContent = activeDeck.pubblica ? "🌐 Pubblica 1BI" : "🔒 Privata";
+      saveDeckNow(activeDeck);
+    });
+
+    document.getElementById("deleteDeckBtn").addEventListener("click", async () => {
+      if (!activeDeck) return;
+      if (!confirm("Eliminare questa presentazione?")) return;
+      const id = activeDeck.id;
+      await deleteDoc(doc(db, "presentazioni_1bi", id));
+      myDecks = myDecks.filter(d => d.id !== id);
+      document.getElementById("backHomeBtn").click();
+    });
+
+    document.getElementById("addSlideBtn").addEventListener("click", () => {
+      if (!activeDeck) return;
+      const prev = activeDeck.slides[currentSlideIdx] || { theme: "theme-tech" };
+      activeDeck.slides.push({
+        theme: prev.theme || "theme-tech",
+        title: "Nuova Diapositiva",
+        body: "• Inserisci qui i concetti principali",
+        code: "",
+        img: "",
+        fullImage: false,
+        notes: ""
+      });
+      currentSlideIdx = activeDeck.slides.length - 1;
+      saveDeckNow(activeDeck);
+      renderEditor();
+    });
+
+    function buildSlideHtml(slide) {
+      if (slide.fullImage && slide.img) {
+        return `<img src="${slide.img}" alt="Slide" />`;
+      }
+      const hasMedia = Boolean(slide.img);
+      return `
+        <div class="slide-content-grid ${hasMedia ? "has-media" : ""}">
+          <div>
+            ${slide.title ? `<div class="slide-h1">${escapeHtml(slide.title)}</div>` : ""}
+            ${slide.body ? `<div class="slide-body-text">${escapeHtml(slide.body)}</div>` : ""}
+            ${slide.code ? `<pre class="slide-code-box">${escapeHtml(slide.code)}</pre>` : ""}
+          </div>
+          ${hasMedia ? `<div><img src="${slide.img}" class="slide-media-img" alt="Media slide" /></div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderEditor() {
+      if (!activeDeck) return;
+      const slides = activeDeck.slides;
+      if (currentSlideIdx >= slides.length) currentSlideIdx = Math.max(0, slides.length - 1);
+      const slide = slides[currentSlideIdx];
+      const isOwner = currentUser && activeDeck.autoreUid === currentUser.uid;
+
+      // Thumbnails
+      const thumbList = document.getElementById("slidesThumbList");
+      thumbList.innerHTML = slides.map((s, idx) => `
+        <div class="slide-thumb ${idx === currentSlideIdx ? "active" : ""}" data-s-idx="${idx}">
+          <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.8rem; font-weight:800;">
+            ${idx + 1}. ${escapeHtml(s.title || "Slide")}
+          </div>
+          ${isOwner && slides.length > 1 ? `<button type="button" data-del-s="${idx}" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:800;">✕</button>` : ""}
+        </div>
+      `).join("");
+
+      thumbList.querySelectorAll("[data-s-idx]").forEach(el => {
+        el.addEventListener("click", (e) => {
+          if (e.target.dataset.delS !== undefined) return;
+          currentSlideIdx = Number(el.dataset.sIdx);
+          renderEditor();
+        });
+      });
+      thumbList.querySelectorAll("[data-del-s]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.dataset.delS);
+          activeDeck.slides.splice(i, 1);
+          if (currentSlideIdx >= activeDeck.slides.length) currentSlideIdx = activeDeck.slides.length - 1;
+          saveDeckNow(activeDeck);
+          renderEditor();
+        });
+      });
+
+      // Preview 16:9
+      const prevBox = document.getElementById("editorSlidePreview");
+      prevBox.className = `slide-canvas-16-9 ${slide.theme || "theme-tech"} ${slide.fullImage ? "slide-full-img-mode" : ""}`;
+      prevBox.innerHTML = buildSlideHtml(slide);
+      document.getElementById("slideIndicatorLabel").textContent = `Slide ${currentSlideIdx + 1} di ${slides.length}`;
+
+      // Inspector
+      document.getElementById("slideThemeSelect").value = slide.theme || "theme-tech";
+      document.getElementById("slideTitleInput").value = slide.title || "";
+      document.getElementById("slideBodyInput").value = slide.body || "";
+      document.getElementById("slideCodeInput").value = slide.code || "";
+      document.getElementById("slideImgInput").value = slide.img && !slide.img.startsWith("data:") ? slide.img : "";
+      document.getElementById("slideNotesInput").value = slide.notes || "";
+    }
+
+    // Bind Inspector inputs
+    ["slideThemeSelect", "slideTitleInput", "slideBodyInput", "slideCodeInput", "slideImgInput", "slideNotesInput"].forEach(id => {
+      document.getElementById(id).addEventListener("input", () => {
+        if (!activeDeck) return;
+        const s = activeDeck.slides[currentSlideIdx];
+        if (!s) return;
+        s.theme = document.getElementById("slideThemeSelect").value;
+        s.title = document.getElementById("slideTitleInput").value;
+        s.body = document.getElementById("slideBodyInput").value;
+        s.code = document.getElementById("slideCodeInput").value;
+        const urlVal = document.getElementById("slideImgInput").value.trim();
+        if (urlVal) { s.img = urlVal; s.fullImage = false; }
+        s.notes = document.getElementById("slideNotesInput").value;
+        saveDeckNow(activeDeck);
+        renderEditor();
+      });
+    });
+
+    document.getElementById("singleImgFileInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file || !activeDeck) return;
+      compressImageFile(file, 1100, 0.82).then(dataUrl => {
+        const s = activeDeck.slides[currentSlideIdx];
+        s.img = dataUrl;
+        s.fullImage = false;
+        saveDeckNow(activeDeck);
+        renderEditor();
+      });
+    });
+
+    // =========================================================
+    // IMPORTAZIONE UNIVERSALE: PDF, PPTX, IMMAGINI, TXT/MD/JSON
+    // =========================================================
+    let appendToCurrentDeck = false;
+    document.getElementById("openImportModalBtn").addEventListener("click", () => {
+      appendToCurrentDeck = false;
+      document.getElementById("importStatusBox").textContent = "";
+      document.getElementById("importModal").classList.add("open");
+    });
+    document.getElementById("importInsideEditorBtn").addEventListener("click", () => {
+      appendToCurrentDeck = true;
+      document.getElementById("importStatusBox").textContent = "";
+      document.getElementById("importModal").classList.add("open");
+    });
+    document.getElementById("closeImportModalBtn").addEventListener("click", () => {
+      document.getElementById("importModal").classList.remove("open");
+    });
+
+    document.getElementById("universalFileInput").addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      const statusEl = document.getElementById("importStatusBox");
+      statusEl.textContent = "Elaborazione file in corso...";
+
+      let importedSlides = [];
+      let deckTitle = files[0].name.replace(/\.[^/.]+$/, "");
+
+      for (const file of files) {
+        const ext = file.name.split(".").pop().toLowerCase();
+
+        if (ext === "pdf") {
+          statusEl.textContent = `Conversione pagine PDF: ${file.name}...`;
+          const pdfSlides = await parsePdfToSlides(file);
+          importedSlides.push(...pdfSlides);
+        } else if (ext === "pptx") {
+          statusEl.textContent = `Estrazione diapositive PowerPoint: ${file.name}...`;
+          const pptxSlides = await parsePptxToSlides(file);
+          importedSlides.push(...pptxSlides);
+        } else if (file.type.startsWith("image/") || ["png", "jpg", "jpeg", "webp"].includes(ext)) {
+          const imgUrl = await compressImageFile(file, 1280, 0.82);
+          importedSlides.push({
+            theme: "theme-tech",
+            title: "",
+            body: "",
+            code: "",
+            img: imgUrl,
+            fullImage: true,
+            notes: `Immagine: ${file.name}`
+          });
+        } else {
+          // TXT, MD, JSON o altri file testuali
+          const rawText = await file.text();
+          if (ext === "json") {
+            try {
+              const parsed = JSON.parse(rawText);
+              if (Array.isArray(parsed.slides)) {
+                importedSlides.push(...parsed.slides);
+                continue;
+              }
+            } catch (_) {}
+          }
+          const blocks = rawText.split(/\n-{3,}\n|\n\n\n+/).filter(b => b.trim());
+          blocks.forEach((blk, idx) => {
+            const lines = blk.trim().split("\n");
+            importedSlides.push({
+              theme: "theme-tech",
+              title: lines[0].replace(/^#+\s*/, "").slice(0, 80) || `Slide ${idx + 1}`,
+              body: lines.slice(1).join("\n").slice(0, 700),
+              code: "",
+              img: "",
+              fullImage: false,
+              notes: ""
+            });
+          });
+        }
+      }
+
+      if (importedSlides.length === 0) {
+        statusEl.textContent = "Nessun contenuto estraibile trovato nel file.";
+        return;
+      }
+
+      document.getElementById("importModal").classList.remove("open");
+      e.target.value = "";
+
+      if (appendToCurrentDeck && activeDeck) {
+        activeDeck.slides.push(...importedSlides);
+        currentSlideIdx = activeDeck.slides.length - importedSlides.length;
+        saveDeckNow(activeDeck);
+        renderEditor();
+      } else {
+        createDeck(deckTitle, importedSlides);
+      }
+    });
+
+    async function parsePdfToSlides(file) {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      const out = [];
+      const maxPages = Math.min(pdf.numPages, 25);
+
+      for (let p = 1; p <= maxPages; p++) {
+        const page = await pdf.getPage(p);
+        const viewport = page.getViewport({ scale: 1.35 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+        out.push({
+          theme: "theme-tech",
+          title: "",
+          body: "",
+          code: "",
+          img: dataUrl,
+          fullImage: true,
+          notes: `Pagina ${p} di ${pdf.numPages}`
+        });
+      }
+      return out;
+    }
+
+    async function parsePptxToSlides(file) {
+      const zip = await JSZip.loadAsync(file);
+      const slideFiles = Object.keys(zip.files)
+        .filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+        .sort((a, b) => {
+          const na = Number(a.match(/slide(\d+)\.xml/)[1]);
+          const nb = Number(b.match(/slide(\d+)\.xml/)[1]);
+          return na - nb;
+        });
+
+      const out = [];
+      for (let i = 0; i < slideFiles.length; i++) {
+        const xmlStr = await zip.files[slideFiles[i]].async("string");
+        const docXml = new DOMParser().parseFromString(xmlStr, "application/xml");
+        const paragraphs = Array.from(docXml.getElementsByTagName("a:p")).map(p =>
+          Array.from(p.getElementsByTagName("a:t")).map(t => t.textContent).join("")
+        ).filter(txt => txt.trim().length > 0);
+
+        out.push({
+          theme: "theme-tech",
+          title: paragraphs[0] || `Diapositiva ${i + 1}`,
+          body: paragraphs.slice(1).map(line => "• " + line).join("\n"),
+          code: "",
+          img: "",
+          fullImage: false,
+          notes: ""
+        });
+      }
+      return out;
+    }
+
+    function compressImageFile(file, maxW, quality) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxW / img.width);
+            const c = document.createElement("canvas");
+            c.width = Math.round(img.width * scale);
+            c.height = Math.round(img.height * scale);
+            c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+            resolve(c.toDataURL("image/jpeg", quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // =========================================================
+    // PROIEZIONE LIM & TELECOMANDO LIVE DAL TELEFONO (FIREBASE)
+    // =========================================================
+    document.getElementById("startLimModeBtn").addEventListener("click", () => {
+      if (activeDeck) startLiveLimSession(activeDeck);
+    });
+
+    async function startLiveLimSession(deck) {
+      const code = String(Math.floor(1000 + Math.random() * 9000));
+      await setDoc(doc(db, "presentazioni_live_1bi", code), {
+        code,
+        deckTitle: deck.title,
+        slides: deck.slides,
+        currentIndex: currentSlideIdx || 0,
+        aggiornatoIl: Date.now()
+      });
+      connectToLiveRoom(code, false);
+    }
+
+    document.getElementById("openRemoteModalBtn").addEventListener("click", () => {
+      document.getElementById("roomCodeInput").value = "";
+      document.getElementById("remoteModal").classList.add("open");
+    });
+    document.getElementById("closeRemoteModalBtn").addEventListener("click", () => {
+      document.getElementById("remoteModal").classList.remove("open");
+    });
+
+    document.getElementById("joinAsRemoteBtn").addEventListener("click", () => {
+      const code = document.getElementById("roomCodeInput").value.trim();
+      if (code.length !== 4) return alert("Inserisci il codice a 4 cifre della LIM.");
+      document.getElementById("remoteModal").classList.remove("open");
+      connectToLiveRoom(code, true);
+    });
+
+    document.getElementById("joinAsLimBtn").addEventListener("click", () => {
+      const code = document.getElementById("roomCodeInput").value.trim();
+      if (code.length !== 4) return alert("Inserisci il codice a 4 cifre.");
+      document.getElementById("remoteModal").classList.remove("open");
+      connectToLiveRoom(code, false);
+    });
+
+    async function connectToLiveRoom(code, asPhoneRemote) {
+      const snap = await getDoc(doc(db, "presentazioni_live_1bi", code));
+      if (!snap.exists()) {
+        return alert("Codice stanza non trovato. Avvia prima la presentazione su LIM!");
+      }
+      liveRoomCode = code;
+      isRemotePhoneMode = asPhoneRemote;
+      document.getElementById("liveRoomCodeBadge").textContent = `CODICE TELECOMANDO: ${code}`;
+      document.getElementById("limOverlay").classList.add("active");
+      updateLimViewMode();
+
+      if (liveUnsub) liveUnsub();
+      liveUnsub = onSnapshot(doc(db, "presentazioni_live_1bi", code), (docSnap) => {
+        if (!docSnap.exists()) return;
+        const data = docSnap.data();
+        liveSlides = data.slides || [];
+        liveSlideIndex = data.currentIndex || 0;
+        renderLiveSlide();
+      });
+    }
+
+    function updateLimViewMode() {
+      document.getElementById("limScreenView").style.display = isRemotePhoneMode ? "none" : "flex";
+      document.getElementById("limFooterControls").style.display = isRemotePhoneMode ? "none" : "flex";
+      document.getElementById("remotePhoneView").style.display = isRemotePhoneMode ? "flex" : "none";
+      document.getElementById("switchRemoteViewBtn").textContent = isRemotePhoneMode
+        ? "🖥️ Passa a Schermo LIM"
+        : "📱 Passa a Telecomando";
+    }
+
+    document.getElementById("switchRemoteViewBtn").addEventListener("click", () => {
+      isRemotePhoneMode = !isRemotePhoneMode;
+      updateLimViewMode();
+    });
+
+    function renderLiveSlide() {
+      if (!liveSlides.length) return;
+      const idx = Math.max(0, Math.min(liveSlides.length - 1, liveSlideIndex));
+      const slide = liveSlides[idx];
+
+      // Aggiorna schermo LIM
+      const limBox = document.getElementById("limSlideRender");
+      limBox.className = `slide-canvas-16-9 ${slide.theme || "theme-tech"} ${slide.fullImage ? "slide-full-img-mode" : ""}`;
+      limBox.innerHTML = buildSlideHtml(slide);
+      document.getElementById("limCounterLabel").textContent = `${idx + 1} / ${liveSlides.length}`;
+
+      // Aggiorna Telecomando Telefono
+      document.getElementById("remoteSlideCounter").textContent = `Slide ${idx + 1} di ${liveSlides.length}`;
+      document.getElementById("remoteSlideTitlePreview").textContent = slide.title || "(Diapositiva immagine)";
+      document.getElementById("remoteSpeakerNotes").textContent = slide.notes || "Nessuna nota segreta per questa slide.";
+    }
+
+    async function changeLiveSlide(delta) {
+      if (!liveRoomCode || !liveSlides.length) return;
+      const next = Math.max(0, Math.min(liveSlides.length - 1, liveSlideIndex + delta));
+      if (next === liveSlideIndex) return;
+      await updateDoc(doc(db, "presentazioni_live_1bi", liveRoomCode), {
+        currentIndex: next
+      });
+    }
+
+    document.getElementById("limPrevBtn").addEventListener("click", () => changeLiveSlide(-1));
+    document.getElementById("limNextBtn").addEventListener("click", () => changeLiveSlide(1));
+    document.getElementById("remotePrevBtn").addEventListener("click", () => changeLiveSlide(-1));
+    document.getElementById("remoteNextBtn").addEventListener("click", () => changeLiveSlide(1));
+
+    window.addEventListener("keydown", (e) => {
+      if (!document.getElementById("limOverlay").classList.contains("active")) return;
+      if (e.key === "ArrowRight" || e.key === " ") changeLiveSlide(1);
+      if (e.key === "ArrowLeft") changeLiveSlide(-1);
+      if (e.key === "Escape") closeLimOverlay();
+    });
+
+    document.getElementById("browserFullBtn").addEventListener("click", () => {
+      const el = document.getElementById("limOverlay");
+      if (!document.fullscreenElement) el.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    });
+
+    function closeLimOverlay() {
+      if (liveUnsub) { liveUnsub(); liveUnsub = null; }
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      document.getElementById("limOverlay").classList.remove("active");
+    }
+    document.getElementById("exitLimBtn").addEventListener("click", closeLimOverlay);
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+
+      const qMine = query(collection(db, "presentazioni_1bi"), where("autoreUid", "==", user.uid));
+      onSnapshot(qMine, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => (b.aggiornatoIl || 0) - (a.aggiornatoIl || 0));
+        myDecks = list;
+        if (!activeDeck && activeTab === "mine") renderDecksGrid();
+      });
+
+      const qPub = query(collection(db, "presentazioni_1bi"), where("pubblica", "==", true));
+      onSnapshot(qPub, (snap) => {
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        list.sort((a, b) => (b.aggiornatoIl || 0) - (a.aggiornatoIl || 0));
+        classDecks = list;
+        if (!activeDeck && activeTab === "class") renderDecksGrid();
+      });
+    });
+  </script>
+</body>
+</html>
