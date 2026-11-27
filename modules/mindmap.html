@@ -8,9 +8,22 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="../js/theme.js"></script>
   <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
     .studio-tabs {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
       margin-bottom: 18px;
       align-items: center;
@@ -18,10 +31,10 @@
     }
     .tab-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .studio-tab-btn {
-      padding: 9px 16px;
+      padding: 10px 16px;
       border-radius: 12px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
-      background: var(--card-bg);
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
       color: var(--text-muted);
       font-weight: 800;
       font-size: 0.85rem;
@@ -29,6 +42,7 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
+      transition: all 0.15s ease;
     }
     .studio-tab-btn.active {
       background: linear-gradient(135deg, #2563eb, #0284c7);
@@ -47,18 +61,19 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      box-shadow: 0 6px 18px rgba(244, 63, 94, 0.28);
+      box-shadow: 0 6px 18px rgba(244, 63, 94, 0.3);
     }
+    .btn-new-board:hover { filter: brightness(1.07); }
 
     /* Griglia Bacheche / Modelli */
     .boards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
       gap: 16px;
     }
     .board-card {
-      background: var(--card-bg);
-      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
       border-radius: 16px;
       overflow: hidden;
       cursor: pointer;
@@ -71,27 +86,27 @@
       border-color: #38bdf8;
     }
     .board-cover {
-      height: 108px;
+      height: 112px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      font-size: 2.2rem;
+      font-size: 2.3rem;
     }
     .board-type-tag {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(15, 23, 42, 0.72);
+      background: #0f172a;
       color: #fff;
       font-size: 0.7rem;
       font-weight: 800;
-      padding: 3px 9px;
+      padding: 3px 10px;
       border-radius: 999px;
-      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.18);
     }
     .board-body {
-      padding: 14px 16px;
+      padding: 15px 16px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -101,7 +116,7 @@
       font-weight: 800;
       font-size: 1rem;
       color: var(--text-main);
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .board-meta {
       font-size: 0.76rem;
@@ -109,7 +124,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--solid-border);
     }
 
     /* EDITOR WORKSPACE */
@@ -119,46 +136,57 @@
       gap: 12px;
     }
     .editor-shell.active { display: flex; }
+    .editor-shell.fullscreen-mode {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: var(--bg-main, #070d19);
+      padding: 12px;
+    }
+    .editor-shell.fullscreen-mode .mindmap-canvas-wrap,
+    .editor-shell.fullscreen-mode .structured-board {
+      height: calc(100vh - 96px);
+    }
 
     .editor-toolbar {
-      background: var(--card-bg);
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
       border-radius: 16px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       justify-content: space-between;
     }
     .editor-title-input {
-      background: transparent;
-      border: 1px dashed transparent;
+      background: var(--solid-sub);
+      border: 1px solid var(--solid-border);
       color: var(--text-main);
-      font-size: 1.1rem;
+      font-size: 1.02rem;
       font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 8px;
+      padding: 6px 11px;
+      border-radius: 10px;
       min-width: 210px;
       font-family: inherit;
     }
     .editor-title-input:focus {
       outline: none;
       border-color: #38bdf8;
-      background: rgba(255,255,255,0.04);
     }
     .tool-btn {
       padding: 7px 12px;
       border-radius: 10px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.14));
-      background: var(--surface-sub, rgba(255,255,255,0.05));
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
       color: var(--text-main);
-      font-size: 0.8rem;
+      font-size: 0.79rem;
       font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      transition: border-color 0.15s ease, background 0.15s ease;
     }
     .tool-btn:hover { border-color: #38bdf8; }
     .tool-btn.primary {
@@ -167,61 +195,129 @@
       color: #fff;
     }
     .tool-btn.connect-active {
-      background: rgba(245, 158, 11, 0.25);
-      border-color: #f59e0b;
-      color: #fbbf24;
+      background: #d97706;
+      border-color: #fbbf24;
+      color: #fff;
     }
     .save-pill {
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 800;
       color: #34d399;
-      background: rgba(16, 185, 129, 0.14);
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.35);
       padding: 4px 10px;
       border-radius: 999px;
     }
 
-    /* CANVAS MAPPA A NODI */
+    /* TELA INFINITA ESTENDIBILE DA TUTTI I LATI */
     .mindmap-canvas-wrap {
       position: relative;
       width: 100%;
-      height: 68vh;
-      min-height: 500px;
+      height: 72vh;
+      min-height: 540px;
       border-radius: 18px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
-      background-color: var(--card-bg);
-      background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
-      background-size: 22px 22px;
-      overflow: auto;
+      border: 1px solid var(--solid-border);
+      background-color: var(--solid-panel);
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
     }
-    .mindmap-stage {
-      position: relative;
-      width: 2200px;
-      height: 1500px;
+    .mindmap-canvas-wrap.panning { cursor: grabbing; }
+
+    .mindmap-viewport {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      background-image: radial-gradient(rgba(148, 163, 184, 0.28) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
     }
     .mindmap-svg {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
+      overflow: visible;
+    }
+    .edge-hit-line {
+      stroke: transparent;
+      stroke-width: 16;
+      fill: none;
+      cursor: pointer;
+    }
+    .edge-visible-line {
+      transition: stroke 0.15s ease;
       pointer-events: none;
     }
+    .edge-group:hover .edge-visible-line {
+      stroke: #f43f5e !important;
+    }
+
+    /* Controlli flottanti sulla tela (Zoom & Espansione 4 lati) */
+    .canvas-hud {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      z-index: 20;
+      display: flex;
+      gap: 6px;
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      padding: 6px 8px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    .canvas-hint-badge {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      z-index: 20;
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 10px;
+    }
+
+    /* NODI CREATIVI SOLIDI */
     .mm-node {
       position: absolute;
-      width: 230px;
-      background: var(--card-bg);
+      width: 245px;
+      background: var(--solid-card);
       border: 2px solid #38bdf8;
-      border-radius: 14px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+      border-radius: 15px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
       user-select: none;
-      z-index: 2;
+      z-index: 5;
+      transition: box-shadow 0.15s ease;
     }
+    .mm-node.style-pill {
+      border-radius: 28px;
+    }
+    .mm-node.style-pill .mm-node-header {
+      border-radius: 25px 25px 0 0;
+    }
+    .mm-node.style-dashed {
+      border-style: dashed;
+      border-width: 2.5px;
+    }
+    .mm-node.style-sticky {
+      background: #fef08a;
+      color: #1e293b;
+      border-color: #eab308;
+    }
+    .mm-node.style-sticky .mm-node-title { color: #0f172a; }
+    .mm-node.style-sticky .mm-node-text { color: #334155; }
+
     .mm-node.selected-source {
-      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.55);
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.65);
       border-color: #f59e0b !important;
     }
     .mm-node-header {
       padding: 7px 10px;
-      border-radius: 11px 11px 0 0;
+      border-radius: 12px 12px 0 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -229,10 +325,36 @@
       font-size: 0.72rem;
       font-weight: 800;
       color: #fff;
+      gap: 4px;
     }
     .mm-node-header:active { cursor: grabbing; }
-    .mm-node-body {
-      padding: 10px 12px;
+    .node-mini-btn {
+      background: rgba(15, 23, 42, 0.35);
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .node-mini-btn:hover { background: rgba(15, 23, 42, 0.65); }
+
+    .mm-node-body { padding: 10px 12px; }
+    .mm-node-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+    .mm-emoji-btn {
+      background: var(--solid-sub);
+      border: 1px solid var(--solid-border);
+      border-radius: 8px;
+      padding: 2px 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      line-height: 1.2;
     }
     .mm-node-title {
       width: 100%;
@@ -240,8 +362,7 @@
       border: none;
       color: var(--text-main);
       font-weight: 800;
-      font-size: 0.92rem;
-      margin-bottom: 5px;
+      font-size: 0.94rem;
       font-family: inherit;
       outline: none;
     }
@@ -250,26 +371,27 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 0.8rem;
+      font-size: 0.81rem;
       resize: vertical;
-      min-height: 46px;
+      min-height: 48px;
       font-family: inherit;
       outline: none;
-      line-height: 1.4;
+      line-height: 1.42;
     }
 
     /* VISTA MURO / COLONNE / TIMELINE */
     .structured-board {
-      min-height: 62vh;
+      min-height: 66vh;
       border-radius: 18px;
-      border: 1px solid var(--table-border, rgba(255,255,255,0.12));
-      background: var(--card-bg);
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
       padding: 20px;
+      overflow: auto;
     }
     .wall-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 15px;
     }
     .columns-wrap {
       display: flex;
@@ -279,29 +401,31 @@
       align-items: flex-start;
     }
     .padlet-col {
-      min-width: 280px;
-      max-width: 280px;
-      background: var(--surface-sub, rgba(255,255,255,0.04));
-      border: 1px solid var(--table-border, rgba(255,255,255,0.1));
-      border-radius: 14px;
-      padding: 12px;
+      min-width: 290px;
+      max-width: 290px;
+      background: var(--solid-sub);
+      border: 1px solid var(--solid-border);
+      border-radius: 15px;
+      padding: 13px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 11px;
     }
     .padlet-card-item {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 12px;
+      background: var(--solid-card);
+      border: 1px solid var(--solid-border);
+      border-radius: 13px;
+      padding: 13px;
       border-top: 4px solid #38bdf8;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.16);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
 
-    /* Modal Nuovo Padlet */
+    /* MODAL SOLIDO AD ALTA LEGGIBILITÀ */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 23, 0.78);
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(6px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -310,32 +434,34 @@
     }
     .modal-backdrop.open { display: flex; }
     .modal-box {
-      background: var(--card-bg);
-      border: 1px solid var(--table-border, rgba(255,255,255,0.15));
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
       border-radius: 20px;
-      padding: 22px;
+      padding: 24px;
       max-width: 680px;
       width: 100%;
-      max-height: 88vh;
+      max-height: 90vh;
       overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
     }
     .layout-picker-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 10px;
-      margin: 12px 0 18px;
+      margin: 12px 0 20px;
     }
     .layout-option {
-      border: 2px solid var(--table-border, rgba(255,255,255,0.12));
+      border: 2px solid var(--solid-border);
       border-radius: 14px;
-      padding: 14px 10px;
+      padding: 15px 10px;
       text-align: center;
       cursor: pointer;
-      background: var(--surface-sub, rgba(255,255,255,0.03));
+      background: var(--solid-sub);
+      transition: all 0.15s ease;
     }
     .layout-option.selected {
       border-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.14);
+      background: rgba(56, 189, 248, 0.18);
     }
   </style>
 </head>
@@ -363,7 +489,7 @@
       <div class="welcome-banner" style="margin-bottom: 18px;">
         <div>
           <h2>Mind Map Studio & Bacheche 1BI</h2>
-          <p>Crea mappe concettuali a nodi e bacheche stile Padlet senza limiti • Salvataggio automatico sul tuo profilo</p>
+          <p>Tela estendibile in ogni direzione e bacheche stile Padlet senza limiti • Salvataggio automatico nel tuo profilo</p>
         </div>
         <button id="openCreateModalBtn" class="btn-new-board">
           <i data-lucide="plus" style="width:18px;height:18px;"></i>
@@ -377,7 +503,7 @@
             <i data-lucide="folder-heart" style="width:16px;height:16px;"></i> Le Mie Mappe (Illimitate)
           </button>
           <button type="button" class="studio-tab-btn" data-tab="templates">
-            <i data-lucide="layout-template" style="width:16px;height:16px;"></i> Galleria Modelli Pronti
+            <i data-lucide="layout-template" style="width:16px;height:16px;"></i> Galleria Modelli Pronti (8)
           </button>
           <button type="button" class="studio-tab-btn" data-tab="shared">
             <i data-lucide="users" style="width:16px;height:16px;"></i> Condivise dalla 1BI
@@ -392,44 +518,63 @@
     <!-- VISTA EDITOR INTERATTIVO -->
     <div id="editorView" class="editor-shell">
       <div class="editor-toolbar">
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap;">
           <button type="button" id="backToHomeBtn" class="tool-btn">
             <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> Tutte le Mappe
           </button>
           <input type="text" id="boardTitleInput" class="editor-title-input" value="Nuova Mappa Concettuale" />
-          <span id="saveStatusPill" class="save-pill">✓ Salvato nel tuo profilo</span>
+          <span id="formatBadge" style="font-size:0.74rem; font-weight:800; padding:4px 10px; border-radius:999px; background:rgba(56,189,248,0.16); color:#38bdf8;">Mappa a Nodi</span>
+          <span id="saveStatusPill" class="save-pill">✓ Salvato</span>
         </div>
 
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <select id="layoutSwitcher" class="tool-btn" style="cursor:pointer;">
-            <option value="mindmap">🧠 Mappa a Nodi</option>
-            <option value="wall">🧱 Muro Schede</option>
-            <option value="columns">📊 Colonne</option>
-            <option value="timeline">⏳ Timeline</option>
-          </select>
-
+        <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
           <button type="button" id="addNodeBtn" class="tool-btn primary">
-            <i data-lucide="plus-circle" style="width:15px;height:15px;"></i> Aggiungi Nodo / Scheda
+            <i data-lucide="plus-circle" style="width:15px;height:15px;"></i> Aggiungi Blocco
           </button>
 
           <button type="button" id="connectModeBtn" class="tool-btn" title="Clicca due nodi per collegarli con una freccia">
             <i data-lucide="git-branch" style="width:15px;height:15px;"></i> Collega Nodi
           </button>
 
-          <button type="button" id="shareToggleBtn" class="tool-btn" title="Condividi una copia con la 1BI">
+          <button type="button" id="exportPngBtn" class="tool-btn" title="Scarica la mappa come immagine PNG">
+            <i data-lucide="download" style="width:15px;height:15px;"></i> PNG
+          </button>
+
+          <button type="button" id="fullscreenBtn" class="tool-btn" title="Espandi a schermo intero">
+            <i data-lucide="maximize-2" style="width:15px;height:15px;"></i> Schermo Intero
+          </button>
+
+          <button type="button" id="shareToggleBtn" class="tool-btn" title="Condividi con la 1BI">
             <i data-lucide="share-2" style="width:15px;height:15px;"></i> <span id="shareBtnLabel">Privata</span>
           </button>
 
-          <button type="button" id="deleteBoardBtn" class="tool-btn" style="color:#f87171; border-color:rgba(239,68,68,0.35);">
+          <button type="button" id="deleteBoardBtn" class="tool-btn" style="color:#f87171; border-color:rgba(239,68,68,0.4);" title="Elimina mappa">
             <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
           </button>
         </div>
       </div>
 
-      <!-- AREA MAPPA A NODI (CON FRECCE SVG) -->
+      <!-- AREA MAPPA A NODI INFINITA ESTENDIBILE DA TUTTI I LATI -->
       <div id="mindmapCanvasWrap" class="mindmap-canvas-wrap">
-        <div id="mindmapStage" class="mindmap-stage">
-          <svg id="mindmapSvg" class="mindmap-svg"></svg>
+        <div id="mindmapViewport" class="mindmap-viewport">
+          <svg id="mindmapSvg" class="mindmap-svg">
+            <defs>
+              <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8" />
+              </marker>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="canvas-hint-badge">
+          🖱️ Trascina lo sfondo per spostarti • I blocchi espandono la tela da tutti i 4 lati • Clicca una freccia per rimuoverla
+        </div>
+
+        <div class="canvas-hud">
+          <button type="button" id="expandAllSidesBtn" class="tool-btn" title="Allarga la tela su tutti e 4 i lati">+ Espandi Tela</button>
+          <button type="button" id="zoomOutBtn" class="tool-btn" title="Riduci zoom">−</button>
+          <button type="button" id="zoomResetBtn" class="tool-btn" title="Centra vista">100%</button>
+          <button type="button" id="zoomInBtn" class="tool-btn" title="Aumenta zoom">+</button>
         </div>
       </div>
 
@@ -438,42 +583,42 @@
     </div>
   </main>
 
-  <!-- MODAL CREA NUOVA MAPPA / PADLET -->
+  <!-- MODAL CREA NUOVA MAPPA / PADLET (SFONDO SOLIDO) -->
   <div id="createModal" class="modal-backdrop">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="font-size:1.15rem; font-weight:800;">Crea da Zero (Senza Limiti)</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-size:1.18rem; font-weight:800;">Crea da Zero (Senza Limiti)</h3>
         <button type="button" id="closeCreateModalBtn" class="tool-btn">✕</button>
       </div>
 
       <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Titolo Mappa o Bacheca</label>
-      <input type="text" id="newBoardTitle" placeholder="Es. Mappa Storia Rivoluzione Francese, Appunti C++..." style="width:100%; margin:6px 0 14px; padding:10px 12px; border-radius:11px; border:1px solid var(--table-border, rgba(255,255,255,0.15)); background:var(--surface-sub, rgba(255,255,255,0.05)); color:var(--text-main); font-size:0.92rem; box-sizing:border-box;" />
+      <input type="text" id="newBoardTitle" placeholder="Es. Mappa Storia Rivoluzione Francese, Appunti C++..." style="width:100%; margin:6px 0 16px; padding:11px 13px; border-radius:11px; border:1px solid var(--solid-border); background:var(--solid-sub); color:var(--text-main); font-size:0.94rem; box-sizing:border-box; outline:none;" />
 
       <label style="font-size:0.78rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Scegli Formato</label>
       <div class="layout-picker-grid">
         <div class="layout-option selected" data-layout="mindmap">
-          <div style="font-size:1.7rem; margin-bottom:6px;">🧠</div>
-          <div style="font-weight:800; font-size:0.85rem;">Mappa a Nodi</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Collega concetti e frecce</div>
+          <div style="font-size:1.8rem; margin-bottom:6px;">🧠</div>
+          <div style="font-weight:800; font-size:0.86rem;">Mappa a Nodi</div>
+          <div style="font-size:0.73rem; color:var(--text-muted); margin-top:3px;">Tela estendibile + frecce</div>
         </div>
         <div class="layout-option" data-layout="wall">
-          <div style="font-size:1.7rem; margin-bottom:6px;">🧱</div>
-          <div style="font-weight:800; font-size:0.85rem;">Muro</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Schede libere a griglia</div>
+          <div style="font-size:1.8rem; margin-bottom:6px;">🧱</div>
+          <div style="font-weight:800; font-size:0.86rem;">Muro</div>
+          <div style="font-size:0.73rem; color:var(--text-muted); margin-top:3px;">Schede libere a griglia</div>
         </div>
         <div class="layout-option" data-layout="columns">
-          <div style="font-size:1.7rem; margin-bottom:6px;">📊</div>
-          <div style="font-weight:800; font-size:0.85rem;">Colonne</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Organizza per argomento</div>
+          <div style="font-size:1.8rem; margin-bottom:6px;">📊</div>
+          <div style="font-weight:800; font-size:0.86rem;">Colonne</div>
+          <div style="font-size:0.73rem; color:var(--text-muted); margin-top:3px;">Organizza per argomento</div>
         </div>
         <div class="layout-option" data-layout="timeline">
-          <div style="font-size:1.7rem; margin-bottom:6px;">⏳</div>
-          <div style="font-weight:800; font-size:0.85rem;">Timeline</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Eventi in ordine di data</div>
+          <div style="font-size:1.8rem; margin-bottom:6px;">⏳</div>
+          <div style="font-weight:800; font-size:0.86rem;">Timeline</div>
+          <div style="font-size:0.73rem; color:var(--text-muted); margin-top:3px;">Eventi in ordine di data</div>
         </div>
       </div>
 
-      <button type="button" id="confirmCreateBoardBtn" class="btn-new-board" style="width:100%; justify-content:center; padding:12px;">
+      <button type="button" id="confirmCreateBoardBtn" class="btn-new-board" style="width:100%; justify-content:center; padding:13px; font-size:0.94rem;">
         Crea e Apri Subito →
       </button>
     </div>
@@ -493,7 +638,9 @@
       where
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const NODE_COLORS = ["#0284c7", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#ef4444"];
+    const NODE_COLORS = ["#0284c7", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#ef4444", "#06b6d4"];
+    const NODE_EMOJIS = ["🧠", "💡", "💻", "📐", "🔥", "📚", "⚡", "✅", "❓", "🎯"];
+    const NODE_STYLES = ["default", "pill", "sticky", "dashed"];
 
     const TEMPLATES = [
       {
@@ -504,10 +651,50 @@
         gradient: "linear-gradient(135deg, #0284c7, #2563eb)",
         desc: "Idea centrale collegata a 3 rami principali per studiare qualsiasi materia.",
         nodes: [
-          { id: "n1", x: 460, y: 120, color: "#2563eb", col: "Concetto Centrale", title: "Argomento Principale", text: "Scrivi qui il titolo del capitolo o della verifica" },
-          { id: "n2", x: 160, y: 330, color: "#10b981", col: "Ramo 1", title: "1. Definizione e Cause", text: "Spiega cosa è e perché succede" },
-          { id: "n3", x: 460, y: 340, color: "#f59e0b", col: "Ramo 2", title: "2. Caratteristiche Chiave", text: "Punti principali da ricordare" },
-          { id: "n4", x: 760, y: 330, color: "#ec4899", col: "Ramo 3", title: "3. Esempi & Conseguenze", text: "Collegamenti ed esercizi" }
+          { id: "n1", x: 1120, y: 780, color: "#2563eb", emoji: "🧠", style: "pill", col: "Concetto Centrale", title: "Argomento Principale", text: "Scrivi qui il titolo del capitolo o della verifica" },
+          { id: "n2", x: 800, y: 980, color: "#10b981", emoji: "📖", style: "default", col: "Ramo 1", title: "1. Definizione e Cause", text: "Spiega cosa è e perché succede" },
+          { id: "n3", x: 1120, y: 1010, color: "#f59e0b", emoji: "⚡", style: "default", col: "Ramo 2", title: "2. Caratteristiche Chiave", text: "Punti principali da ricordare" },
+          { id: "n4", x: 1440, y: 980, color: "#ec4899", emoji: "🎯", style: "default", col: "Ramo 3", title: "3. Esempi & Conseguenze", text: "Collegamenti ed esercizi" }
+        ],
+        edges: [
+          { from: "n1", to: "n2" },
+          { from: "n1", to: "n3" },
+          { from: "n1", to: "n4" }
+        ]
+      },
+      {
+        id: "tpl_flowchart",
+        title: "Diagramma di Flusso / Algoritmo",
+        layout: "mindmap",
+        emoji: "💻",
+        gradient: "linear-gradient(135deg, #0ea5e9, #10b981)",
+        desc: "Perfetto per Informatica 1BI: Inizio, Input dati, Condizione If/Else e Output.",
+        nodes: [
+          { id: "n1", x: 1120, y: 720, color: "#10b981", emoji: "▶️", style: "pill", col: "Start", title: "INIZIO", text: "Avvio dell'algoritmo" },
+          { id: "n2", x: 1120, y: 890, color: "#0284c7", emoji: "⌨️", style: "default", col: "Input", title: "Leggi Input (N)", text: "Acquisizione variabile da tastiera" },
+          { id: "n3", x: 1120, y: 1060, color: "#f59e0b", emoji: "❓", style: "dashed", col: "Condizione", title: "Condizione: N > 0 ?", text: "Verifica vera o falsa" },
+          { id: "n4", x: 860, y: 1230, color: "#10b981", emoji: "✅", style: "default", col: "Vero", title: "Ramo VERO", text: "Esegui istruzioni se vero" },
+          { id: "n5", x: 1380, y: 1230, color: "#ef4444", emoji: "❌", style: "default", col: "Falso", title: "Ramo FALSO", text: "Esegui istruzioni alternative" }
+        ],
+        edges: [
+          { from: "n1", to: "n2" },
+          { from: "n2", to: "n3" },
+          { from: "n3", to: "n4" },
+          { from: "n3", to: "n5" }
+        ]
+      },
+      {
+        id: "tpl_ripasso",
+        title: "Scheda Ripasso Pre-Verifica",
+        layout: "mindmap",
+        emoji: "📐",
+        gradient: "linear-gradient(135deg, #f59e0b, #ef4444)",
+        desc: "Organizza Formule, Regole da non sbagliare ed Esercizi tipo prima del compito.",
+        nodes: [
+          { id: "n1", x: 1120, y: 820, color: "#ef4444", emoji: "🔥", style: "pill", col: "Verifica", title: "Verifica di...", text: "Data e argomenti del programma" },
+          { id: "n2", x: 820, y: 760, color: "#0284c7", emoji: "📐", style: "sticky", col: "Formule", title: "Formule & Sintassi", text: "Scrivi le formule essenziali" },
+          { id: "n3", x: 1420, y: 760, color: "#8b5cf6", emoji: "💡", style: "sticky", col: "Trucchi", title: "Errori da Evitare", text: "Attenzione ai segni / eccezioni" },
+          { id: "n4", x: 1120, y: 1040, color: "#10b981", emoji: "✅", style: "default", col: "Esercizi", title: "Esercizio Svolto Tipo", text: "Passaggi chiave della risoluzione" }
         ],
         edges: [
           { from: "n1", to: "n2" },
@@ -521,13 +708,34 @@
         layout: "columns",
         emoji: "⚖️",
         gradient: "linear-gradient(135deg, #7c3aed, #db2777)",
-        desc: "Ideale per confrontare due teorie, linguaggi di programmazione o personaggi storici.",
+        desc: "Ideale per confrontare due teorie, linguaggi di programmazione o epoche storiche.",
         nodes: [
-          { id: "n1", x: 120, y: 120, color: "#2563eb", col: "Elemento A", title: "Caratteristiche A", text: "Punti di forza e dettagli del primo elemento" },
-          { id: "n2", x: 420, y: 120, color: "#10b981", col: "Punti in Comune", title: "Analogie", text: "Cosa hanno in comune A e B" },
-          { id: "n3", x: 720, y: 120, color: "#f59e0b", col: "Elemento B", title: "Caratteristiche B", text: "Differenze e peculiarità del secondo elemento" }
+          { id: "n1", x: 900, y: 800, color: "#2563eb", emoji: "🔵", style: "default", col: "Elemento A", title: "Caratteristiche A", text: "Punti di forza e dettagli del primo elemento" },
+          { id: "n2", x: 1150, y: 800, color: "#10b981", emoji: "🤝", style: "default", col: "Punti in Comune", title: "Analogie", text: "Cosa hanno in comune A e B" },
+          { id: "n3", x: 1400, y: 800, color: "#f59e0b", emoji: "🟠", style: "default", col: "Elemento B", title: "Caratteristiche B", text: "Differenze e peculiarità del secondo elemento" }
         ],
         edges: []
+      },
+      {
+        id: "tpl_letteratura",
+        title: "Analisi Autore / Opera Letteraria",
+        layout: "mindmap",
+        emoji: "📚",
+        gradient: "linear-gradient(135deg, #8b5cf6, #6366f1)",
+        desc: "Schema completo per Italiano e Storia: Vita, Opere, Temi e Stile.",
+        nodes: [
+          { id: "n1", x: 1120, y: 840, color: "#8b5cf6", emoji: "📚", style: "pill", col: "Autore", title: "Nome Autore / Opera", text: "Periodo storico e corrente" },
+          { id: "n2", x: 840, y: 740, color: "#0284c7", emoji: "👤", style: "default", col: "Biografia", title: "Biografia & Contesto", text: "Eventi principali della vita" },
+          { id: "n3", x: 1400, y: 740, color: "#ec4899", emoji: "✍️", style: "default", col: "Opere", title: "Opere Principali", text: "Titoli e trama sintetica" },
+          { id: "n4", x: 840, y: 980, color: "#f59e0b", emoji: "💡", style: "default", col: "Temi", title: "Temi Chiave", text: "Messaggi e concetti ricorrenti" },
+          { id: "n5", x: 1400, y: 980, color: "#10b981", emoji: "🎨", style: "default", col: "Stile", title: "Lingua & Stile", text: "Figure retoriche e registro" }
+        ],
+        edges: [
+          { from: "n1", to: "n2" },
+          { from: "n1", to: "n3" },
+          { from: "n1", to: "n4" },
+          { from: "n1", to: "n5" }
+        ]
       },
       {
         id: "tpl_timeline",
@@ -535,24 +743,38 @@
         layout: "timeline",
         emoji: "⏳",
         gradient: "linear-gradient(135deg, #059669, #0d9488)",
-        desc: "Ordina date, battaglie, scoperte scientifiche o fasi di un algoritmo.",
+        desc: "Ordina date, battaglie, scoperte scientifiche o fasi di un progetto.",
         nodes: [
-          { id: "n1", x: 100, y: 150, color: "#0284c7", col: "Fase 1", title: "Data / Step 1", text: "Inizio degli eventi" },
-          { id: "n2", x: 380, y: 150, color: "#8b5cf6", col: "Fase 2", title: "Data / Step 2", text: "Svolta centrale" },
-          { id: "n3", x: 660, y: 150, color: "#ec4899", col: "Fase 3", title: "Data / Step 3", text: "Conclusione e risultati" }
+          { id: "n1", x: 850, y: 850, color: "#0284c7", emoji: "1️⃣", style: "default", col: "Fase 1", title: "Data / Step 1", text: "Inizio degli eventi" },
+          { id: "n2", x: 1120, y: 850, color: "#8b5cf6", emoji: "2️⃣", style: "default", col: "Fase 2", title: "Data / Step 2", text: "Svolta centrale" },
+          { id: "n3", x: 1390, y: 850, color: "#ec4899", emoji: "3️⃣", style: "default", col: "Fase 3", title: "Data / Step 3", text: "Conclusione e risultati" }
         ],
         edges: [{ from: "n1", to: "n2" }, { from: "n2", to: "n3" }]
       },
       {
+        id: "tpl_kanban",
+        title: "Bacheca Progetto / Cogestione",
+        layout: "columns",
+        emoji: "🚀",
+        gradient: "linear-gradient(135deg, #2563eb, #06b6d4)",
+        desc: "Dividi i compiti del gruppo in Da Fare, In Corso e Completato.",
+        nodes: [
+          { id: "n1", x: 900, y: 800, color: "#ef4444", emoji: "📌", style: "default", col: "Da Fare", title: "Ricerca fonti e immagini", text: "Assegnato al gruppo" },
+          { id: "n2", x: 1150, y: 800, color: "#f59e0b", emoji: "⚙️", style: "default", col: "In Corso", title: "Creazione slide / codice", text: "Lavorazione in laboratorio" },
+          { id: "n3", x: 1400, y: 800, color: "#10b981", emoji: "✅", style: "default", col: "Completato", title: "Scaletta argomenti", text: "Pronto per la consegna" }
+        ],
+        edges: []
+      },
+      {
         id: "tpl_brainstorm",
-        title: "Lavagna Brainstorming & Gruppi",
+        title: "Lavagna Post-it & Brainstorming",
         layout: "wall",
         emoji: "💡",
         gradient: "linear-gradient(135deg, #ea580c, #eab308)",
-        desc: "Bacheca libera stile Padlet per raccogliere idee, link e appunti veloci.",
+        desc: "Bacheca libera stile Padlet con post-it colorati per appunti rapidi.",
         nodes: [
-          { id: "n1", x: 140, y: 130, color: "#f59e0b", col: "Idee", title: "Idea #1", text: "Appunta qui una proposta o un concetto" },
-          { id: "n2", x: 420, y: 130, color: "#10b981", col: "Idee", title: "Idea #2", text: "Aggiungi altre schede cliccando in alto" }
+          { id: "n1", x: 900, y: 800, color: "#f59e0b", emoji: "💡", style: "sticky", col: "Idee", title: "Idea #1", text: "Appunta qui una proposta o un concetto" },
+          { id: "n2", x: 1180, y: 800, color: "#10b981", emoji: "🔥", style: "sticky", col: "Idee", title: "Idea #2", text: "Aggiungi altre schede cliccando in alto" }
         ],
         edges: []
       }
@@ -567,6 +789,13 @@
     let connectSourceId = null;
     let saveTimer = null;
     let selectedModalLayout = "mindmap";
+
+    // Stato Tela Infinita Estendibile da tutti e 4 i lati
+    let canvasW = 3200;
+    let canvasH = 2400;
+    let panX = -750;
+    let panY = -550;
+    let zoomLevel = 1;
 
     // Tab navigation
     document.querySelectorAll(".studio-tab-btn").forEach(btn => {
@@ -603,12 +832,14 @@
         nodes: [
           {
             id: "n_" + Date.now(),
-            x: 420,
-            y: 160,
+            x: 1120,
+            y: 820,
             color: "#0284c7",
+            emoji: "🧠",
+            style: "pill",
             col: "Generale",
             title: title,
-            text: "Fai clic per modificare il testo o trascina il blocco"
+            text: "Fai clic per modificare il testo o trascina il blocco in ogni direzione"
           }
         ],
         edges: []
@@ -622,6 +853,8 @@
         id: newId,
         title: templateData.title,
         layout: templateData.layout || "mindmap",
+        canvasW: 3200,
+        canvasH: 2400,
         nodes: JSON.parse(JSON.stringify(templateData.nodes || [])),
         edges: JSON.parse(JSON.stringify(templateData.edges || [])),
         autoreUid: currentUser.uid,
@@ -637,7 +870,8 @@
     function saveBoardNow(board) {
       if (!board || !currentUser) return;
       board.aggiornatoIl = Date.now();
-      // Salvataggio locale immediato (backup istantaneo)
+      board.canvasW = canvasW;
+      board.canvasH = canvasH;
       localStorage.setItem("eduhub_mm_" + board.id, JSON.stringify(board));
 
       const pill = document.getElementById("saveStatusPill");
@@ -648,7 +882,7 @@
         if (board.autoreUid === currentUser.uid) {
           await setDoc(doc(db, "mindmaps_1bi", board.id), board);
         }
-        if (pill) pill.textContent = "✓ Salvato nel tuo profilo";
+        if (pill) pill.textContent = "✓ Salvato";
       }, 350);
     }
 
@@ -666,7 +900,7 @@
             <div class="board-body">
               <div>
                 <div class="board-title">${tpl.title}</div>
-                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">${tpl.desc}</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.45;">${tpl.desc}</div>
               </div>
               <div class="board-meta">
                 <span style="color:#38bdf8; font-weight:800;">Usa Modello →</span>
@@ -693,7 +927,7 @@
               ${activeTab === "mine" ? "Non hai ancora creato mappe" : "Nessuna mappa condivisa in 1BI al momento"}
             </div>
             <div style="font-size:0.84rem; color:var(--text-muted);">
-              Clicca su <strong>Crea Mappa / Bacheca</strong> o scegli un modello dalla Galleria!
+              Clicca su <strong>Crea Mappa / Bacheca</strong> o scegli uno degli 8 modelli pronti!
             </div>
           </div>
         `;
@@ -713,7 +947,7 @@
               <div>
                 <div class="board-title">${escapeHtml(b.title)}</div>
                 <div style="font-size:0.78rem; color:var(--text-muted);">
-                  ${countNodes} ${countNodes === 1 ? "nodo" : "nodi"} • di ${escapeHtml(b.autoreNome || "Studente")}
+                  ${countNodes} ${countNodes === 1 ? "blocco" : "blocchi"} • di ${escapeHtml(b.autoreNome || "Studente")}
                 </div>
               </div>
               <div class="board-meta">
@@ -735,10 +969,47 @@
       });
     }
 
+    function centerViewportOnNodes(board) {
+      const wrap = document.getElementById("mindmapCanvasWrap");
+      const rect = wrap.getBoundingClientRect();
+      const vw = rect.width || 900;
+      const vh = rect.height || 560;
+
+      if (board.nodes && board.nodes.length > 0) {
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        board.nodes.forEach(n => {
+          minX = Math.min(minX, n.x || 0);
+          maxX = Math.max(maxX, (n.x || 0) + 245);
+          minY = Math.min(minY, n.y || 0);
+          maxY = Math.max(maxY, (n.y || 0) + 140);
+        });
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        panX = Math.round(vw / 2 - centerX * zoomLevel);
+        panY = Math.round(vh / 2 - centerY * zoomLevel);
+      } else {
+        panX = Math.round(vw / 2 - canvasW / 2);
+        panY = Math.round(vh / 2 - canvasH / 2);
+      }
+      applyViewportTransform();
+    }
+
+    function applyViewportTransform() {
+      const vp = document.getElementById("mindmapViewport");
+      if (!vp) return;
+      vp.style.width = canvasW + "px";
+      vp.style.height = canvasH + "px";
+      vp.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+      document.getElementById("zoomResetBtn").textContent = Math.round(zoomLevel * 100) + "%";
+    }
+
     function openBoardEditor(board) {
       activeBoard = board;
       connectMode = false;
       connectSourceId = null;
+      canvasW = board.canvasW || 3200;
+      canvasH = board.canvasH || 2400;
+      zoomLevel = 1;
 
       document.getElementById("homeView").style.display = "none";
       document.getElementById("editorView").classList.add("active");
@@ -748,7 +1019,7 @@
       titleInput.value = board.title;
       titleInput.readOnly = !isOwner;
 
-      document.getElementById("layoutSwitcher").value = board.layout || "mindmap";
+      document.getElementById("formatBadge").textContent = `${layoutEmoji(board.layout)} ${layoutLabel(board.layout)}`;
       document.getElementById("shareBtnLabel").textContent = board.condivisa ? "Condivisa 1BI" : "Privata";
       document.getElementById("shareToggleBtn").style.display = isOwner ? "inline-flex" : "none";
       document.getElementById("deleteBoardBtn").style.display = isOwner ? "inline-flex" : "none";
@@ -756,28 +1027,32 @@
       document.getElementById("connectModeBtn").style.display = isOwner && board.layout === "mindmap" ? "inline-flex" : "none";
 
       renderEditorWorkspace();
+      if (board.layout === "mindmap") {
+        requestAnimationFrame(() => centerViewportOnNodes(board));
+      }
     }
 
     document.getElementById("backToHomeBtn").addEventListener("click", () => {
       activeBoard = null;
-      document.getElementById("editorView").classList.remove("active");
+      document.getElementById("editorView").classList.remove("active", "fullscreen-mode");
       document.getElementById("homeView").style.display = "block";
       renderHomeGrid();
+    });
+
+    document.getElementById("fullscreenBtn").addEventListener("click", () => {
+      const shell = document.getElementById("editorView");
+      shell.classList.toggle("fullscreen-mode");
+      const isFull = shell.classList.contains("fullscreen-mode");
+      document.getElementById("fullscreenBtn").innerHTML = isFull
+        ? `<i data-lucide="minimize-2" style="width:15px;height:15px;"></i> Riduci`
+        : `<i data-lucide="maximize-2" style="width:15px;height:15px;"></i> Schermo Intero`;
+      if (window.lucide) lucide.createIcons();
     });
 
     document.getElementById("boardTitleInput").addEventListener("input", (e) => {
       if (!activeBoard) return;
       activeBoard.title = e.target.value;
       saveBoardNow(activeBoard);
-    });
-
-    document.getElementById("layoutSwitcher").addEventListener("change", (e) => {
-      if (!activeBoard) return;
-      activeBoard.layout = e.target.value;
-      const isOwner = currentUser && activeBoard.autoreUid === currentUser.uid;
-      document.getElementById("connectModeBtn").style.display = isOwner && activeBoard.layout === "mindmap" ? "inline-flex" : "none";
-      saveBoardNow(activeBoard);
-      renderEditorWorkspace();
     });
 
     document.getElementById("shareToggleBtn").addEventListener("click", () => {
@@ -797,13 +1072,86 @@
       document.getElementById("backToHomeBtn").click();
     });
 
+    // Controlli Zoom & Espansione Tela su tutti e 4 i lati
+    document.getElementById("zoomInBtn").addEventListener("click", () => {
+      zoomLevel = Math.min(1.6, +(zoomLevel + 0.15).toFixed(2));
+      applyViewportTransform();
+    });
+    document.getElementById("zoomOutBtn").addEventListener("click", () => {
+      zoomLevel = Math.max(0.45, +(zoomLevel - 0.15).toFixed(2));
+      applyViewportTransform();
+    });
+    document.getElementById("zoomResetBtn").addEventListener("click", () => {
+      zoomLevel = 1;
+      if (activeBoard) centerViewportOnNodes(activeBoard);
+    });
+    document.getElementById("expandAllSidesBtn").addEventListener("click", () => {
+      if (!activeBoard) return;
+      const pad = 450;
+      canvasW += pad * 2;
+      canvasH += pad * 2;
+      activeBoard.nodes.forEach(n => {
+        n.x = (n.x || 0) + pad;
+        n.y = (n.y || 0) + pad;
+      });
+      panX -= pad * zoomLevel;
+      panY -= pad * zoomLevel;
+      applyViewportTransform();
+      saveBoardNow(activeBoard);
+      renderEditorWorkspace();
+    });
+
+    // Pan dello sfondo della tela (mouse + touch)
+    const canvasWrap = document.getElementById("mindmapCanvasWrap");
+    let isPanning = false, panStartX = 0, panStartY = 0, origPanX = 0, origPanY = 0;
+
+    canvasWrap.addEventListener("mousedown", (e) => {
+      if (e.target.closest(".mm-node") || e.target.closest(".canvas-hud") || e.target.closest(".canvas-hint-badge")) return;
+      isPanning = true;
+      canvasWrap.classList.add("panning");
+      panStartX = e.clientX;
+      panStartY = e.clientY;
+      origPanX = panX;
+      origPanY = panY;
+    });
+    window.addEventListener("mousemove", (e) => {
+      if (!isPanning) return;
+      panX = origPanX + (e.clientX - panStartX);
+      panY = origPanY + (e.clientY - panStartY);
+      applyViewportTransform();
+    });
+    window.addEventListener("mouseup", () => {
+      if (isPanning) {
+        isPanning = false;
+        canvasWrap.classList.remove("panning");
+      }
+    });
+
+    canvasWrap.addEventListener("touchstart", (e) => {
+      if (e.target.closest(".mm-node") || e.target.closest(".canvas-hud")) return;
+      const t = e.touches[0];
+      isPanning = true;
+      panStartX = t.clientX;
+      panStartY = t.clientY;
+      origPanX = panX;
+      origPanY = panY;
+    }, { passive: true });
+    window.addEventListener("touchmove", (e) => {
+      if (!isPanning) return;
+      const t = e.touches[0];
+      panX = origPanX + (t.clientX - panStartX);
+      panY = origPanY + (t.clientY - panStartY);
+      applyViewportTransform();
+    }, { passive: true });
+    window.addEventListener("touchend", () => { isPanning = false; });
+
     document.getElementById("connectModeBtn").addEventListener("click", () => {
       connectMode = !connectMode;
       connectSourceId = null;
       const btn = document.getElementById("connectModeBtn");
       btn.classList.toggle("connect-active", connectMode);
       btn.innerHTML = connectMode
-        ? `<i data-lucide="git-branch" style="width:15px;height:15px;"></i> Clicca 1° nodo...`
+        ? `<i data-lucide="git-branch" style="width:15px;height:15px;"></i> Clicca 1° blocco...`
         : `<i data-lucide="git-branch" style="width:15px;height:15px;"></i> Collega Nodi`;
       if (window.lucide) lucide.createIcons();
       renderEditorWorkspace();
@@ -813,11 +1161,19 @@
       if (!activeBoard) return;
       const idx = activeBoard.nodes.length;
       const color = NODE_COLORS[idx % NODE_COLORS.length];
+
+      // Posiziona il nuovo blocco al centro della vista attuale
+      const rect = canvasWrap.getBoundingClientRect();
+      const centerX = Math.round(((rect.width || 800) / 2 - panX) / zoomLevel) - 120 + (idx % 3) * 35;
+      const centerY = Math.round(((rect.height || 500) / 2 - panY) / zoomLevel) - 60 + (idx % 3) * 35;
+
       const newNode = {
         id: "n_" + Date.now() + "_" + idx,
-        x: 180 + (idx % 4) * 250,
-        y: 140 + Math.floor(idx / 4) * 190,
+        x: Math.max(120, centerX),
+        y: Math.max(120, centerY),
         color,
+        emoji: NODE_EMOJIS[idx % NODE_EMOJIS.length],
+        style: "default",
         col: "Sezione " + ((idx % 3) + 1),
         title: "Nuovo Concetto",
         text: "Scrivi qui i dettagli..."
@@ -827,15 +1183,115 @@
       renderEditorWorkspace();
     });
 
+    // Esporta Mappa in PNG
+    document.getElementById("exportPngBtn").addEventListener("click", () => {
+      if (!activeBoard || !activeBoard.nodes.length) return;
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      activeBoard.nodes.forEach(n => {
+        minX = Math.min(minX, n.x || 0);
+        maxX = Math.max(maxX, (n.x || 0) + 250);
+        minY = Math.min(minY, n.y || 0);
+        maxY = Math.max(maxY, (n.y || 0) + 150);
+      });
+      const pad = 60;
+      const w = Math.max(600, maxX - minX + pad * 2);
+      const h = Math.max(400, maxY - minY + pad * 2);
+
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext("2d");
+
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, w, h);
+
+      // Linee
+      (activeBoard.edges || []).forEach(ed => {
+        const a = activeBoard.nodes.find(n => n.id === ed.from);
+        const b = activeBoard.nodes.find(n => n.id === ed.to);
+        if (!a || !b) return;
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(a.x - minX + pad + 122, a.y - minY + pad + 65);
+        ctx.lineTo(b.x - minX + pad + 122, b.y - minY + pad + 65);
+        ctx.stroke();
+      });
+
+      // Nodi
+      activeBoard.nodes.forEach(n => {
+        const nx = n.x - minX + pad;
+        const ny = n.y - minY + pad;
+        ctx.fillStyle = "#162033";
+        ctx.strokeStyle = n.color || "#38bdf8";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(nx, ny, 245, 130, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = n.color || "#0284c7";
+        ctx.fillRect(nx + 2, ny + 2, 241, 24);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 14px sans-serif";
+        ctx.fillText(`${n.emoji || ""} ${n.title || ""}`.slice(0, 30), nx + 12, ny + 48);
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "12px sans-serif";
+        ctx.fillText((n.text || "").slice(0, 36), nx + 12, ny + 74);
+      });
+
+      const link = document.createElement("a");
+      link.download = (activeBoard.title || "mappa-1bi").replace(/\s+/g, "_") + ".png";
+      link.href = c.toDataURL("image/png");
+      link.click();
+    });
+
+    function autoExpandBoundsIfNeeded(node) {
+      let expanded = false;
+      const step = 450;
+
+      // Espansione lato SINISTRO
+      if (node.x < 120) {
+        canvasW += step;
+        activeBoard.nodes.forEach(n => { n.x = (n.x || 0) + step; });
+        panX -= step * zoomLevel;
+        expanded = true;
+      }
+      // Espansione lato SUPERIORE
+      if (node.y < 120) {
+        canvasH += step;
+        activeBoard.nodes.forEach(n => { n.y = (n.y || 0) + step; });
+        panY -= step * zoomLevel;
+        expanded = true;
+      }
+      // Espansione lato DESTRO
+      if (node.x + 320 > canvasW) {
+        canvasW += step;
+        expanded = true;
+      }
+      // Espansione lato INFERIORE
+      if (node.y + 240 > canvasH) {
+        canvasH += step;
+        expanded = true;
+      }
+
+      if (expanded) {
+        applyViewportTransform();
+        renderMindmapNodes(true);
+      }
+    }
+
     function renderEditorWorkspace() {
       if (!activeBoard) return;
-      const canvasWrap = document.getElementById("mindmapCanvasWrap");
       const structWrap = document.getElementById("structuredBoardWrap");
       const isOwner = currentUser && activeBoard.autoreUid === currentUser.uid;
 
       if (activeBoard.layout === "mindmap") {
         canvasWrap.style.display = "block";
         structWrap.style.display = "none";
+        applyViewportTransform();
         renderMindmapNodes(isOwner);
       } else {
         canvasWrap.style.display = "none";
@@ -845,29 +1301,36 @@
     }
 
     function renderMindmapNodes(isOwner) {
-      const stage = document.getElementById("mindmapStage");
-      const svg = document.getElementById("mindmapSvg");
-      stage.querySelectorAll(".mm-node").forEach(n => n.remove());
+      const vp = document.getElementById("mindmapViewport");
+      vp.querySelectorAll(".mm-node").forEach(n => n.remove());
 
       activeBoard.nodes.forEach((node) => {
         const el = document.createElement("div");
-        el.className = "mm-node" + (connectSourceId === node.id ? " selected-source" : "");
+        const styleClass = node.style && node.style !== "default" ? ` style-${node.style}` : "";
+        el.className = "mm-node" + styleClass + (connectSourceId === node.id ? " selected-source" : "");
         el.style.left = (node.x || 100) + "px";
         el.style.top = (node.y || 100) + "px";
-        el.style.borderColor = node.color || "#38bdf8";
+        if (node.style !== "sticky") {
+          el.style.borderColor = node.color || "#38bdf8";
+        }
 
         el.innerHTML = `
           <div class="mm-node-header" style="background:${node.color || "#0284c7"};">
-            <span>⠿ Trascina</span>
+            <span>⠿ Sposta</span>
             ${isOwner ? `
-              <div style="display:flex; gap:6px; align-items:center;">
-                <button type="button" class="btn-color-node" title="Cambia colore" style="background:rgba(0,0,0,0.25); border:none; color:#fff; border-radius:6px; padding:1px 6px; cursor:pointer; font-size:0.7rem;">🎨</button>
-                <button type="button" class="btn-del-node" title="Elimina nodo" style="background:rgba(0,0,0,0.25); border:none; color:#fff; border-radius:6px; padding:1px 6px; cursor:pointer; font-size:0.7rem;">✕</button>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <button type="button" class="node-mini-btn btn-style-node" title="Cambia stile (Pillola, Post-it, Tratteggiato)">✨</button>
+                <button type="button" class="node-mini-btn btn-color-node" title="Cambia colore">🎨</button>
+                <button type="button" class="node-mini-btn btn-dup-node" title="Duplica blocco">📋</button>
+                <button type="button" class="node-mini-btn btn-del-node" title="Elimina blocco">✕</button>
               </div>
             ` : ""}
           </div>
           <div class="mm-node-body">
-            <input type="text" class="mm-node-title" value="${escapeHtml(node.title)}" ${isOwner ? "" : "readonly"} />
+            <div class="mm-node-title-row">
+              <button type="button" class="mm-emoji-btn" title="Cambia icona">${node.emoji || "🧠"}</button>
+              <input type="text" class="mm-node-title" value="${escapeHtml(node.title)}" ${isOwner ? "" : "readonly"} />
+            </div>
             <textarea class="mm-node-text" ${isOwner ? "" : "readonly"}>${escapeHtml(node.text)}</textarea>
           </div>
         `;
@@ -879,7 +1342,7 @@
 
           if (!connectSourceId) {
             connectSourceId = node.id;
-            document.getElementById("connectModeBtn").textContent = "Ora clicca il 2° nodo...";
+            document.getElementById("connectModeBtn").textContent = "Ora clicca il 2° blocco...";
             renderMindmapNodes(isOwner);
           } else if (connectSourceId !== node.id) {
             const existsIdx = activeBoard.edges.findIndex(
@@ -902,6 +1365,13 @@
         });
 
         if (isOwner) {
+          el.querySelector(".mm-emoji-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            const cur = NODE_EMOJIS.indexOf(node.emoji || "🧠");
+            node.emoji = NODE_EMOJIS[(cur + 1) % NODE_EMOJIS.length];
+            saveBoardNow(activeBoard);
+            renderMindmapNodes(isOwner);
+          });
           el.querySelector(".mm-node-title").addEventListener("input", (e) => {
             node.title = e.target.value;
             saveBoardNow(activeBoard);
@@ -910,10 +1380,29 @@
             node.text = e.target.value;
             saveBoardNow(activeBoard);
           });
+          el.querySelector(".btn-style-node")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const cur = NODE_STYLES.indexOf(node.style || "default");
+            node.style = NODE_STYLES[(cur + 1) % NODE_STYLES.length];
+            saveBoardNow(activeBoard);
+            renderMindmapNodes(isOwner);
+          });
           el.querySelector(".btn-color-node")?.addEventListener("click", (e) => {
             e.stopPropagation();
             const cur = NODE_COLORS.indexOf(node.color);
             node.color = NODE_COLORS[(cur + 1) % NODE_COLORS.length];
+            saveBoardNow(activeBoard);
+            renderMindmapNodes(isOwner);
+          });
+          el.querySelector(".btn-dup-node")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const copy = {
+              ...node,
+              id: "n_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
+              x: (node.x || 100) + 40,
+              y: (node.y || 100) + 40
+            };
+            activeBoard.nodes.push(copy);
             saveBoardNow(activeBoard);
             renderMindmapNodes(isOwner);
           });
@@ -925,7 +1414,7 @@
             renderMindmapNodes(isOwner);
           });
 
-          // Drag & Drop nodo (mouse + touch)
+          // Drag & Drop nodo con supporto Zoom & Auto-espansione 4 lati
           const header = el.querySelector(".mm-node-header");
           let dragging = false, startX = 0, startY = 0, origX = 0, origY = 0;
 
@@ -938,20 +1427,22 @@
           };
           const moveDrag = (clientX, clientY) => {
             if (!dragging) return;
-            node.x = Math.max(10, origX + (clientX - startX));
-            node.y = Math.max(10, origY + (clientY - startY));
+            node.x = Math.round(origX + (clientX - startX) / zoomLevel);
+            node.y = Math.round(origY + (clientY - startY) / zoomLevel);
             el.style.left = node.x + "px";
             el.style.top = node.y + "px";
-            drawSvgEdges();
+            drawSvgEdges(isOwner);
           };
           const endDrag = () => {
             if (!dragging) return;
             dragging = false;
+            autoExpandBoundsIfNeeded(node);
             saveBoardNow(activeBoard);
           };
 
           header.addEventListener("mousedown", (e) => {
             if (e.target.tagName === "BUTTON") return;
+            e.stopPropagation();
             startDrag(e.clientX, e.clientY);
           });
           window.addEventListener("mousemove", (e) => moveDrag(e.clientX, e.clientY));
@@ -959,6 +1450,7 @@
 
           header.addEventListener("touchstart", (e) => {
             if (e.target.tagName === "BUTTON") return;
+            e.stopPropagation();
             const t = e.touches[0];
             startDrag(t.clientX, t.clientY);
           }, { passive: true });
@@ -970,27 +1462,50 @@
           window.addEventListener("touchend", endDrag);
         }
 
-        stage.appendChild(el);
+        vp.appendChild(el);
       });
 
-      drawSvgEdges();
+      drawSvgEdges(isOwner);
     }
 
-    function drawSvgEdges() {
+    function drawSvgEdges(isOwner) {
       const svg = document.getElementById("mindmapSvg");
       if (!activeBoard || !svg) return;
-      const lines = (activeBoard.edges || []).map(ed => {
+      const defs = svg.querySelector("defs")?.outerHTML || "";
+
+      const lines = (activeBoard.edges || []).map((ed, idx) => {
         const a = activeBoard.nodes.find(n => n.id === ed.from);
         const b = activeBoard.nodes.find(n => n.id === ed.to);
         if (!a || !b) return "";
-        const x1 = (a.x || 0) + 115;
-        const y1 = (a.y || 0) + 60;
-        const x2 = (b.x || 0) + 115;
-        const y2 = (b.y || 0) + 60;
+        const x1 = (a.x || 0) + 122;
+        const y1 = (a.y || 0) + 65;
+        const x2 = (b.x || 0) + 122;
+        const y2 = (b.y || 0) + 65;
         const cx = (x1 + x2) / 2;
-        return `<path d="M ${x1} ${y1} Q ${cx} ${y1}, ${x2} ${y2}" stroke="#38bdf8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.85" />`;
+        const dPath = `M ${x1} ${y1} Q ${cx} ${y1}, ${x2} ${y2}`;
+        return `
+          <g class="edge-group" data-edge-idx="${idx}">
+            <path d="${dPath}" class="edge-hit-line" />
+            <path d="${dPath}" class="edge-visible-line" stroke="#38bdf8" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrowHead)" />
+          </g>
+        `;
       }).join("");
-      svg.innerHTML = lines;
+
+      svg.innerHTML = defs + lines;
+
+      if (isOwner) {
+        svg.querySelectorAll(".edge-group").forEach(g => {
+          g.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const idx = Number(g.dataset.edgeIdx);
+            if (!isNaN(idx)) {
+              activeBoard.edges.splice(idx, 1);
+              saveBoardNow(activeBoard);
+              drawSvgEdges(isOwner);
+            }
+          });
+        });
+      }
     }
 
     function renderStructuredBoard(isOwner) {
@@ -1006,7 +1521,7 @@
           <div class="columns-wrap">
             ${Object.entries(groups).map(([colName, items]) => `
               <div class="padlet-col">
-                <div style="font-weight:800; font-size:0.9rem; color:#38bdf8; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.08);">
+                <div style="font-weight:800; font-size:0.92rem; color:#38bdf8; padding-bottom:6px; border-bottom:1px solid var(--solid-border);">
                   ${escapeHtml(colName)}
                 </div>
                 ${items.map(n => renderCardItemHtml(n, isOwner, true)).join("")}
@@ -1055,9 +1570,9 @@
       return `
         <div class="padlet-card-item" style="border-top-color:${n.color || "#38bdf8"};">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
-            ${stepBadge ? `<span style="font-size:0.7rem; font-weight:800; color:#34d399;">${stepBadge}</span>` : ""}
+            ${stepBadge ? `<span style="font-size:0.72rem; font-weight:800; color:#34d399;">${stepBadge}</span>` : ""}
             ${showColInput && isOwner
-              ? `<input type="text" data-edit-col="${n.id}" value="${escapeHtml(n.col || "")}" style="font-size:0.72rem; background:rgba(255,255,255,0.06); border:none; color:var(--text-muted); border-radius:6px; padding:2px 6px; width:120px;" />`
+              ? `<input type="text" data-edit-col="${n.id}" value="${escapeHtml(n.col || "")}" style="font-size:0.74rem; background:var(--solid-sub); border:1px solid var(--solid-border); color:var(--text-muted); border-radius:6px; padding:2px 7px; width:130px;" />`
               : `<span></span>`}
             ${isOwner ? `<button type="button" data-del-card="${n.id}" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:800;">✕</button>` : ""}
           </div>
@@ -1081,7 +1596,6 @@
       if (!user) return;
       currentUser = user;
 
-      // Carica le mappe personali dell'utente (illimitate)
       const qMine = query(collection(db, "mindmaps_1bi"), where("autoreUid", "==", user.uid));
       onSnapshot(qMine, (snap) => {
         const list = [];
@@ -1091,7 +1605,6 @@
         if (!activeBoard && activeTab === "mine") renderHomeGrid();
       });
 
-      // Carica le mappe condivise dalla classe 1BI
       const qShared = query(collection(db, "mindmaps_1bi"), where("condivisa", "==", true));
       onSnapshot(qShared, (snap) => {
         const list = [];
