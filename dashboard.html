@@ -8,6 +8,242 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="js/theme.js"></script>
   <style>
+    /* =========================================================================
+       EDUHUB 1BI - ULTRA UI/UX UPGRADE PACK
+       ========================================================================= */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(7, 11, 20, 0.4); }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #38bdf8, #818cf8);
+      border-radius: 999px;
+    }
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Sfondo Aurora + Griglia Tech */
+    #eh-ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+      background-image: radial-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px);
+      background-size: 26px 26px;
+    }
+    html[data-theme="light"] #eh-ambient-bg {
+      background-image: radial-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px);
+    }
+    .eh-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(115px);
+      opacity: 0.26;
+      animation: ehFloatOrb 18s ease-in-out infinite alternate;
+    }
+    html[data-theme="light"] .eh-orb {
+      opacity: 0.14;
+    }
+    .eh-orb-1 { width: 460px; height: 460px; background: #2563eb; top: -120px; left: -90px; }
+    .eh-orb-2 { width: 420px; height: 420px; background: #7c3aed; bottom: -110px; right: -80px; animation-delay: -6s; }
+    .eh-orb-3 { width: 320px; height: 320px; background: #06b6d4; top: 42%; left: 48%; opacity: 0.14; animation-delay: -12s; }
+    @keyframes ehFloatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(45px, 35px) scale(1.12); }
+    }
+
+    /* Barra Progresso Scorrimento in alto */
+    #eh-scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #ec4899);
+      z-index: 9999;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.75);
+      transition: width 0.08s linear;
+    }
+
+    /* Topbar Glassmorphism + Pillola Orologio/Campanella */
+    .topbar {
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .topbar.eh-scrolled {
+      box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.65);
+    }
+    .eh-clock-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #7dd3fc;
+      font-size: 0.74rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    html[data-theme="light"] .eh-clock-pill {
+      background: rgba(14, 165, 233, 0.1);
+      color: #0369a1;
+      border-color: rgba(14, 165, 233, 0.3);
+    }
+    .eh-live-pulse {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+      animation: ehPulseDot 2s infinite;
+    }
+    @keyframes ehPulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.45); opacity: 0.45; }
+    }
+
+    /* Hero Banner Potenziato */
+    .welcome-banner {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(59, 130, 246, 0.35) !important;
+      box-shadow: 0 20px 45px -22px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .welcome-banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(56, 189, 248, 0.08) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: ehHeroShine 7.5s infinite;
+      pointer-events: none;
+    }
+    @keyframes ehHeroShine {
+      0%, 62% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .welcome-banner h2 {
+      background: linear-gradient(90deg, #ffffff 0%, #93c5fd 50%, #c4b5fd 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: ehTitleGradient 6s linear infinite;
+    }
+    html[data-theme="light"] .welcome-banner h2 {
+      background: linear-gradient(90deg, #0f172a 0%, #2563eb 55%, #7c3aed 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    @keyframes ehTitleGradient {
+      to { background-position: 200% center; }
+    }
+
+    /* Barra Livello XP + Mood + Spotify Live dentro Hero */
+    .eh-hero-meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .eh-xp-level-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #fde68a;
+    }
+    html[data-theme="light"] .eh-xp-level-box {
+      background: rgba(254, 243, 199, 0.75);
+      color: #92400e;
+    }
+    .eh-xp-bar-track {
+      width: 78px;
+      height: 6px;
+      border-radius: 99px;
+      background: rgba(148, 163, 184, 0.25);
+      overflow: hidden;
+    }
+    .eh-xp-bar-fill {
+      height: 100%;
+      width: 15%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #f59e0b, #fde047);
+      transition: width 0.5s ease;
+    }
+    .eh-mood-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(139, 92, 246, 0.16);
+      border: 1px solid rgba(167, 139, 250, 0.38);
+      color: #ddd6fe;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+    html[data-theme="light"] .eh-mood-btn {
+      color: #5b21b6;
+      background: rgba(139, 92, 246, 0.12);
+    }
+    .eh-mood-btn:hover { transform: translateY(-1px); }
+
+    .eh-spotify-live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(29, 185, 84, 0.14);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      color: #86efac;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-decoration: none;
+      max-width: 310px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: transform 0.18s ease;
+    }
+    html[data-theme="light"] .eh-spotify-live-pill {
+      color: #15803d;
+      background: rgba(34, 197, 94, 0.12);
+    }
+    .eh-spotify-live-pill:hover { transform: translateY(-1px); }
+    .eh-eq-bars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+    .eh-eq-bars span {
+      width: 2.5px;
+      background: #4ade80;
+      border-radius: 2px;
+      animation: ehEq 0.9s ease-in-out infinite alternate;
+    }
+    .eh-eq-bars span:nth-child(2) { animation-delay: 0.25s; }
+    .eh-eq-bars span:nth-child(3) { animation-delay: 0.5s; }
+    @keyframes ehEq {
+      0% { height: 3px; }
+      100% { height: 12px; }
+    }
+
     /* STREAK GIORNALIERA & MISSIONI LAMPO */
     .streak-missions-grid {
       display: grid;
@@ -133,9 +369,7 @@
       text-decoration: none;
       transition: transform 0.2s ease;
     }
-    .crate-pill-btn:hover {
-      transform: translateY(-2px);
-    }
+    .crate-pill-btn:hover { transform: translateY(-2px); }
 
     .wrapped-pill-btn {
       display: inline-flex;
@@ -151,24 +385,251 @@
       text-decoration: none;
       transition: transform 0.2s ease;
     }
-    .wrapped-pill-btn:hover {
-      transform: translateY(-2px);
+    .wrapped-pill-btn:hover { transform: translateY(-2px); }
+
+    /* Sticky Filter Bar + Ricerca Rapida */
+    .eh-sticky-filter-bar {
+      position: sticky;
+      top: 66px;
+      z-index: 40;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 20px 0 18px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(11, 17, 32, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      align-items: center;
+      box-shadow: 0 10px 25px -12px rgba(0, 0, 0, 0.55);
+    }
+    html[data-theme="light"] .eh-sticky-filter-bar {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(15, 23, 42, 0.1);
+    }
+    .eh-search-box {
+      position: relative;
+      margin-left: auto;
+      min-width: 220px;
+      flex: 1 1 220px;
+      max-width: 290px;
+    }
+    .eh-search-box input {
+      width: 100%;
+      padding: 7px 54px 7px 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.65);
+      color: var(--text-main, #f8fafc);
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    html[data-theme="light"] .eh-search-box input {
+      background: rgba(241, 245, 249, 0.9);
+      color: #0f172a;
+    }
+    .eh-search-box input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+    }
+    .eh-search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.76rem;
+      opacity: 0.65;
+      pointer-events: none;
+    }
+    .eh-search-kbd {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Spotlight Hover & Bottone Stella Preferiti sulle Card (senza cambiare design card) */
+    .hub-card {
+      position: relative;
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, border-color 0.24s ease !important;
+    }
+    .hub-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.28s ease;
+      background: radial-gradient(
+        240px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(56, 189, 248, 0.13),
+        transparent 70%
+      );
+    }
+    .hub-card:hover::after {
+      opacity: 1;
+    }
+    .eh-fav-star {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.55);
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.18s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+    html[data-theme="light"] .eh-fav-star {
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .hub-card:hover .eh-fav-star,
+    .eh-fav-star.is-fav {
+      opacity: 1;
+    }
+    .eh-fav-star.is-fav {
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.55);
+      background: rgba(251, 191, 36, 0.14);
+    }
+    .eh-fav-star:hover {
+      transform: scale(1.12);
+    }
+
+    /* Command Palette Ctrl+K & Modale Scorciatoie */
+    .eh-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 10vh;
+    }
+    .eh-modal-backdrop.open { display: flex; }
+    .eh-cmd-box {
+      width: min(560px, 92vw);
+      border-radius: 20px;
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+      overflow: hidden;
+      color: #f8fafc;
+    }
+    html[data-theme="light"] .eh-cmd-box {
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .eh-cmd-input {
+      width: 100%;
+      padding: 16px 18px;
+      border: none;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      background: transparent;
+      color: inherit;
+      font-size: 0.96rem;
+      font-weight: 700;
+      outline: none;
+    }
+    .eh-cmd-results {
+      max-height: 330px;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .eh-cmd-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      transition: background 0.15s ease;
+    }
+    .eh-cmd-item:hover, .eh-cmd-item.selected {
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+    }
+
+    /* Toast Notifiche Rapide */
+    #eh-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 99999;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #f8fafc;
+      font-size: 0.82rem;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+    #eh-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     @media (max-width: 860px) {
-      .streak-missions-grid {
-        grid-template-columns: 1fr;
-      }
+      .streak-missions-grid { grid-template-columns: 1fr; }
+      .eh-clock-pill { display: none; }
+      .eh-sticky-filter-bar { top: 58px; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
+  <!-- Sfondo Aurora + Barra Progresso -->
+  <div id="eh-ambient-bg">
+    <div class="eh-orb eh-orb-1"></div>
+    <div class="eh-orb eh-orb-2"></div>
+    <div class="eh-orb eh-orb-3"></div>
+  </div>
+  <div id="eh-scroll-progress"></div>
+
+  <header class="topbar" id="mainTopbar">
     <div class="topbar-left">
-      <a href="dashboard.html" class="topbar-logo">EDUHUB</a>
+      <a href="dashboard.html" class="topbar-logo" id="eduhubLogo">EDUHUB</a>
       <span class="topbar-sub">Classe 1BI</span>
     </div>
     <div class="topbar-right">
+      <div class="eh-clock-pill" id="ehClockBellPill" title="Orario e conto alla rovescia campanella 1BI">
+        <span class="eh-live-pulse"></span>
+        <span id="ehClockText">--:--</span>
+        <span>•</span>
+        <span id="ehBellText">1BI</span>
+      </div>
       <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
       <span class="badge-role">1BI</span>
       <a href="profilo.html" class="profile-pill" data-track="profilo" title="Apri il tuo profilo">
@@ -184,7 +645,28 @@
       <div>
         <h2>Bentornato, <span id="welcomeUserName">Studente</span>!</h2>
         <p>Strumenti digitali condivisi per la <strong>1BI Informatica</strong> • Clicca sul tuo nome in alto per il profilo</p>
+
+        <!-- Barra Livello XP + Mood Rapido + Spotify Live Classe -->
+        <div class="eh-hero-meta-strip">
+          <div class="eh-xp-level-box" title="Il tuo livello XP accumulato su EduHub">
+            <span id="ehLevelLabel">⭐ Lv. 1 • Novizio 1BI</span>
+            <div class="eh-xp-bar-track">
+              <div class="eh-xp-bar-fill" id="ehLevelProgressFill"></div>
+            </div>
+            <span id="ehLevelNextText">0/250</span>
+          </div>
+
+          <button type="button" class="eh-mood-btn" id="ehMoodToggleBtn" title="Clicca per cambiare il tuo stato rapido">
+            <span id="ehMoodText">💻 Modalità Coding</span>
+          </button>
+
+          <a href="modules/wrapped-stats.html" class="eh-spotify-live-pill" id="ehSpotifyLivePill" data-track="wrapped" title="Apri Wrapped & Classifica Spotify 1BI">
+            <span class="eh-eq-bars"><span></span><span></span><span></span></span>
+            <span id="ehSpotifyLiveText">Spotify 1BI Sync 24h/24 Attivo</span>
+          </a>
+        </div>
       </div>
+
       <div class="banner-actions-right">
         <a href="modules/wrapped-stats.html" class="wrapped-pill-btn" data-track="wrapped" title="Apri il tuo Wrapped 1BI, i record della classe e la classifica Spotify">
           <span>📊 Wrapped & Spotify 1BI</span>
@@ -313,10 +795,13 @@
       </div>
     </a>
 
-    <!-- BARRA FILTRO RAPIDO SEZIONI -->
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin: 20px 0 16px; align-items:center;">
+    <!-- BARRA FILTRO RAPIDO SEZIONI + RICERCA ISTANTANEA STICKY -->
+    <div class="eh-sticky-filter-bar">
       <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:7px 15px; border-radius:999px; border:1px solid #38bdf8; background:rgba(56,189,248,0.18); color:#38bdf8; font-weight:800; font-size:0.78rem; cursor:pointer;">
         Tutte (27)
+      </button>
+      <button type="button" class="dash-filter-btn" data-cat="favorites" id="favFilterBtn" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
+        ⭐ Preferiti (<span id="favCountNum">0</span>)
       </button>
       <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
         📚 Didattica & Studio
@@ -330,6 +815,12 @@
       <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
         🎮 Arena, Casse XP & Svago
       </button>
+
+      <div class="eh-search-box">
+        <span class="eh-search-icon">🔍</span>
+        <input type="text" id="ehInlineSearchInput" placeholder="Cerca strumento..." autocomplete="off" />
+        <span class="eh-search-kbd">Ctrl K</span>
+      </div>
     </div>
 
     <!-- SEZIONE 1: DIDATTICA & STUDIO -->
@@ -588,6 +1079,32 @@
     </a>
   </main>
 
+  <!-- COMMAND PALETTE (CTRL + K) -->
+  <div class="eh-modal-backdrop" id="ehCmdModal">
+    <div class="eh-cmd-box">
+      <input type="text" class="eh-cmd-input" id="ehCmdInput" placeholder="⚡ Vai subito a uno strumento (es. Verifiche, AI, Basi, Spotify)..." autocomplete="off" />
+      <div class="eh-cmd-results" id="ehCmdResults"></div>
+    </div>
+  </div>
+
+  <!-- MODALE SCORCIATOIE (?) -->
+  <div class="eh-modal-backdrop" id="ehHelpModal">
+    <div class="eh-cmd-box" style="padding: 20px 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <strong style="font-size:1rem;">⌨️ Scorciatoie & Segreti EduHub 1BI</strong>
+        <button type="button" id="ehCloseHelpBtn" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:0.84rem;">
+        <div><strong>Ctrl + K</strong> → Apre la Command Palette per saltare ovunque</div>
+        <div><strong>?</strong> → Mostra questa guida rapida</div>
+        <div><strong>⭐ Stellina sulle card</strong> → Salva gli strumenti nei tuoi Preferiti</div>
+        <div><strong>5 click su EDUHUB</strong> → Attiva la pioggia di particelle neon</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="eh-toast"></div>
+
   <script type="module" src="js/auth.js"></script>
   <script type="module">
     import { db, auth } from "./js/firebase-config.js";
@@ -595,7 +1112,85 @@
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { collection, doc, onSnapshot, query, orderBy, limit, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Filtro rapido sezioni dashboard
+    function showToast(msg) {
+      const t = document.getElementById("eh-toast");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove("show"), 2600);
+    }
+
+    // =========================================================================
+    // 1. PREFERITI (STELLINE SULLE CARD), FILTRI & RICERCA ISTANTANEA
+    // =========================================================================
+    let favTools = JSON.parse(localStorage.getItem("eduhub_fav_tools") || "[]");
+    let currentCat = "all";
+    let currentSearch = "";
+
+    function updateFavCount() {
+      const el = document.getElementById("favCountNum");
+      if (el) el.textContent = favTools.length;
+    }
+
+    document.querySelectorAll(".hub-card").forEach(card => {
+      const key = card.dataset.track || card.getAttribute("href");
+      const star = document.createElement("button");
+      star.type = "button";
+      star.className = "eh-fav-star" + (favTools.includes(key) ? " is-fav" : "");
+      star.title = "Aggiungi o rimuovi dai Preferiti";
+      star.textContent = favTools.includes(key) ? "★" : "☆";
+      star.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (favTools.includes(key)) {
+          favTools = favTools.filter(x => x !== key);
+          star.classList.remove("is-fav");
+          star.textContent = "☆";
+          showToast("Rimosso dai Preferiti");
+        } else {
+          favTools.push(key);
+          star.classList.add("is-fav");
+          star.textContent = "★";
+          showToast("⭐ Aggiunto ai Preferiti!");
+        }
+        localStorage.setItem("eduhub_fav_tools", JSON.stringify(favTools));
+        updateFavCount();
+        applyDashboardFilters();
+      });
+      card.appendChild(star);
+
+      // Effetto Spotlight al passaggio del mouse
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+        card.style.setProperty("--my", `${e.clientY - rect.top}px`);
+      });
+    });
+    updateFavCount();
+
+    function applyDashboardFilters() {
+      const q = currentSearch.trim().toLowerCase();
+      document.querySelectorAll(".dash-section").forEach(sec => {
+        const secCat = sec.dataset.section;
+        const catMatches = (currentCat === "all" || currentCat === "favorites" || secCat === currentCat);
+        if (!catMatches) {
+          sec.style.display = "none";
+          return;
+        }
+        let visibleCards = 0;
+        sec.querySelectorAll(".hub-card").forEach(card => {
+          const key = card.dataset.track || card.getAttribute("href");
+          const isFavOk = currentCat !== "favorites" || favTools.includes(key);
+          const isSearchOk = !q || card.textContent.toLowerCase().includes(q);
+          const show = isFavOk && isSearchOk;
+          card.style.display = show ? "" : "none";
+          if (show) visibleCards++;
+        });
+        sec.style.display = visibleCards > 0 ? "block" : "none";
+      });
+    }
+
     document.querySelectorAll(".dash-filter-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".dash-filter-btn").forEach(b => {
@@ -606,20 +1201,219 @@
         btn.style.borderColor = "#38bdf8";
         btn.style.background = "rgba(56,189,248,0.18)";
         btn.style.color = "#38bdf8";
-
-        const cat = btn.dataset.cat;
-        document.querySelectorAll(".dash-section").forEach(sec => {
-          sec.style.display = (cat === "all" || sec.dataset.section === cat) ? "block" : "none";
-        });
+        currentCat = btn.dataset.cat;
+        applyDashboardFilters();
       });
     });
 
-    // Avvia widget flottante Rubrica Compagni 1BI (in basso a sinistra)
-    initCompagniWidget();
+    const inlineSearch = document.getElementById("ehInlineSearchInput");
+    if (inlineSearch) {
+      inlineSearch.addEventListener("input", () => {
+        currentSearch = inlineSearch.value;
+        applyDashboardFilters();
+      });
+    }
 
     // =========================================================================
-    // STREAK GIORNALIERA & 32 MISSIONI LAMPO A ROTAZIONE GIORNALIERA
+    // 2. COMMAND PALETTE (CTRL + K) & SCORCIATOIE (?)
     // =========================================================================
+    const allToolsList = Array.from(document.querySelectorAll(".hub-card")).map(c => ({
+      title: c.querySelector("h3")?.textContent.trim() || "Strumento",
+      desc: c.querySelector("p")?.textContent.trim() || "",
+      href: c.getAttribute("href")
+    }));
+    allToolsList.unshift(
+      { title: "📊 Wrapped & Spotify 1BI", desc: "Classifica ascolti e statistiche Spotify live", href: "modules/wrapped-stats.html" },
+      { title: "🕒 Orario Scolastico 1BI", desc: "Tabella oraria ufficiale e laboratori", href: "modules/orario.html" },
+      { title: "📢 Bacheca di Classe", desc: "Avvisi e comunicazioni ufficiali", href: "modules/bacheca.html" },
+      { title: "🏆 Classifica Contributori XP", desc: "Podio studenti della 1BI", href: "modules/classifica.html" }
+    );
+
+    const cmdModal = document.getElementById("ehCmdModal");
+    const cmdInput = document.getElementById("ehCmdInput");
+    const cmdResults = document.getElementById("ehCmdResults");
+    const helpModal = document.getElementById("ehHelpModal");
+    let cmdIdx = 0;
+
+    function renderCmdResults(q = "") {
+      const term = q.trim().toLowerCase();
+      const filtered = allToolsList.filter(t =>
+        !term || t.title.toLowerCase().includes(term) || t.desc.toLowerCase().includes(term)
+      ).slice(0, 8);
+      cmdIdx = 0;
+      cmdResults.innerHTML = filtered.length
+        ? filtered.map((item, i) => `
+            <a href="${item.href}" class="eh-cmd-item ${i === 0 ? "selected" : ""}">
+              <span>${item.title}</span>
+              <span style="font-size:0.74rem; opacity:0.65;">Apri ↵</span>
+            </a>
+          `).join("")
+        : `<div style="padding:14px; text-align:center; opacity:0.6; font-size:0.84rem;">Nessuno strumento trovato</div>`;
+    }
+
+    function openCmdModal() {
+      cmdModal.classList.add("open");
+      cmdInput.value = "";
+      renderCmdResults("");
+      setTimeout(() => cmdInput.focus(), 30);
+    }
+
+    cmdInput.addEventListener("input", () => renderCmdResults(cmdInput.value));
+    cmdInput.addEventListener("keydown", (e) => {
+      const items = Array.from(cmdResults.querySelectorAll(".eh-cmd-item"));
+      if (!items.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        cmdIdx = (cmdIdx + 1) % items.length;
+        items.forEach((el, i) => el.classList.toggle("selected", i === cmdIdx));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        cmdIdx = (cmdIdx - 1 + items.length) % items.length;
+        items.forEach((el, i) => el.classList.toggle("selected", i === cmdIdx));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        items[cmdIdx]?.click();
+      }
+    });
+
+    cmdModal.addEventListener("click", (e) => { if (e.target === cmdModal) cmdModal.classList.remove("open"); });
+    helpModal.addEventListener("click", (e) => { if (e.target === helpModal) helpModal.classList.remove("open"); });
+    document.getElementById("ehCloseHelpBtn").addEventListener("click", () => helpModal.classList.remove("open"));
+
+    window.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        cmdModal.classList.contains("open") ? cmdModal.classList.remove("open") : openCmdModal();
+      } else if (e.key === "Escape") {
+        cmdModal.classList.remove("open");
+        helpModal.classList.remove("open");
+      } else if (e.key === "?" && !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) {
+        helpModal.classList.toggle("open");
+      }
+    });
+
+    // =========================================================================
+    // 3. OROLOGIO LIVE, CAMPANELLA 1BI, MOOD & SCROLL PROGRESS
+    // =========================================================================
+    function updateClockAndBell() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const clockEl = document.getElementById("ehClockText");
+      const bellEl = document.getElementById("ehBellText");
+      if (clockEl) clockEl.textContent = `${hh}:${mm}`;
+
+      const day = now.getDay();
+      const mins = now.getHours() * 60 + now.getMinutes();
+      const slots = [
+        { start: 480, end: 540, label: "1ª Ora" },
+        { start: 540, end: 600, label: "2ª Ora" },
+        { start: 600, end: 650, label: "3ª Ora" },
+        { start: 650, end: 665, label: "Ricreazione ☕" },
+        { start: 665, end: 720, label: "4ª Ora" },
+        { start: 720, end: 780, label: "5ª Ora" },
+        { start: 780, end: 840, label: "6ª Ora" }
+      ];
+      let msg = "1BI Online";
+      if (day === 0) msg = "Domenica";
+      else if (mins < 480) msg = `Campanella tra ${480 - mins}m`;
+      else if (mins >= 840) msg = "Pomeriggio 1BI";
+      else {
+        const s = slots.find(x => mins >= x.start && mins < x.end);
+        msg = s ? `${s.label} (-${s.end - mins}m)` : "In Classe";
+      }
+      if (bellEl) bellEl.textContent = msg;
+    }
+    updateClockAndBell();
+    setInterval(updateClockAndBell, 15000);
+
+    // Mood rapido ciclico
+    const MOODS = [
+      "💻 Modalità Coding",
+      "📚 Studio per Verifica",
+      "🎧 Musica & Chill",
+      "🔥 Focus Massimo",
+      "☕ Pausa Caffè",
+      "🚀 Pronto a spaccare"
+    ];
+    let moodIndex = Number(localStorage.getItem("eduhub_mood_idx") || 0) % MOODS.length;
+    const moodTextEl = document.getElementById("ehMoodText");
+    if (moodTextEl) moodTextEl.textContent = MOODS[moodIndex];
+    document.getElementById("ehMoodToggleBtn")?.addEventListener("click", () => {
+      moodIndex = (moodIndex + 1) % MOODS.length;
+      localStorage.setItem("eduhub_mood_idx", String(moodIndex));
+      moodTextEl.textContent = MOODS[moodIndex];
+      showToast(`Stato aggiornato: ${MOODS[moodIndex]}`);
+    });
+
+    // Barra progresso scroll + ombra topbar
+    const topbarEl = document.getElementById("mainTopbar");
+    const scrollBarEl = document.getElementById("eh-scroll-progress");
+    window.addEventListener("scroll", () => {
+      const st = window.scrollY;
+      const dh = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollBarEl) scrollBarEl.style.width = (dh > 0 ? (st / dh) * 100 : 0) + "%";
+      if (topbarEl) topbarEl.classList.toggle("eh-scrolled", st > 10);
+    }, { passive: true });
+
+    // =========================================================================
+    // 4. EASTER EGG NEON CONFETTI (5 CLICK SU EDUHUB O KONAMI CODE)
+    // =========================================================================
+    function launchNeonConfetti() {
+      showToast("🎉 Modalità Party 1BI attivata!");
+      const colors = ["#38bdf8", "#818cf8", "#ec4899", "#22c55e", "#f59e0b"];
+      for (let i = 0; i < 70; i++) {
+        const p = document.createElement("div");
+        const size = Math.random() * 8 + 5;
+        p.style.cssText = `
+          position: fixed; top: -12px; left: ${Math.random() * 100}vw;
+          width: ${size}px; height: ${size}px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          border-radius: ${Math.random() > 0.5 ? "50%" : "3px"};
+          z-index: 99999; pointer-events: none;
+          transition: transform ${1.5 + Math.random() * 1.4}s cubic-bezier(.15,.8,.3,1), opacity 2.4s ease;
+        `;
+        document.body.appendChild(p);
+        requestAnimationFrame(() => {
+          p.style.transform = `translate(${(Math.random() - 0.5) * 260}px, ${window.innerHeight + 40}px) rotate(${Math.random() * 720}deg)`;
+          p.style.opacity = "0";
+        });
+        setTimeout(() => p.remove(), 3000);
+      }
+    }
+
+    let logoClicks = 0;
+    let logoTimer = null;
+    document.getElementById("eduhubLogo")?.addEventListener("click", (e) => {
+      logoClicks++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => { logoClicks = 0; }, 1200);
+      if (logoClicks >= 5) {
+        logoClicks = 0;
+        e.preventDefault();
+        launchNeonConfetti();
+      }
+    });
+
+    const konami = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let kPos = 0;
+    window.addEventListener("keydown", (e) => {
+      if (e.key === konami[kPos]) {
+        kPos++;
+        if (kPos === konami.length) {
+          kPos = 0;
+          launchNeonConfetti();
+        }
+      } else {
+        kPos = 0;
+      }
+    });
+
+    // =========================================================================
+    // 5. WIDGET COMPAGNI, STREAK GIORNALIERA & 32 MISSIONI LAMPO (ORIGINALE)
+    // =========================================================================
+    initCompagniWidget();
+
     let currentUser = null;
     let userProfileData = {};
 
@@ -633,7 +1427,6 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     }
 
-    // Mega-catalogo di 32 Missioni Lampo (ne vengono sorteggiate 3 diverse ogni giorno!)
     const MISSION_POOL = [
       { id: "m_casse", track: "casse", label: "🎰 Visita la Sala Casse & Ruota XP", xp: 30, href: "modules/casse-xp.html" },
       { id: "m_shop", track: "shop", label: "✨ Controlla le novità nel Negozio XP", xp: 25, href: "modules/negozio-xp.html" },
@@ -669,14 +1462,12 @@
       { id: "m_wrapped", track: "wrapped", label: "📊 Controlla il tuo Wrapped & Classifica Spotify 1BI", xp: 30, href: "modules/wrapped-stats.html" }
     ];
 
-    // Seleziona 3 missioni diverse in modo deterministico in base alla data odierna
     function getTodaysMissions() {
       const dateStr = getTodayKey();
       let seed = 0;
       for (let i = 0; i < dateStr.length; i++) {
         seed = (seed * 31 + dateStr.charCodeAt(i)) >>> 0;
       }
-
       const poolCopy = [...MISSION_POOL];
       const selected = [];
       for (let i = 0; i < 3; i++) {
@@ -687,7 +1478,6 @@
       return selected;
     }
 
-    // Traccia automaticamente quando lo studente apre qualsiasi sezione della dashboard
     document.querySelectorAll("[data-track]").forEach(el => {
       el.addEventListener("click", () => {
         const trackKey = el.dataset.track;
@@ -696,6 +1486,21 @@
         }
       });
     });
+
+    function updateHeroLevelBar(curXp) {
+      const level = Math.floor(curXp / 250) + 1;
+      const inLevelXp = curXp % 250;
+      const pct = Math.min(100, Math.round((inLevelXp / 250) * 100));
+      const ranks = ["Novizio 1BI", "Coder 1BI", "Hacker Jr.", "Pro Dev 1BI", "Architetto", "Leggenda 1BI"];
+      const rankTitle = ranks[Math.min(level - 1, ranks.length - 1)];
+
+      const lbl = document.getElementById("ehLevelLabel");
+      const fill = document.getElementById("ehLevelProgressFill");
+      const next = document.getElementById("ehLevelNextText");
+      if (lbl) lbl.textContent = `⭐ Lv. ${level} • ${rankTitle}`;
+      if (fill) fill.style.width = `${pct}%`;
+      if (next) next.textContent = `${inLevelXp}/250 XP`;
+    }
 
     function renderStreakAndMissions() {
       const today = getTodayKey();
@@ -731,6 +1536,7 @@
 
       const curXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0);
       document.getElementById("missionsXpWalletBadge").textContent = `Saldo: ${curXp} XP`;
+      updateHeroLevelBar(curXp);
 
       const todaysMissions = getTodaysMissions();
       const claimedMissions = Array.isArray(userProfileData.claimedMissionsToday?.[today])
@@ -779,6 +1585,7 @@
             punti: latestXp,
             claimedMissionsToday: { [today]: updatedList }
           }, { merge: true });
+          showToast(`⚡ Missione completata! +${m.xp} XP`);
         });
       });
     }
@@ -802,6 +1609,7 @@
         streakCount: newStreak,
         lastStreakDate: today
       }, { merge: true });
+      showToast(`🔥 Streak Giorno ${newStreak} riscattata! +${bonusXp} XP`);
     });
 
     onAuthStateChanged(auth, (user) => {
@@ -813,7 +1621,7 @@
       });
     });
 
-    // 1. Ultimo Annuncio in Bacheca
+    // 6. Ultimo Annuncio in Bacheca
     const qBach = query(collection(db, "bacheca_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qBach, (snap) => {
       const titleEl = document.getElementById("latestBachecaTitle");
@@ -831,7 +1639,7 @@
       subEl.textContent = dataStr ? `Pubblicato da ${autore} il ${dataStr}` : `Pubblicato da ${autore}`;
     });
 
-    // 2. Controllo nuovi messaggi non letti nella Chat 1BI
+    // 7. Controllo nuovi messaggi non letti nella Chat 1BI
     const qLastMsg = query(collection(db, "chat_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qLastMsg, (snap) => {
       if (snap.empty) return;
@@ -839,6 +1647,24 @@
       const lastSeen = localStorage.getItem("eduhub_last_chat_seen") || "";
       if (lastMsgTime && lastMsgTime > lastSeen) {
         document.getElementById("chatUnreadDot").style.display = "inline-block";
+      }
+    });
+
+    // 8. Pillola Live Spotify 1BI collegata al Worker 24h/24 su Firestore
+    onSnapshot(collection(db, "spotify_stats_1bi"), (snap) => {
+      const pillText = document.getElementById("ehSpotifyLiveText");
+      if (!pillText) return;
+      const playingDocs = snap.docs
+        .map(d => d.data())
+        .filter(d => d && d.isPlaying && d.nowTrack);
+
+      if (playingDocs.length > 0) {
+        const first = playingDocs[0];
+        const who = first.displayName || first.nome || "1BI";
+        const extra = playingDocs.length > 1 ? ` (+${playingDocs.length - 1})` : "";
+        pillText.textContent = `🎵 ${who}: ${first.nowTrack}${extra}`;
+      } else {
+        pillText.textContent = "Spotify 1BI Sync 24h/24 Attivo";
       }
     });
   </script>
