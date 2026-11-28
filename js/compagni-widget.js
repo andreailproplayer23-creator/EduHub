@@ -1,7 +1,5 @@
 import { db } from "./firebase-config.js";
-import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { db, auth } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { collection, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const REP_EMAILS = [
@@ -60,6 +58,8 @@ function isUserOnline(u) {
 export function initCompagniWidget() {
   if (document.getElementById("compagniFloatingBtn")) return;
 
+  // Heartbeat stato online in tempo reale
+  const auth = getAuth();
   let heartbeatTimer = null;
   onAuthStateChanged(auth, (user) => {
     if (!user) return;
