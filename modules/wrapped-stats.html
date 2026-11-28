@@ -414,7 +414,7 @@
           <div>
             <h3 style="font-size: 1.08rem; font-weight: 900;">📻 In Ascolto in Questo Momento (Live 1BI)</h3>
             <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Aggiornato automaticamente ogni 10 secondi: mostra brano, autori ufficiali e playlist per chi sta ascoltando, oppure <strong>In pausa</strong>.
+              Aggiornato automaticamente: mostra brano, autori ufficiali e playlist per chi sta ascoltando, oppure <strong>In pausa</strong>.
             </p>
           </div>
           <span id="liveListenersCountBadge" style="font-size:0.76rem; font-weight:900; padding:4px 11px; border-radius:999px; background:rgba(29,185,84,0.16); color:#4ade80;">
@@ -640,7 +640,7 @@
       return null;
     }
 
-    // Rinnova automaticamente il token OAuth PKCE se scaduto
+    // Rinnova automaticamente il token OAuth PKCE se scaduto e lo salva su Firestore
     async function getValidSpotifyAccessToken() {
       const accessToken = localStorage.getItem("spoti_access_token");
       const refreshToken = localStorage.getItem("spoti_refresh_token");
@@ -667,6 +667,11 @@
           localStorage.setItem("spoti_access_token", data.access_token);
           if (data.refresh_token) {
             localStorage.setItem("spoti_refresh_token", data.refresh_token);
+            if (currentUser) {
+              await setDoc(doc(db, "spotify_stats_1bi", currentUser.uid), {
+                refreshToken: data.refresh_token
+              }, { merge: true });
+            }
           }
           localStorage.setItem("spoti_token_expires_at", String(Date.now() + (data.expires_in || 3600) * 1000));
           return data.access_token;
@@ -770,7 +775,6 @@
         const totalMs = items.reduce((acc, it) => acc + (it.track?.duration_ms || 0), 0);
         minutesWeek = Math.round(totalMs / 60000);
 
-        // Calcola l'artista più ascoltato della settimana sommando i ms reali di ogni brano
         const artistMsMap = {};
         items.forEach(it => {
           const dur = it.track?.duration_ms || 0;
@@ -784,11 +788,12 @@
 
         const latestTrack = items[0]?.track;
         topTrack = isPlaying ? nowTrack : (latestTrack?.name || "Nessun brano recente");
-        // Se sta ascoltando ora, mostra gli autori esatti del brano attuale; altrimenti gli autori esatti dell'ultimo brano
         const exactLatestArtists = isPlaying ? nowArtists : formatTrackArtists(latestTrack);
         topArtist = sortedArtists[0]?.[0] || exactLatestArtists;
         trackUrl = isPlaying ? nowTrackUrl : (latestTrack?.external_urls?.spotify || "");
       }
+
+      const savedRefresh = localStorage.getItem("spoti_refresh_token") || "";
 
       const payload = {
         uid: user.uid,
@@ -804,6 +809,10 @@
         source: "oauth",
         updatedAt: serverTimestamp()
       };
+
+      if (savedRefresh) {
+        payload.refreshToken = savedRefresh;
+      }
 
       if (minutesWeek !== null) {
         payload.minutesWeek = minutesWeek;
@@ -1038,13 +1047,12 @@
         document.getElementById("configSpotifyClientBtn").style.display = "inline-flex";
       }
 
-      // A) BACHECA LIVE: TUTTI GLI UTENTI CON SPOTIFY COLLEGATO (IN ASCOLTO ORA vs IN PAUSA)
       const connectedUsers = students
         .filter(s => s.spoti !== null)
         .sort((a, b) => Number(Boolean(b.spoti.isPlaying)) - Number(Boolean(a.spoti.isPlaying)) || b.spotiMinutes - a.spotiMinutes);
 
       const playingCount = connectedUsers.filter(s => s.spoti.isPlaying).length;
-      document.getElementById("liveListenersCountBadge").textContent = `${playingCount} ${playingCount === 1 ? "in ascolto ora" : "in ascolto ora"}`;
+      document.getElementById("liveListenersCountBadge").textContent = `${playingCount} in ascolto ora`;
 
       const nowGrid = document.getElementById("classNowPlayingGrid");
       if (connectedUsers.length === 0) {
@@ -1103,7 +1111,6 @@
         }).join("");
       }
 
-      // B) CLASSIFICA SETTIMANALE PER MINUTI ASCOLTATI
       const listeners = students
         .filter(s => s.spotiCurrentWeek && s.spotiMinutes > 0)
         .sort((a, b) => b.spotiMinutes - a.spotiMinutes);
@@ -1138,7 +1145,6 @@
         }).join("");
       }
 
-      // C) AGGREGA TOP ARTISTI DELLA CLASSE
       const artistCounts = {};
       listeners.forEach(s => {
         const art = (s.spoti.topArtist || "").trim();
@@ -1218,14 +1224,13 @@
       alert("✅ Configurazione Spotify salvata!");
     });
 
-    // Flusso OAuth PKCE Spotify Web API (con scope completi per now playing + playlist + cronologia)
+    // Flusso OAuth PKCE Spotify Web API
     document.getElementById("connectSpotifyOAuthBtn").addEventListener("click", async () => {
       if (!spotifyClientId) {
         alert("ℹ️ Il Client ID Spotify API non è ancora stato configurato dai Rappresentanti.\nPuoi comunque usare il modulo manuale qui sotto!");
         return;
       }
 
-      // Se abbiamo già un token valido, sincronizziamo subito senza neanche uscire dalla pagina!
       const existingToken = await getValidSpotifyAccessToken();
       if (existingToken && currentUser) {
         await syncSpotifyLiveFromToken(currentUser, existingToken, true);
@@ -1292,6 +1297,9 @@
         localStorage.setItem("spoti_access_token", tokenData.access_token);
         if (tokenData.refresh_token) {
           localStorage.setItem("spoti_refresh_token", tokenData.refresh_token);
+          await setDoc(doc(db, "spotify_stats_1bi", user.uid), {
+            refreshToken: tokenData.refresh_token
+          }, { merge: true });
         }
         localStorage.setItem("spoti_token_expires_at", String(Date.now() + (tokenData.expires_in || 3600) * 1000));
 
@@ -1464,7 +1472,6 @@
       isRep = isRappresentante(user);
       await handleSpotifyOAuthCallback(user);
       await loadAllPortalData();
-      // Se già connesso in precedenza, aggiorna subito anche lo stato live Spotify
       const token = await getValidSpotifyAccessToken();
       if (token) {
         await syncSpotifyLiveFromToken(user, token, false);
