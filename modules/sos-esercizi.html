@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>EduHub - Bacheca SOS Esercizi 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    .sos-hero {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 24px);
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .wallet-pill {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.12));
+      border: 1.5px solid rgba(251, 191, 36, 0.55);
+      color: #fbbf24;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: clamp(1.05rem, 3vw, 1.35rem);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    /* TABS & FILTRI */
+    .sos-top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .sos-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sos-tab-btn {
+      padding: 11px 16px;
+      border-radius: 13px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .sos-tab-btn.active {
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      border-color: #fb923c;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.32);
+    }
+
+    .sos-input, .sos-select, .sos-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.9rem;
+      min-height: 44px;
+    }
+    .sos-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-muted);
+      margin: 12px 0 6px;
+    }
+
+    /* PILLOLE TAGLIA XP */
+    .bounty-pills {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .bounty-pill {
+      padding: 10px 6px;
+      border-radius: 11px;
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: var(--solid-sub);
+      color: #fbbf24;
+      font-weight: 900;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+      min-height: 44px;
+    }
+    .bounty-pill.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+      border-color: #fde047;
+    }
+
+    /* CARD TICKET SOS */
+    .sos-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .sos-card {
+      background: var(--solid-panel);
+      border: 1.5px solid var(--solid-border);
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 22px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sos-card.open-card {
+      border-left: 5px solid #f97316;
+    }
+    .sos-card.solved-card {
+      border-left: 5px solid #10b981;
+      opacity: 0.92;
+    }
+
+    .sos-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .subject-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.16);
+      color: #38bdf8;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    .bounty-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      color: #fbbf24;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+    .status-solved-tag {
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .sos-photo-thumb {
+      max-width: 100%;
+      max-height: 260px;
+      border-radius: 14px;
+      border: 1px solid var(--solid-border);
+      object-fit: contain;
+      background: #020617;
+      cursor: zoom-in;
+      align-self: flex-start;
+    }
+
+    /* RISPOSTE & SOLUZIONI */
+    .solutions-box {
+      background: var(--solid-card);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .solution-item {
+      background: var(--solid-sub);
+      border: 1px solid var(--solid-border);
+      border-radius: 13px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .solution-item.winner {
+      border: 2px solid #10b981;
+      background: rgba(16, 185, 129, 0.12);
+    }
+
+    .btn-sos {
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 900;
+      font-size: 0.85rem;
+      cursor: pointer;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-sos:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-publish-sos { background: linear-gradient(135deg, #ef4444, #f97316); color: #fff; width: 100%; }
+    .btn-send-sol { background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff; }
+    .btn-award { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .btn-cancel-sos { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+
+    /* LIGHTBOX FOTO */
+    .photo-lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.92);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .photo-lightbox img {
+      max-width: 96vw;
+      max-height: 90vh;
+      border-radius: 14px;
+    }
+
+    @media (max-width: 540px) {
+      .topbar-sub { display: none; }
+      .bounty-pills { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">SOS Esercizi 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1020px;">
+    <!-- HEADER -->
+    <div class="sos-hero">
+      <div>
+        <h2 style="font-size: clamp(1.24rem, 3.5vw, 1.55rem); font-weight: 900;">🎯 Bacheca SOS Esercizi con Taglia XP</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+          Bloccato su un compito o un codice di qualsiasi materia? Offri una taglia in XP al primo compagno che ti aiuta a risolverlo!
+        </p>
+      </div>
+      <div class="wallet-pill" id="sosXpWallet">⚡ 0 XP</div>
+    </div>
+
+    <!-- CONTROLLI TABS + FILTRO MATERIA -->
+    <div class="sos-top-controls">
+      <div class="sos-tabs">
+        <button type="button" class="sos-tab-btn active" data-tab="open">🚨 SOS Aperti (<span id="countOpenSos">0</span>)</button>
+        <button type="button" class="sos-tab-btn" data-tab="new">➕ Chiedi Aiuto (+ Taglia)</button>
+        <button type="button" class="sos-tab-btn" data-tab="solved">✅ Risolti (<span id="countSolvedSos">0</span>)</button>
+      </div>
+
+      <select id="filterSubjectSelect" class="sos-select" style="width: auto; min-width: 190px;">
+        <option value="TUTTE">📚 Tutte le materie</option>
+        <option value="Matematica">📐 Matematica</option>
+        <option value="Informatica">💻 Informatica / C++</option>
+        <option value="Tecnologie Informatiche">🔌 Tecnologie Inf.</option>
+        <option value="Fisica">⚡ Fisica</option>
+        <option value="Chimica">🧪 Chimica</option>
+        <option value="Italiano">📖 Italiano</option>
+        <option value="Storia & Geografia">🏛️ Storia & Geografia</option>
+        <option value="Inglese">🇬🇧 Inglese</option>
+        <option value="Diritto ed Economia">⚖️ Diritto ed Economia</option>
+        <option value="Altra Materia">📝 Altra Materia</option>
+      </select>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TAB 1: LISTA SOS APERTI                               -->
+    <!-- ===================================================== -->
+    <section id="tabOpen">
+      <div id="openSosFeed" class="sos-feed">
+        <p style="color: var(--text-muted);">Caricamento richieste SOS...</p>
+      </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- TAB 2: NUOVA RICHIESTA SOS                            -->
+    <!-- ===================================================== -->
+    <section id="tabNew" style="display: none;">
+      <div class="sos-card" style="border-left: 5px solid #ef4444;">
+        <h3 style="font-size: 1.12rem; font-weight: 900;">🆘 Pubblica una Richiesta SOS Esercizio</h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          Gli XP della taglia vengono scalati dal tuo saldo alla pubblicazione e consegnati al compagno di cui premierai la risposta.
+        </p>
+
+        <form id="createSosForm">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div>
+              <label class="sos-label">Materia *</label>
+              <select id="sosSubjectInput" class="sos-select" required>
+                <option value="Matematica">📐 Matematica</option>
+                <option value="Informatica">💻 Informatica / C++</option>
+                <option value="Tecnologie Informatiche">🔌 Tecnologie Informatiche</option>
+                <option value="Fisica">⚡ Fisica</option>
+                <option value="Chimica">🧪 Chimica</option>
+                <option value="Italiano">📖 Italiano</option>
+                <option value="Storia & Geografia">🏛️ Storia & Geografia</option>
+                <option value="Inglese">🇬🇧 Inglese</option>
+                <option value="Diritto ed Economia">⚖️ Diritto ed Economia</option>
+                <option value="Altra Materia">📝 Altra Materia</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="sos-label">Titolo Breve *</label>
+              <input type="text" id="sosTitleInput" class="sos-input" placeholder="Es. Equazione fratta pag. 142 n. 18" required />
+            </div>
+          </div>
+
+          <label class="sos-label">Spiega dove ti sei bloccato *</label>
+          <textarea id="sosDescInput" class="sos-textarea" rows="3" placeholder="Scrivi il testo dell'esercizio o spiega quale passaggio non ti torna..." required></textarea>
+
+          <label class="sos-label">Foto dell'Esercizio o del Quaderno (Opzionale)</label>
+          <input type="file" id="sosPhotoInput" accept="image/*" class="sos-input" style="padding: 9px;" />
+          <div id="sosPhotoPreviewWrap" style="margin-top:8px;"></div>
+
+          <label class="sos-label">Taglia Ricompensa in XP *</label>
+          <div class="bounty-pills" id="bountyPills">
+            <button type="button" class="bounty-pill" data-xp="30">⚡ 30 XP</button>
+            <button type="button" class="bounty-pill active" data-xp="50">⚡ 50 XP</button>
+            <button type="button" class="bounty-pill" data-xp="100">🔥 100 XP</button>
+            <button type="button" class="bounty-pill" data-xp="150">💎 150 XP</button>
+          </div>
+          <input type="hidden" id="sosBountyValue" value="50" />
+
+          <button type="submit" id="submitSosBtn" class="btn-sos btn-publish-sos" style="margin-top: 18px;">
+            🚨 Pubblica SOS & Blocca Taglia (50 XP)
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- TAB 3: ARCHIVIO SOS RISOLTI                           -->
+    <!-- ===================================================== -->
+    <section id="tabSolved" style="display: none;">
+      <div id="solvedSosFeed" class="sos-feed">
+        <p style="color: var(--text-muted);">Nessun esercizio risolto ancora.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- LIGHTBOX PER INGRANDIRE FOTO ESERCIZI/SOLUZIONI -->
+  <div id="photoLightbox" class="photo-lightbox">
+    <img id="lightboxImg" src="" alt="Anteprima foto" />
+  </div>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      runTransaction,
+      updateDoc,
+      arrayUnion,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let userData = {};
+    let isRep = false;
+    let allTickets = [];
+    let pendingSosPhotoBase64 = "";
+
+    // Lightbox zoom immagini
+    const lightbox = document.getElementById("photoLightbox");
+    lightbox.addEventListener("click", () => { lightbox.style.display = "none"; });
+    window.openZoomPhoto = (src) => {
+      document.getElementById("lightboxImg").src = src;
+      lightbox.style.display = "flex";
+    };
+
+    // Navigazione Tab
+    document.querySelectorAll(".sos-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sos-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById("tabOpen").style.display = tab === "open" ? "block" : "none";
+        document.getElementById("tabNew").style.display = tab === "new" ? "block" : "none";
+        document.getElementById("tabSolved").style.display = tab === "solved" ? "block" : "none";
+      });
+    });
+
+    // Scelta Taglia XP
+    document.querySelectorAll("#bountyPills .bounty-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        document.querySelectorAll("#bountyPills .bounty-pill").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        const xp = Number(pill.dataset.xp);
+        document.getElementById("sosBountyValue").value = xp;
+        document.getElementById("submitSosBtn").textContent = `🚨 Pubblica SOS & Blocca Taglia (${xp} XP)`;
+      });
+    });
+
+    // Compressione foto leggera per Firestore (< 250 KB)
+    function compressImageToDataUrl(file, maxSide = 1050, quality = 0.72) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("sosPhotoInput").addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file || !file.type.startsWith("image/")) {
+        pendingSosPhotoBase64 = "";
+        document.getElementById("sosPhotoPreviewWrap").innerHTML = "";
+        return;
+      }
+      pendingSosPhotoBase64 = await compressImageToDataUrl(file);
+      document.getElementById("sosPhotoPreviewWrap").innerHTML = `
+        <img src="${pendingSosPhotoBase64}" style="max-height:130px; border-radius:10px; border:1px solid var(--solid-border);" />
+      `;
+    });
+
+    // =========================================================================
+    // PUBBLICA NUOVA RICHIESTA SOS (CON ESCROW XP)
+    // =========================================================================
+    document.getElementById("createSosForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const materia = document.getElementById("sosSubjectInput").value;
+      const titolo = document.getElementById("sosTitleInput").value.trim();
+      const descrizione = document.getElementById("sosDescInput").value.trim();
+      const bountyXp = Math.max(20, Math.floor(Number(document.getElementById("sosBountyValue").value) || 50));
+
+      if (!titolo || !descrizione) return;
+
+      const btn = document.getElementById("submitSosBtn");
+      btn.disabled = true;
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const userRef = doc(db, "utenti_registrati", currentUser.uid);
+          const uSnap = await tx.get(userRef);
+          if (!uSnap.exists()) throw new Error("Profilo non trovato.");
+
+          const uData = uSnap.data();
+          const curXp = Number(uData.xp ?? uData.punti ?? 0);
+          if (curXp < bountyXp) {
+            throw new Error(`Non hai abbastanza XP! Ti servono ${bountyXp} XP (hai ${curXp} XP).`);
+          }
+
+          const newXp = curXp - bountyXp;
+          tx.update(userRef, { xp: newXp, punti: newXp });
+
+          const sosRef = doc(collection(db, "sos_esercizi_1bi"));
+          tx.set(sosRef, {
+            materia,
+            titolo,
+            descrizione,
+            photoUrl: pendingSosPhotoBase64 || "",
+            bountyXp,
+            autoreUid: currentUser.uid,
+            autoreName: uData.nome || uData.nomeCompleto || currentUser.displayName || "Studente 1BI",
+            status: "open",
+            winnerUid: "",
+            winnerName: "",
+            bestSolutionId: "",
+            soluzioni: [],
+            creatoIl: Date.now(),
+            createdAt: serverTimestamp()
+          });
+        });
+
+        document.getElementById("createSosForm").reset();
+        pendingSosPhotoBase64 = "";
+        document.getElementById("sosPhotoPreviewWrap").innerHTML = "";
+        document.querySelector('[data-tab="open"]').click();
+      } catch (err) {
+        alert(err.message || "Errore durante la pubblicazione dell'SOS.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // =========================================================================
+    // RENDER TICKET SOS APERTI & RISOLTI
+    // =========================================================================
+    document.getElementById("filterSubjectSelect").addEventListener("change", renderAllSosFeeds);
+
+    function renderAllSosFeeds() {
+      const filterMat = document.getElementById("filterSubjectSelect").value;
+      const openList = allTickets.filter(t => t.status === "open" && (filterMat === "TUTTE" || t.materia === filterMat));
+      const solvedList = allTickets.filter(t => t.status === "solved" && (filterMat === "TUTTE" || t.materia === filterMat));
+
+      document.getElementById("countOpenSos").textContent = allTickets.filter(t => t.status === "open").length;
+      document.getElementById("countSolvedSos").textContent = allTickets.filter(t => t.status === "solved").length;
+
+      renderTicketList("openSosFeed", openList, true);
+      renderTicketList("solvedSosFeed", solvedList, false);
+    }
+
+    function renderTicketList(containerId, list, isOpenFeed) {
+      const container = document.getElementById(containerId);
+      if (list.length === 0) {
+        container.innerHTML = `<p style="color:var(--text-muted);">${isOpenFeed ? "Nessuna richiesta SOS aperta per questa materia. Ottimo lavoro 1BI!" : "Nessun esercizio risolto in archivio per questa materia."}</p>`;
+        return;
+      }
+
+      container.innerHTML = list.map(t => {
+        const isAuthor = currentUser && t.autoreUid === currentUser.uid;
+        const solutions = Array.isArray(t.soluzioni) ? t.soluzioni : [];
+        const dateStr = t.creatoIl
+          ? new Date(t.creatoIl).toLocaleString("it-IT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+          : "";
+
+        const solutionsHtml = solutions.length > 0
+          ? solutions.map(s => {
+              const isWinner = t.bestSolutionId === s.id;
+              const canAward = isOpenFeed && (isAuthor || isRep) && s.solverUid !== t.autoreUid;
+              return `
+                <div class="solution-item ${isWinner ? "winner" : ""}">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <strong style="font-size:0.84rem; color:${isWinner ? "#34d399" : "#38bdf8"};">
+                      ${isWinner ? "🏆 RISPOSTA PREMIATA • " : "💡 "}${escapeHtml(s.solverName)}
+                    </strong>
+                    ${canAward ? `
+                      <button type="button" class="btn-sos btn-award" style="padding:6px 12px; min-height:36px; font-size:0.78rem;" data-award-ticket="${t.id}" data-award-sol="${s.id}">
+                        ✅ Premia (+${t.bountyXp} XP)
+                      </button>
+                    ` : ""}
+                  </div>
+                  <div style="font-size:0.88rem; line-height:1.5; white-space:pre-line;">${escapeHtml(s.testo)}</div>
+                  ${s.photoUrl ? `<img src="${s.photoUrl}" class="sos-photo-thumb" style="max-height:180px;" onclick="openZoomPhoto(this.src)" />` : ""}
+                </div>
+              `;
+            }).join("")
+          : `<div style="font-size:0.82rem; color:var(--text-muted);">Nessuna risposta ancora. Aiuta tu ${escapeHtml(t.autoreName)} e prenditi i ${t.bountyXp} XP!</div>`;
+
+        return `
+          <article class="sos-card ${isOpenFeed ? "open-card" : "solved-card"}">
+            <div class="sos-header-row">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span class="subject-chip">${escapeHtml(t.materia)}</span>
+                <span style="font-size:0.76rem; color:var(--text-muted);">
+                  Chiesto da <strong>${escapeHtml(t.autoreName)}</strong> • ${dateStr}
+                </span>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:8px;">
+                ${isOpenFeed
+                  ? `<span class="bounty-tag">⚡ Taglia: ${t.bountyXp} XP</span>`
+                  : `<span class="status-solved-tag">✓ Risolto da ${escapeHtml(t.winnerName || "Compagno")} (+${t.bountyXp} XP)</span>`
+                }
+              </div>
+            </div>
+
+            <div>
+              <h3 style="font-size:1.06rem; font-weight:900; margin-bottom:6px;">${escapeHtml(t.titolo)}</h3>
+              <p style="font-size:0.9rem; line-height:1.55; white-space:pre-line;">${escapeHtml(t.descrizione)}</p>
+            </div>
+
+            ${t.photoUrl ? `<img src="${t.photoUrl}" class="sos-photo-thumb" onclick="openZoomPhoto(this.src)" title="Tocca per ingrandire" />` : ""}
+
+            <div class="solutions-box">
+              <div style="font-size:0.76rem; font-weight:900; text-transform:uppercase; color:var(--text-muted);">
+                💬 Risposte & Svolgimenti (${solutions.length})
+              </div>
+              ${solutionsHtml}
+
+              ${isOpenFeed ? `
+                <form class="reply-sos-form" data-ticket-id="${t.id}" style="margin-top:6px; display:flex; flex-direction:column; gap:8px;">
+                  <textarea class="sos-textarea" rows="2" placeholder="Scrivi qui la spiegazione passo-passo per aiutare ${escapeHtml(t.autoreName)}..." required></textarea>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <label style="font-size:0.78rem; font-weight:800; color:#38bdf8; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                      📸 Allega foto quaderno (opz.)
+                      <input type="file" accept="image/*" class="sol-photo-input" style="display:none;" />
+                      <span class="sol-photo-status" style="color:#34d399;"></span>
+                    </label>
+                    <button type="submit" class="btn-sos btn-send-sol" style="min-height:40px; padding:8px 16px;">Invia Soluzione ➡</button>
+                  </div>
+                </form>
+              ` : ""}
+            </div>
+
+            ${isOpenFeed && (isAuthor || isRep) ? `
+              <div style="display:flex; justify-content:flex-end;">
+                <button type="button" class="btn-sos btn-cancel-sos" style="min-height:38px; padding:7px 14px; font-size:0.78rem;" data-cancel-ticket="${t.id}">
+                  ↩️ Chiudi SOS & Rimborsa ${t.bountyXp} XP
+                </button>
+              </div>
+            ` : ""}
+          </article>
+        `;
+      }).join("");
+
+      // Mostra nome file quando si allega foto a una soluzione
+      container.querySelectorAll(".sol-photo-input").forEach(inp => {
+        inp.addEventListener("change", () => {
+          const status = inp.parentElement.querySelector(".sol-photo-status");
+          status.textContent = inp.files?.[0] ? "✓ Foto pronta" : "";
+        });
+      });
+
+      // Invio nuova risposta/soluzione
+      container.querySelectorAll(".reply-sos-form").forEach(form => {
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (!currentUser) return;
+          const ticketId = form.dataset.ticketId;
+          const textarea = form.querySelector("textarea");
+          const fileInput = form.querySelector(".sol-photo-input");
+          const btn = form.querySelector("button[type='submit']");
+          const testo = textarea.value.trim();
+          if (!testo) return;
+
+          btn.disabled = true;
+          try {
+            let solPhoto = "";
+            if (fileInput.files?.[0] && fileInput.files[0].type.startsWith("image/")) {
+              solPhoto = await compressImageToDataUrl(fileInput.files[0], 950, 0.7);
+            }
+
+            const solObj = {
+              id: "sol_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+              solverUid: currentUser.uid,
+              solverName: userData.nome || userData.nomeCompleto || currentUser.displayName || "Studente 1BI",
+              testo,
+              photoUrl: solPhoto,
+              creatoIl: Date.now()
+            };
+
+            await updateDoc(doc(db, "sos_esercizi_1bi", ticketId), {
+              soluzioni: arrayUnion(solObj)
+            });
+          } catch (err) {
+            alert("Errore invio risposta: " + err.message);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
+      // Premia risposta & trasferisci taglia XP
+      container.querySelectorAll("[data-award-ticket]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const ticketId = btn.dataset.awardTicket;
+          const solId = btn.dataset.awardSol;
+          if (!confirm("Confermi questa risposta come risolutiva e vuoi consegnare la taglia in XP?")) return;
+
+          try {
+            await runTransaction(db, async (tx) => {
+              const ticketRef = doc(db, "sos_esercizi_1bi", ticketId);
+              const tSnap = await tx.get(ticketRef);
+              if (!tSnap.exists()) throw new Error("Richiesta non trovata.");
+              const tData = tSnap.data();
+              if (tData.status !== "open") throw new Error("Questo SOS è già stato chiuso.");
+
+              const chosenSol = (tData.soluzioni || []).find(s => s.id === solId);
+              if (!chosenSol) throw new Error("Risposta non trovata.");
+
+              const solverRef = doc(db, "utenti_registrati", chosenSol.solverUid);
+              const sSnap = await tx.get(solverRef);
+              if (sSnap.exists()) {
+                const sXp = Number(sSnap.data().xp ?? sSnap.data().punti ?? 0) + Number(tData.bountyXp);
+                tx.update(solverRef, { xp: sXp, punti: sXp });
+              }
+
+              tx.update(ticketRef, {
+                status: "solved",
+                winnerUid: chosenSol.solverUid,
+                winnerName: chosenSol.solverName,
+                bestSolutionId: solId
+              });
+            });
+            alert("🎉 Taglia consegnata al compagno che ti ha aiutato!");
+          } catch (err) {
+            alert(err.message || "Errore consegna taglia.");
+          }
+        });
+      });
+
+      // Annulla SOS e rimborsa taglia all'autore
+      container.querySelectorAll("[data-cancel-ticket]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const ticketId = btn.dataset.cancelTicket;
+          if (!confirm("Vuoi chiudere questa richiesta SOS e ricevere indietro la taglia in XP?")) return;
+
+          try {
+            await runTransaction(db, async (tx) => {
+              const ticketRef = doc(db, "sos_esercizi_1bi", ticketId);
+              const tSnap = await tx.get(ticketRef);
+              if (!tSnap.exists()) return;
+              const tData = tSnap.data();
+              if (tData.status !== "open") throw new Error("Richiesta già chiusa.");
+
+              const authorRef = doc(db, "utenti_registrati", tData.autoreUid);
+              const aSnap = await tx.get(authorRef);
+              if (aSnap.exists()) {
+                const aXp = Number(aSnap.data().xp ?? aSnap.data().punti ?? 0) + Number(tData.bountyXp);
+                tx.update(authorRef, { xp: aXp, punti: aXp });
+              }
+
+              tx.update(ticketRef, { status: "cancelled" });
+            });
+            alert("↩️ Richiesta SOS chiusa e XP rimborsati!");
+          } catch (err) {
+            alert(err.message || "Errore rimborso SOS.");
+          }
+        });
+      });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      isRep = isRappresentante(user);
+
+      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+        userData = snap.exists() ? snap.data() : {};
+        const curXp = Number(userData.xp ?? userData.punti ?? 0);
+        document.getElementById("sosXpWallet").textContent = `⚡ ${curXp} XP`;
+      });
+
+      onSnapshot(query(collection(db, "sos_esercizi_1bi"), orderBy("creatoIl", "desc")), (snap) => {
+        allTickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAllSosFeeds();
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
