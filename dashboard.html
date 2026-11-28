@@ -9,18 +9,71 @@
   <script src="js/theme.js"></script>
   <style>
     /* =========================================================================
-       EDUHUB 1BI - ULTRA UI/UX UPGRADE PACK (0 WARNINGS)
+       EDUHUB 1BI - ULTRA UI/UX UPGRADE PACK V2 (0 WARNINGS)
        ========================================================================= */
+    :root {
+      --eh-accent: #38bdf8;
+      --eh-accent-2: #818cf8;
+      --eh-accent-3: #ec4899;
+      --eh-orb-1: #2563eb;
+      --eh-orb-2: #7c3aed;
+      --eh-orb-3: #06b6d4;
+      --eh-sticky-top: 64px;
+    }
+
+    /* 7 SKIN MULTI-TEMA */
+    html[data-skin="cyberpunk"] {
+      --eh-accent: #f472b6;
+      --eh-accent-2: #22d3ee;
+      --eh-accent-3: #a855f7;
+      --eh-orb-1: #db2777;
+      --eh-orb-2: #0891b2;
+      --eh-orb-3: #7e22ce;
+    }
+    html[data-skin="matrix"] {
+      --eh-accent: #4ade80;
+      --eh-accent-2: #10b981;
+      --eh-accent-3: #22c55e;
+      --eh-orb-1: #15803d;
+      --eh-orb-2: #065f46;
+      --eh-orb-3: #16a34a;
+    }
+    html[data-skin="sunset"] {
+      --eh-accent: #fbbf24;
+      --eh-accent-2: #f97316;
+      --eh-accent-3: #ef4444;
+      --eh-orb-1: #d97706;
+      --eh-orb-2: #ea580c;
+      --eh-orb-3: #dc2626;
+    }
+    html[data-skin="ocean"] {
+      --eh-accent: #2dd4bf;
+      --eh-accent-2: #34d399;
+      --eh-accent-3: #0ea5e9;
+      --eh-orb-1: #0d9488;
+      --eh-orb-2: #059669;
+      --eh-orb-3: #0284c7;
+    }
+    html[data-skin="crimson"] {
+      --eh-accent: #f87171;
+      --eh-accent-2: #fb7185;
+      --eh-accent-3: #f59e0b;
+      --eh-orb-1: #b91c1c;
+      --eh-orb-2: #9f1239;
+      --eh-orb-3: #d97706;
+    }
+
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: rgba(7, 11, 20, 0.4); }
     ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #38bdf8, #818cf8);
+      background: linear-gradient(180deg, var(--eh-accent), var(--eh-accent-2));
       border-radius: 999px;
     }
 
     body {
       position: relative;
       overflow-x: hidden;
+      transition: background-color 0.35s ease, color 0.35s ease;
     }
 
     /* Sfondo Aurora + Griglia Tech */
@@ -40,13 +93,14 @@
       position: absolute;
       border-radius: 50%;
       filter: blur(115px);
-      opacity: 0.26;
+      opacity: 0.28;
+      transition: background 0.6s ease;
       animation: ehFloatOrb 18s ease-in-out infinite alternate;
     }
     html[data-theme="light"] .eh-orb { opacity: 0.14; }
-    .eh-orb-1 { width: 460px; height: 460px; background: #2563eb; top: -120px; left: -90px; }
-    .eh-orb-2 { width: 420px; height: 420px; background: #7c3aed; bottom: -110px; right: -80px; animation-delay: -6s; }
-    .eh-orb-3 { width: 320px; height: 320px; background: #06b6d4; top: 42%; left: 48%; opacity: 0.14; animation-delay: -12s; }
+    .eh-orb-1 { width: 460px; height: 460px; background: var(--eh-orb-1); top: -120px; left: -90px; }
+    .eh-orb-2 { width: 420px; height: 420px; background: var(--eh-orb-2); bottom: -110px; right: -80px; animation-delay: -6s; }
+    .eh-orb-3 { width: 320px; height: 320px; background: var(--eh-orb-3); top: 42%; left: 48%; opacity: 0.16; animation-delay: -12s; }
     @keyframes ehFloatOrb {
       0% { transform: translate(0, 0) scale(1); }
       100% { transform: translate(45px, 35px) scale(1.12); }
@@ -71,20 +125,23 @@
       top: 0; left: 0;
       height: 3px;
       width: 0%;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #ec4899);
+      background: linear-gradient(90deg, var(--eh-accent), var(--eh-accent-2), var(--eh-accent-3));
       z-index: 9999;
-      box-shadow: 0 0 10px rgba(99, 102, 241, 0.75);
+      box-shadow: 0 0 10px var(--eh-accent);
       transition: width 0.08s linear;
     }
 
-    /* Topbar Glassmorphism + Pillola Orologio/Campanella */
+    /* Topbar Glassmorphism Fissa in cima */
     .topbar {
-      backdrop-filter: blur(16px) !important;
-      -webkit-backdrop-filter: blur(16px) !important;
-      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 60 !important;
+      backdrop-filter: blur(18px) !important;
+      -webkit-backdrop-filter: blur(18px) !important;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
     }
     .topbar.eh-scrolled {
-      box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.72);
     }
     .eh-clock-pill {
       display: inline-flex;
@@ -94,11 +151,13 @@
       border-radius: 999px;
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #7dd3fc;
+      color: var(--eh-accent);
       font-size: 0.74rem;
       font-weight: 800;
       white-space: nowrap;
+      transition: transform 0.2s ease, border-color 0.3s ease;
     }
+    .eh-clock-pill:hover { transform: translateY(-1px); }
     html[data-theme="light"] .eh-clock-pill {
       background: rgba(14, 165, 233, 0.1);
       color: #0369a1;
@@ -115,6 +174,29 @@
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.45); opacity: 0.45; }
     }
+
+    /* Selettore Multi-Tema nella Topbar */
+    .eh-skin-select {
+      padding: 5px 9px;
+      border-radius: 9px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      background: rgba(15, 23, 42, 0.75);
+      color: #e2e8f0;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s ease, transform 0.18s ease;
+    }
+    .eh-skin-select:hover {
+      border-color: var(--eh-accent);
+      transform: translateY(-1px);
+    }
+    html[data-theme="light"] .eh-skin-select {
+      background: rgba(241, 245, 249, 0.95);
+      color: #0f172a;
+    }
+
     .eh-matrix-btn {
       padding: 5px 10px;
       border-radius: 9px;
@@ -133,6 +215,17 @@
       color: #052e16;
     }
 
+    /* Animazioni di ingresso (Scroll Reveal) */
+    .eh-reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .eh-reveal.eh-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* Banner Compleanno del Giorno */
     #ehBirthdayBanner {
       display: none;
@@ -146,6 +239,11 @@
       background: linear-gradient(135deg, rgba(236, 72, 153, 0.22), rgba(245, 158, 11, 0.18));
       border: 1.5px solid rgba(244, 114, 182, 0.55);
       box-shadow: 0 12px 30px -12px rgba(236, 72, 153, 0.45);
+      animation: ehFadeSlideDown 0.45s ease;
+    }
+    @keyframes ehFadeSlideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Hero Banner Potenziato */
@@ -154,6 +252,7 @@
       overflow: hidden;
       border: 1px solid rgba(59, 130, 246, 0.35) !important;
       box-shadow: 0 20px 45px -22px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: border-color 0.35s ease, box-shadow 0.35s ease;
     }
     .welcome-banner::before {
       content: "";
@@ -169,7 +268,7 @@
       100% { transform: translateX(100%); }
     }
     .welcome-banner h2 {
-      background: linear-gradient(90deg, #ffffff 0%, #93c5fd 50%, #c4b5fd 100%);
+      background: linear-gradient(90deg, #ffffff 0%, var(--eh-accent) 50%, var(--eh-accent-2) 100%);
       background-size: 200% auto;
       -webkit-background-clip: text;
       background-clip: text;
@@ -223,7 +322,7 @@
       width: 15%;
       border-radius: 99px;
       background: linear-gradient(90deg, #f59e0b, #fde047);
-      transition: width 0.5s ease;
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .eh-mood-btn {
       display: inline-flex;
@@ -237,13 +336,13 @@
       font-size: 0.76rem;
       font-weight: 800;
       cursor: pointer;
-      transition: transform 0.18s ease, background 0.18s ease;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.18s ease;
     }
     html[data-theme="light"] .eh-mood-btn {
       color: #5b21b6;
       background: rgba(139, 92, 246, 0.12);
     }
-    .eh-mood-btn:hover { transform: translateY(-1px); }
+    .eh-mood-btn:hover { transform: translateY(-2px) scale(1.02); }
 
     .eh-spotify-live-pill {
       display: inline-flex;
@@ -261,13 +360,13 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      transition: transform 0.18s ease;
+      transition: transform 0.2s ease;
     }
     html[data-theme="light"] .eh-spotify-live-pill {
       color: #15803d;
       background: rgba(34, 197, 94, 0.12);
     }
-    .eh-spotify-live-pill:hover { transform: translateY(-1px); }
+    .eh-spotify-live-pill:hover { transform: translateY(-2px); }
     .eh-eq-bars {
       display: inline-flex;
       align-items: flex-end;
@@ -292,7 +391,7 @@
       display: grid;
       grid-template-columns: 1fr 1.45fr;
       gap: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .streak-card {
       background: linear-gradient(145deg, rgba(249, 115, 22, 0.16), rgba(245, 158, 11, 0.08));
@@ -303,7 +402,9 @@
       flex-direction: column;
       justify-content: space-between;
       gap: 12px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
+    .streak-card:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -16px rgba(249, 115, 22, 0.45); }
     .streak-days-dots {
       display: flex;
       gap: 6px;
@@ -321,11 +422,13 @@
       font-size: 0.72rem;
       font-weight: 900;
       color: var(--text-muted);
+      transition: transform 0.25s ease, background 0.25s ease;
     }
     .streak-day-dot.done {
       background: linear-gradient(135deg, #f97316, #f59e0b);
       border-color: #fde047;
       color: #0f172a;
+      transform: scale(1.03);
     }
     .btn-claim-streak {
       width: 100%;
@@ -337,9 +440,9 @@
       font-weight: 900;
       font-size: 0.84rem;
       cursor: pointer;
-      transition: transform 0.18s ease, opacity 0.18s ease;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
     }
-    .btn-claim-streak:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn-claim-streak:hover:not(:disabled) { transform: translateY(-2px) scale(1.01); }
     .btn-claim-streak:disabled {
       background: rgba(16, 185, 129, 0.2);
       border: 1px solid rgba(16, 185, 129, 0.45);
@@ -356,6 +459,22 @@
       flex-direction: column;
       justify-content: space-between;
       gap: 10px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .missions-card:hover { transform: translateY(-2px); }
+    .eh-missions-progress-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 99px;
+      background: rgba(148, 163, 184, 0.2);
+      overflow: hidden;
+    }
+    .eh-missions-progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--eh-accent), #10b981);
+      transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .mission-row {
       display: flex;
@@ -367,7 +486,9 @@
       background: rgba(15, 23, 42, 0.32);
       border: 1px solid rgba(148, 163, 184, 0.16);
       font-size: 0.82rem;
+      transition: transform 0.18s ease, border-color 0.18s ease;
     }
+    .mission-row:hover { transform: translateX(3px); border-color: rgba(56, 189, 248, 0.35); }
     html[data-theme="light"] .mission-row {
       background: rgba(15, 23, 42, 0.04);
     }
@@ -379,10 +500,12 @@
       font-size: 0.74rem;
       cursor: pointer;
       white-space: nowrap;
+      transition: transform 0.18s ease;
     }
+    .btn-mission-action:hover { transform: scale(1.04); }
     .btn-mission-go {
       background: rgba(56, 189, 248, 0.18);
-      color: #38bdf8;
+      color: var(--eh-accent);
       border: 1px solid rgba(56, 189, 248, 0.4);
       text-decoration: none;
     }
@@ -408,9 +531,9 @@
       font-size: 0.8rem;
       font-weight: 800;
       text-decoration: none;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .crate-pill-btn:hover { transform: translateY(-2px); }
+    .crate-pill-btn:hover { transform: translateY(-2px) scale(1.03); }
 
     .wrapped-pill-btn {
       display: inline-flex;
@@ -424,9 +547,91 @@
       font-size: 0.8rem;
       font-weight: 800;
       text-decoration: none;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .wrapped-pill-btn:hover { transform: translateY(-2px); }
+    .wrapped-pill-btn:hover { transform: translateY(-2px) scale(1.03); }
+
+    /* NUOVA GRIGLIA WIDGET EXTRA: PODIO TOP 3 XP + QUIZ TECH + BLOCCO NOTE */
+    .eh-extra-widgets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .eh-mini-widget {
+      background: var(--card-bg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 15px 17px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+    .eh-mini-widget:hover {
+      transform: translateY(-2px);
+      border-color: var(--eh-accent);
+    }
+    .eh-podium-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.35);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    html[data-theme="light"] .eh-podium-row { background: rgba(15, 23, 42, 0.04); }
+
+    .eh-quiz-opt {
+      width: 100%;
+      text-align: left;
+      padding: 7px 11px;
+      border-radius: 9px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: rgba(15, 23, 42, 0.4);
+      color: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    html[data-theme="light"] .eh-quiz-opt { background: rgba(15, 23, 42, 0.04); }
+    .eh-quiz-opt:hover:not(:disabled) {
+      border-color: var(--eh-accent);
+      transform: translateX(3px);
+    }
+    .eh-quiz-opt.correct {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #10b981;
+      color: #34d399;
+    }
+    .eh-quiz-opt.wrong {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #f87171;
+    }
+
+    .eh-scratchpad-area {
+      width: 100%;
+      min-height: 86px;
+      resize: vertical;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: rgba(15, 23, 42, 0.42);
+      color: inherit;
+      padding: 9px 11px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    html[data-theme="light"] .eh-scratchpad-area { background: rgba(241, 245, 249, 0.9); }
+    .eh-scratchpad-area:focus { border-color: var(--eh-accent); }
 
     /* Griglia Riepiloghi Rapidi (Bacheca + Prossime Verifiche) */
     .eh-recaps-grid {
@@ -440,7 +645,7 @@
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(234, 88, 12, 0.05)) !important;
     }
 
-    /* Striscia Usati di Recente */
+    /* Striscia Usati di Recente & Preferiti Rapidi */
     #ehRecentStrip {
       display: none;
       align-items: center;
@@ -463,7 +668,7 @@
       border-radius: 999px;
       background: rgba(56, 189, 248, 0.14);
       border: 1px solid rgba(56, 189, 248, 0.32);
-      color: #7dd3fc;
+      color: var(--eh-accent);
       font-size: 0.76rem;
       font-weight: 800;
       text-decoration: none;
@@ -475,26 +680,28 @@
     }
     .eh-recent-chip:hover { transform: translateY(-1px); background: rgba(56, 189, 248, 0.24); }
 
-    /* BARRA RICERCA CENTRATA STICKY + FILTRI */
+    /* BARRA RICERCA CENTRATA STICKY AGGANCIATA ALLA TOPBAR (ZERO GAP!) */
     .eh-sticky-controls {
       position: sticky;
-      top: 64px;
+      top: var(--eh-sticky-top);
       z-index: 45;
       margin: 18px 0 18px;
       padding: 12px 14px;
-      border-radius: 18px;
-      background: rgba(10, 16, 30, 0.84);
-      border: 1px solid rgba(56, 189, 248, 0.24);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 14px 32px -14px rgba(0, 0, 0, 0.7);
+      border-radius: 0 0 18px 18px;
+      background: rgba(10, 16, 30, 0.94);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-top: none;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 16px 34px -14px rgba(0, 0, 0, 0.78);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
     }
     html[data-theme="light"] .eh-sticky-controls {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.96);
       border-color: rgba(14, 165, 233, 0.25);
     }
 
@@ -504,7 +711,7 @@
       justify-content: center;
       gap: 8px;
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
     }
     .eh-search-box {
       position: relative;
@@ -515,8 +722,8 @@
       width: 100%;
       padding: 9px 115px 9px 36px;
       border-radius: 999px;
-      border: 1.5px solid rgba(56, 189, 248, 0.35);
-      background: rgba(15, 23, 42, 0.82);
+      border: 1.5px solid rgba(56, 189, 248, 0.38);
+      background: rgba(15, 23, 42, 0.85);
       color: var(--text-main, #f8fafc);
       font-size: 0.85rem;
       font-weight: 700;
@@ -528,7 +735,7 @@
       color: #0f172a;
     }
     .eh-search-box input:focus {
-      border-color: #38bdf8;
+      border-color: var(--eh-accent);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
     }
     .eh-search-icon {
@@ -556,7 +763,7 @@
       padding: 2px 7px;
       border-radius: 999px;
       background: rgba(56, 189, 248, 0.18);
-      color: #38bdf8;
+      color: var(--eh-accent);
     }
     .eh-search-kbd {
       font-size: 0.65rem;
@@ -579,10 +786,10 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: transform 0.25s ease;
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .eh-random-tool-btn:hover {
-      transform: rotate(25deg) scale(1.08);
+      transform: rotate(35deg) scale(1.1);
     }
 
     .eh-filter-pills-row {
@@ -592,11 +799,19 @@
       justify-content: center;
       align-items: center;
     }
+    .dash-filter-btn {
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background 0.2s ease, color 0.2s ease !important;
+    }
+    .dash-filter-btn:hover {
+      transform: translateY(-2px);
+    }
 
-    /* Spotlight Hover & Bottone Stella Preferiti sulle Card */
+    /* Spotlight Hover, Tilt 3D & Bottone Stella Preferiti sulle Card */
     .hub-card {
       position: relative;
-      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, border-color 0.24s ease !important;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
     }
     .hub-card::after {
       content: "";
@@ -608,7 +823,7 @@
       transition: opacity 0.28s ease;
       background: radial-gradient(
         240px circle at var(--mx, 50%) var(--my, 50%),
-        rgba(56, 189, 248, 0.13),
+        rgba(56, 189, 248, 0.15),
         transparent 70%
       );
     }
@@ -629,8 +844,8 @@
       justify-content: center;
       font-size: 0.78rem;
       cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.2s ease, transform 0.18s ease, color 0.2s ease, border-color 0.2s ease;
+      opacity: 0.45;
+      transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, border-color 0.2s ease;
     }
     html[data-theme="light"] .eh-fav-star { background: rgba(255, 255, 255, 0.85); }
     .hub-card:hover .eh-fav-star,
@@ -640,7 +855,7 @@
       border-color: rgba(251, 191, 36, 0.55);
       background: rgba(251, 191, 36, 0.14);
     }
-    .eh-fav-star:hover { transform: scale(1.12); }
+    .eh-fav-star:hover { transform: scale(1.18) rotate(12deg); }
 
     /* Pulsante Torna Su (Back to Top) */
     #ehBackToTopBtn {
@@ -651,9 +866,9 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: 1px solid rgba(56, 189, 248, 0.45);
+      border: 1px solid var(--eh-accent);
       background: rgba(15, 23, 42, 0.88);
-      color: #38bdf8;
+      color: var(--eh-accent);
       font-size: 1rem;
       font-weight: 900;
       cursor: pointer;
@@ -662,13 +877,14 @@
       opacity: 0;
       pointer-events: none;
       transform: translateY(10px);
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     #ehBackToTopBtn.visible {
       opacity: 1;
       pointer-events: auto;
       transform: translateY(0);
     }
+    #ehBackToTopBtn:hover { transform: translateY(-3px) scale(1.06); }
 
     /* Command Palette Ctrl+K & Modale Scorciatoie */
     .eh-modal-backdrop {
@@ -687,10 +903,15 @@
       width: min(560px, 92vw);
       border-radius: 20px;
       background: #0f172a;
-      border: 1px solid rgba(56, 189, 248, 0.4);
+      border: 1px solid var(--eh-accent);
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
       overflow: hidden;
       color: #f8fafc;
+      animation: ehModalPop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes ehModalPop {
+      from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
     html[data-theme="light"] .eh-cmd-box {
       background: #ffffff;
@@ -729,7 +950,7 @@
     }
     .eh-cmd-item:hover, .eh-cmd-item.selected {
       background: rgba(56, 189, 248, 0.18);
-      color: #38bdf8;
+      color: var(--eh-accent);
     }
 
     /* Toast Notifiche Rapide */
@@ -742,7 +963,7 @@
       padding: 10px 18px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.94);
-      border: 1px solid rgba(56, 189, 248, 0.45);
+      border: 1px solid var(--eh-accent);
       color: #f8fafc;
       font-size: 0.82rem;
       font-weight: 800;
@@ -756,10 +977,9 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    @media (max-width: 860px) {
-      .streak-missions-grid, .eh-recaps-grid { grid-template-columns: 1fr; }
+    @media (max-width: 960px) {
+      .streak-missions-grid, .eh-recaps-grid, .eh-extra-widgets-grid { grid-template-columns: 1fr; }
       .eh-clock-pill { display: none; }
-      .eh-sticky-controls { top: 58px; }
     }
   </style>
 </head>
@@ -785,8 +1005,20 @@
         <span>•</span>
         <span id="ehBellText">1BI</span>
       </div>
-      <button type="button" id="ehMatrixToggleBtn" class="eh-matrix-btn" title="Attiva/Disattiva Modalità Matrix 1BI">&lt;/&gt;</button>
-      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <div class="eh-clock-pill" id="ehOnlineCountPill" title="Compagni 1BI attivi su EduHub">
+        <span>👥</span>
+        <span id="ehOnlineCountText">1BI Live</span>
+      </div>
+      <select id="ehSkinSelector" class="eh-skin-select" title="Scegli lo stile cromatico della Dashboard">
+        <option value="default">🌌 Deep Space</option>
+        <option value="cyberpunk">⚡ Cyberpunk</option>
+        <option value="matrix">🟢 Matrix</option>
+        <option value="sunset">🌅 Sunset Gold</option>
+        <option value="ocean">🌊 Ocean</option>
+        <option value="crimson">🩸 Crimson</option>
+      </select>
+      <button type="button" id="ehMatrixToggleBtn" class="eh-matrix-btn" title="Attiva/Disattiva Pioggia Matrix 1BI">&lt;/&gt;</button>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema Chiaro/Scuro"></button>
       <span class="badge-role">1BI</span>
       <a href="profilo.html" class="profile-pill" data-track="profilo" title="Apri il tuo profilo">
         <div class="nav-avatar" id="navAvatar">S</div>
@@ -811,7 +1043,7 @@
       </a>
     </div>
 
-    <div class="welcome-banner">
+    <div class="welcome-banner eh-reveal">
       <div>
         <h2>Bentornato, <span id="welcomeUserName">Studente</span>!</h2>
         <p>Strumenti digitali condivisi per la <strong>1BI Informatica</strong> • Clicca sul tuo nome in alto per il profilo</p>
@@ -856,7 +1088,7 @@
     </div>
 
     <!-- STREAK GIORNALIERA & MISSIONI LAMPO XP -->
-    <div class="streak-missions-grid">
+    <div class="streak-missions-grid eh-reveal">
       <div class="streak-card">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -889,16 +1121,20 @@
       <div class="missions-card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
           <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:#38bdf8;">
-              ⚡ Missioni Lampo del Giorno
+            <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:var(--eh-accent);">
+              ⚡ Missioni Lampo (<span id="missionsProgressCount">0/3</span>)
             </span>
-            <span style="font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(56,189,248,0.14); color:#7dd3fc;">
-              🔄 Nuove ogni 24h
-            </span>
+            <button type="button" id="claimAllMissionsBonusBtn" style="display:none; padding:2px 9px; border-radius:999px; border:none; background:linear-gradient(135deg,#f59e0b,#ec4899); color:#fff; font-size:0.7rem; font-weight:900; cursor:pointer;">
+              🎁 Super Bonus +50 XP!
+            </button>
           </div>
           <span id="missionsXpWalletBadge" style="font-size:0.78rem; font-weight:900; color:#fbbf24;">
             Saldo: -- XP
           </span>
+        </div>
+
+        <div class="eh-missions-progress-bar">
+          <div class="eh-missions-progress-fill" id="ehMissionsProgressFill"></div>
         </div>
 
         <div id="dailyMissionsList" style="display:flex; flex-direction:column; gap:8px;">
@@ -907,8 +1143,57 @@
       </div>
     </div>
 
+    <!-- NUOVA GRIGLIA WIDGET EXTRA: PODIO TOP 3 XP + QUIZ TECH DEL GIORNO + BLOCCO NOTE -->
+    <div class="eh-extra-widgets-grid eh-reveal">
+      <!-- 1. Podio Live Top 3 XP -->
+      <div class="eh-mini-widget">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:#fbbf24;">
+            🏆 Podio Live 1BI
+          </span>
+          <a href="modules/classifica.html" style="font-size:0.74rem; font-weight:800; color:var(--eh-accent); text-decoration:none;">Classifica →</a>
+        </div>
+        <div id="ehMiniPodiumList" style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:0.78rem; color:var(--text-muted);">Caricamento podio XP...</div>
+        </div>
+      </div>
+
+      <!-- 2. Sfida Lampo Informatica (+20 XP) -->
+      <div class="eh-mini-widget">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+          <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:var(--eh-accent);">
+            🧠 Quiz Lampo Tech (+20 XP)
+          </span>
+          <span id="ehQuizStatusBadge" style="font-size:0.68rem; font-weight:900; padding:2px 8px; border-radius:999px; background:rgba(56,189,248,0.16); color:var(--eh-accent);">
+            Sfida Oggi
+          </span>
+        </div>
+        <div id="ehDailyQuizQuestion" style="font-size:0.82rem; font-weight:800; line-height:1.35;">
+          Caricamento domanda del giorno...
+        </div>
+        <div id="ehDailyQuizOptions" style="display:flex; flex-direction:column; gap:5px;"></div>
+      </div>
+
+      <!-- 3. Blocco Note Rapido 1BI -->
+      <div class="eh-mini-widget">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.74rem; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; color:#34d399;">
+            📝 Blocco Note Rapido
+          </span>
+          <button type="button" id="ehClearScratchpadBtn" style="background:none; border:none; color:var(--text-muted); font-size:0.72rem; font-weight:800; cursor:pointer;" title="Svuota note">
+            Pulisci
+          </button>
+        </div>
+        <textarea id="ehScratchpadArea" class="eh-scratchpad-area" placeholder="Scrivi qui un promemoria, un compito o un appunto veloce (salvato in automatico)..."></textarea>
+        <div style="display:flex; justify-content:space-between; font-size:0.69rem; color:var(--text-muted);">
+          <span id="ehScratchpadSavedStatus">✓ Salvato sul dispositivo</span>
+          <span id="ehScratchpadChars">0 caratteri</span>
+        </div>
+      </div>
+    </div>
+
     <!-- DOPPIO RIEPILOGO RAPIDO: ULTIMO ANNUNCIO BACHECA + PROSSIME VERIFICHE -->
-    <div class="eh-recaps-grid">
+    <div class="eh-recaps-grid eh-reveal">
       <a href="modules/bacheca.html" id="latestBachecaBox" data-track="bacheca" class="recap-box recap-bacheca" style="display: block;">
         <div>
           <span class="recap-label" style="color: #f87171;">
@@ -937,7 +1222,7 @@
     </div>
 
     <!-- 1. ORARIO SCOLASTICO IN EVIDENZA -->
-    <a href="modules/orario.html" data-track="orario" class="featured-circolari" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(6, 182, 212, 0.08));">
+    <a href="modules/orario.html" data-track="orario" class="featured-circolari eh-reveal" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(6, 182, 212, 0.08));">
       <div class="featured-left">
         <div class="icon-badge" style="background: rgba(16,185,129,0.18); color: #34d399; width: 64px; height: 64px;">
           <i data-lucide="calendar-days" style="width: 30px; height: 30px;"></i>
@@ -957,7 +1242,7 @@
     </a>
 
     <!-- 2. BACHECA DI CLASSE IN EVIDENZA -->
-    <a href="modules/bacheca.html" data-track="bacheca" class="featured-bacheca">
+    <a href="modules/bacheca.html" data-track="bacheca" class="featured-bacheca eh-reveal">
       <div class="featured-left">
         <div class="icon-badge" style="background: rgba(220,38,38,0.18); color: #ef4444; width: 64px; height: 64px;">
           <i data-lucide="bell-ring" style="width: 30px; height: 30px;"></i>
@@ -984,8 +1269,8 @@
       <div id="ehRecentList" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
     </div>
 
-    <!-- BARRA RICERCA CENTRATA STICKY + FILTRI RAPIDI -->
-    <div class="eh-sticky-controls">
+    <!-- BARRA RICERCA CENTRATA STICKY AGGANCIATA ALLA TOPBAR + FILTRI RAPIDI -->
+    <div class="eh-sticky-controls" id="ehStickyControls">
       <div class="eh-center-search-row">
         <div class="eh-search-box">
           <span class="eh-search-icon">🔍</span>
@@ -999,7 +1284,7 @@
       </div>
 
       <div class="eh-filter-pills-row">
-        <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:6px 14px; border-radius:999px; border:1px solid #38bdf8; background:rgba(56,189,248,0.18); color:#38bdf8; font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:6px 14px; border-radius:999px; border:1px solid var(--eh-accent); background:rgba(56,189,248,0.18); color:var(--eh-accent); font-weight:800; font-size:0.77rem; cursor:pointer;">
           Tutte (27)
         </button>
         <button type="button" class="dash-filter-btn" data-cat="favorites" id="favFilterBtn" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
@@ -1021,7 +1306,7 @@
     </div>
 
     <!-- SEZIONE 1: DIDATTICA & STUDIO -->
-    <div class="dash-section" data-section="studio" style="margin-bottom: 26px;">
+    <div class="dash-section eh-reveal" data-section="studio" style="margin-bottom: 26px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         📚 Didattica & Studio
       </div>
@@ -1101,7 +1386,7 @@
     </div>
 
     <!-- SEZIONE 2: LABORATORI & STRUMENTI TECH -->
-    <div class="dash-section" data-section="tech" style="margin-bottom: 26px;">
+    <div class="dash-section eh-reveal" data-section="tech" style="margin-bottom: 26px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         💻 Laboratori & Strumenti Tech
       </div>
@@ -1157,7 +1442,7 @@
     </div>
 
     <!-- SEZIONE 3: VITA DI CLASSE & RAPPRESENTANTI -->
-    <div class="dash-section" data-section="classe" style="margin-bottom: 26px;">
+    <div class="dash-section eh-reveal" data-section="classe" style="margin-bottom: 26px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         🏫 Vita di Classe & Rappresentanti
       </div>
@@ -1213,7 +1498,7 @@
     </div>
 
     <!-- SEZIONE 4: ARENA, CASSE XP & SVAGO -->
-    <div class="dash-section" data-section="svago" style="margin-bottom: 24px;">
+    <div class="dash-section eh-reveal" data-section="svago" style="margin-bottom: 24px;">
       <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px; padding-left:4px;">
         🎮 Arena, Casse XP & Compleanni
       </div>
@@ -1297,6 +1582,7 @@
       <div style="display:flex; flex-direction:column; gap:8px; font-size:0.84rem;">
         <div><strong>Ctrl + K</strong> → Apre la Command Palette per saltare ovunque</div>
         <div><strong>?</strong> → Mostra questa guida rapida</div>
+        <div><strong>Menu Temi in alto</strong> → Cambia tra 7 skin cromatiche</div>
         <div><strong>&lt;/&gt; in alto</strong> → Attiva/disattiva lo sfondo Matrix 1BI</div>
         <div><strong>⭐ Stellina sulle card</strong> → Salva gli strumenti nei tuoi Preferiti</div>
         <div><strong>5 click su EDUHUB</strong> → Attiva la pioggia di particelle neon</div>
@@ -1320,6 +1606,54 @@
       t.classList.add("show");
       clearTimeout(t._timer);
       t._timer = setTimeout(() => t.classList.remove("show"), 2600);
+    }
+
+    // =========================================================================
+    // 0. AGGANCIO TOPBAR -> BARRA RICERCA (ZERO GAP) + MULTI-TEMA + SCROLL REVEAL
+    // =========================================================================
+    const topbarEl = document.getElementById("mainTopbar");
+    function syncStickyOffset() {
+      if (!topbarEl) return;
+      const h = Math.ceil(topbarEl.getBoundingClientRect().height);
+      document.documentElement.style.setProperty("--eh-sticky-top", `${h}px`);
+    }
+    syncStickyOffset();
+    window.addEventListener("resize", syncStickyOffset);
+    if (window.ResizeObserver && topbarEl) {
+      new ResizeObserver(syncStickyOffset).observe(topbarEl);
+    }
+
+    // Selettore Multi-Tema (7 Skin)
+    const skinSelector = document.getElementById("ehSkinSelector");
+    const savedSkin = localStorage.getItem("eduhub_skin") || "default";
+    if (savedSkin && savedSkin !== "default") {
+      document.documentElement.setAttribute("data-skin", savedSkin);
+    }
+    if (skinSelector) {
+      skinSelector.value = savedSkin;
+      skinSelector.addEventListener("change", () => {
+        const val = skinSelector.value;
+        localStorage.setItem("eduhub_skin", val);
+        if (val === "default") document.documentElement.removeAttribute("data-skin");
+        else document.documentElement.setAttribute("data-skin", val);
+        showToast(`🎨 Tema impostato: ${skinSelector.options[skinSelector.selectedIndex].text}`);
+      });
+    }
+
+    // Scroll Reveal animato
+    const revealEls = document.querySelectorAll(".eh-reveal");
+    if ("IntersectionObserver" in window) {
+      const revObs = new IntersectionObserver((entries) => {
+        entries.forEach((entry, idx) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add("eh-in"), idx * 45);
+            revObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06 });
+      revealEls.forEach(el => revObs.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add("eh-in"));
     }
 
     // =========================================================================
@@ -1389,11 +1723,19 @@
       });
       card.appendChild(star);
 
-      // Spotlight hover
+      // Spotlight hover + Tilt 3D prospettico
       card.addEventListener("mousemove", (e) => {
         const rect = card.getBoundingClientRect();
-        card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
-        card.style.setProperty("--my", `${e.clientY - rect.top}px`);
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty("--mx", `${x}px`);
+        card.style.setProperty("--my", `${y}px`);
+        const rotY = ((x / rect.width) - 0.5) * 6;
+        const rotX = ((y / rect.height) - 0.5) * -6;
+        card.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-4px)`;
+      });
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
       });
     });
     updateFavCount();
@@ -1435,9 +1777,9 @@
           b.style.background = "var(--card-bg)";
           b.style.color = "var(--text-muted)";
         });
-        btn.style.borderColor = "#38bdf8";
+        btn.style.borderColor = "var(--eh-accent)";
         btn.style.background = "rgba(56,189,248,0.18)";
-        btn.style.color = "#38bdf8";
+        btn.style.color = "var(--eh-accent)";
         currentCat = btn.dataset.cat;
         applyDashboardFilters();
       });
@@ -1549,20 +1891,19 @@
       const bellEl = document.getElementById("ehBellText");
       if (clockEl) clockEl.textContent = `${hh}:${mm}`;
 
-      const day = now.getDay(); // 0 = Dom
+      const day = now.getDay();
       const mins = now.getHours() * 60 + now.getMinutes();
 
-      // 7 Moduli da 54 min + Ricreazioni 10:30-10:40 e 12:20-12:30
       const slots = [
-        { start: 8 * 60,      end: 8 * 60 + 54,  label: "1ª Ora" },        // 08:00 - 08:54
-        { start: 8 * 60 + 54, end: 9 * 60 + 48,  label: "2ª Ora" },        // 08:54 - 09:48
-        { start: 9 * 60 + 48, end: 10 * 60 + 30, label: "3ª Ora" },        // 09:48 - 10:30
-        { start: 10 * 60 + 30,end: 10 * 60 + 40, label: "1ª Ricreazione ☕" }, // 10:30 - 10:40
-        { start: 10 * 60 + 40,end: 11 * 60 + 34, label: "4ª Ora" },        // 10:40 - 11:34
-        { start: 11 * 60 + 34,end: 12 * 60 + 20, label: "5ª Ora" },        // 11:34 - 12:20
-        { start: 12 * 60 + 20,end: 12 * 60 + 30, label: "2ª Ricreazione ☕" }, // 12:20 - 12:30
-        { start: 12 * 60 + 30,end: 13 * 60 + 24, label: "6ª Ora" },        // 12:30 - 13:24
-        { start: 13 * 60 + 24,end: 14 * 60 + 18, label: "7ª Ora" }         // 13:24 - 14:18
+        { start: 8 * 60,       end: 8 * 60 + 54,  label: "1ª Ora" },
+        { start: 8 * 60 + 54,  end: 9 * 60 + 48,  label: "2ª Ora" },
+        { start: 9 * 60 + 48,  end: 10 * 60 + 30, label: "3ª Ora" },
+        { start: 10 * 60 + 30, end: 10 * 60 + 40, label: "1ª Ricreazione ☕" },
+        { start: 10 * 60 + 40, end: 11 * 60 + 34, label: "4ª Ora" },
+        { start: 11 * 60 + 34, end: 12 * 60 + 20, label: "5ª Ora" },
+        { start: 12 * 60 + 20, end: 12 * 60 + 30, label: "2ª Ricreazione ☕" },
+        { start: 12 * 60 + 30, end: 13 * 60 + 24, label: "6ª Ora" },
+        { start: 13 * 60 + 24, end: 14 * 60 + 18, label: "7ª Ora" }
       ];
 
       let msg = "1BI Online";
@@ -1601,7 +1942,6 @@
     });
 
     // Barra progresso scroll + ombra topbar + tasto Torna Su
-    const topbarEl = document.getElementById("mainTopbar");
     const scrollBarEl = document.getElementById("eh-scroll-progress");
     const backTopBtn = document.getElementById("ehBackToTopBtn");
     window.addEventListener("scroll", () => {
@@ -1703,12 +2043,35 @@
     });
 
     // =========================================================================
-    // 5. WIDGET COMPAGNI, STREAK GIORNALIERA & 32 MISSIONI LAMPO
+    // 5. BLOCCO NOTE RAPIDO & QUIZ LAMPO INFORMATICA DEL GIORNO (+20 XP)
     // =========================================================================
-    initCompagniWidget();
+    const scratchArea = document.getElementById("ehScratchpadArea");
+    const scratchChars = document.getElementById("ehScratchpadChars");
+    if (scratchArea) {
+      scratchArea.value = localStorage.getItem("eduhub_scratchpad_1bi") || "";
+      scratchChars.textContent = `${scratchArea.value.length} caratteri`;
+      scratchArea.addEventListener("input", () => {
+        localStorage.setItem("eduhub_scratchpad_1bi", scratchArea.value);
+        scratchChars.textContent = `${scratchArea.value.length} caratteri`;
+      });
+    }
+    document.getElementById("ehClearScratchpadBtn")?.addEventListener("click", () => {
+      if (!scratchArea) return;
+      scratchArea.value = "";
+      localStorage.removeItem("eduhub_scratchpad_1bi");
+      scratchChars.textContent = "0 caratteri";
+      showToast("📝 Blocco note svuotato");
+    });
 
-    let currentUser = null;
-    let userProfileData = {};
+    const TECH_QUIZ_POOL = [
+      { q: "Quanto vale il numero binario 1010 in decimale?", opts: ["8", "10", "12"], ans: 1 },
+      { q: "Quale porta logica restituisce 1 solo se entrambi gli ingressi sono 1?", opts: ["OR", "XOR", "AND"], ans: 2 },
+      { q: "Quanti bit ci sono in 1 Byte?", opts: ["4 bit", "8 bit", "16 bit"], ans: 1 },
+      { q: "Quale tag HTML crea un collegamento ipertestuale?", opts: ["<link>", "<a>", "<href>"], ans: 1 },
+      { q: "In esadecimale, a quale numero decimale corrisponde la lettera F?", opts: ["14", "15", "16"], ans: 1 },
+      { q: "Quale memoria è volatile e si svuota allo spegnimento del PC?", opts: ["SSD", "ROM", "RAM"], ans: 2 },
+      { q: "Quale proprietà CSS rende flessibile un contenitore?", opts: ["display: flex", "float: center", "align: grid"], ans: 0 }
+    ];
 
     function getTodayKey() {
       const d = new Date();
@@ -1719,6 +2082,68 @@
       const d = new Date(Date.now() - 86400000);
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     }
+
+    function renderDailyTechQuiz() {
+      const today = getTodayKey();
+      let seed = 0;
+      for (let i = 0; i < today.length; i++) seed = (seed * 17 + today.charCodeAt(i)) >>> 0;
+      const quiz = TECH_QUIZ_POOL[seed % TECH_QUIZ_POOL.length];
+
+      const qEl = document.getElementById("ehDailyQuizQuestion");
+      const optsEl = document.getElementById("ehDailyQuizOptions");
+      const badgeEl = document.getElementById("ehQuizStatusBadge");
+      if (!qEl || !optsEl) return;
+
+      qEl.textContent = quiz.q;
+      const doneKey = `eduhub_quiz_done_${today}`;
+      const alreadyDone = localStorage.getItem(doneKey);
+
+      if (alreadyDone) {
+        badgeEl.textContent = "✓ Completato";
+        badgeEl.style.background = "rgba(16,185,129,0.2)";
+        badgeEl.style.color = "#34d399";
+      }
+
+      optsEl.innerHTML = quiz.opts.map((opt, idx) => `
+        <button type="button" class="eh-quiz-opt ${alreadyDone && idx === quiz.ans ? "correct" : ""}" data-qidx="${idx}" ${alreadyDone ? "disabled" : ""}>
+          ${opt}
+        </button>
+      `).join("");
+
+      optsEl.querySelectorAll(".eh-quiz-opt").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const chosen = Number(btn.dataset.qidx);
+          optsEl.querySelectorAll(".eh-quiz-opt").forEach(b => b.disabled = true);
+          localStorage.setItem(doneKey, "1");
+
+          if (chosen === quiz.ans) {
+            btn.classList.add("correct");
+            badgeEl.textContent = "+20 XP!";
+            badgeEl.style.background = "rgba(16,185,129,0.22)";
+            badgeEl.style.color = "#34d399";
+            if (currentUser) {
+              const newXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0) + 20;
+              await setDoc(doc(db, "utenti_registrati", currentUser.uid), { xp: newXp, punti: newXp }, { merge: true });
+            }
+            showToast("🧠 Risposta esatta! +20 XP guadagnati!");
+          } else {
+            btn.classList.add("wrong");
+            optsEl.querySelectorAll(".eh-quiz-opt")[quiz.ans]?.classList.add("correct");
+            badgeEl.textContent = "Riprova domani";
+            showToast("❌ Risposta errata! Riprova domani");
+          }
+        });
+      });
+    }
+    renderDailyTechQuiz();
+
+    // =========================================================================
+    // 6. WIDGET COMPAGNI, STREAK GIORNALIERA & 32 MISSIONI LAMPO + SUPER BONUS
+    // =========================================================================
+    initCompagniWidget();
+
+    let currentUser = null;
+    let userProfileData = {};
 
     const MISSION_POOL = [
       { id: "m_casse", track: "casse", label: "🎰 Visita la Sala Casse & Ruota XP", xp: 30, href: "modules/casse-xp.html" },
@@ -1836,6 +2261,19 @@
         ? userProfileData.claimedMissionsToday[today]
         : [];
 
+      // Progresso Missioni (0/3) + Super Bonus +50 XP
+      const doneCount = todaysMissions.filter(m => claimedMissions.includes(m.id)).length;
+      const progCountEl = document.getElementById("missionsProgressCount");
+      const progFillEl = document.getElementById("ehMissionsProgressFill");
+      const superBonusBtn = document.getElementById("claimAllMissionsBonusBtn");
+      if (progCountEl) progCountEl.textContent = `${doneCount}/3`;
+      if (progFillEl) progFillEl.style.width = `${Math.round((doneCount / 3) * 100)}%`;
+
+      const superBonusClaimed = Boolean(userProfileData.superMissionBonusToday?.[today]);
+      if (superBonusBtn) {
+        superBonusBtn.style.display = (doneCount === 3 && !superBonusClaimed) ? "inline-block" : "none";
+      }
+
       const listEl = document.getElementById("dailyMissionsList");
       listEl.innerHTML = todaysMissions.map(m => {
         const isClaimed = claimedMissions.includes(m.id);
@@ -1883,6 +2321,19 @@
       });
     }
 
+    document.getElementById("claimAllMissionsBonusBtn")?.addEventListener("click", async () => {
+      if (!currentUser) return;
+      const today = getTodayKey();
+      const latestXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0) + 50;
+      await setDoc(doc(db, "utenti_registrati", currentUser.uid), {
+        xp: latestXp,
+        punti: latestXp,
+        superMissionBonusToday: { [today]: true }
+      }, { merge: true });
+      launchNeonConfetti();
+      showToast("🎁 Super Bonus 3/3 riscattato! +50 XP!");
+    });
+
     document.getElementById("claimStreakBtn").addEventListener("click", async () => {
       if (!currentUser) return;
       const today = getTodayKey();
@@ -1914,7 +2365,47 @@
       });
     });
 
-    // 6. Ultimo Annuncio in Bacheca
+    // =========================================================================
+    // 7. PODIO TOP 3 XP LIVE + CONTATORE COMPAGNI ONLINE NELLA TOPBAR
+    // =========================================================================
+    onSnapshot(collection(db, "utenti_registrati"), (snap) => {
+      const users = snap.docs.map(d => d.data());
+
+      // Podio Top 3 XP
+      const podiumEl = document.getElementById("ehMiniPodiumList");
+      if (podiumEl) {
+        const sorted = [...users]
+          .map(u => ({
+            name: u.nome || u.displayName || "Studente 1BI",
+            xp: Number(u.xp ?? u.punti ?? 0)
+          }))
+          .sort((a, b) => b.xp - a.xp)
+          .slice(0, 3);
+
+        const medals = ["🥇", "🥈", "🥉"];
+        podiumEl.innerHTML = sorted.length
+          ? sorted.map((u, i) => `
+              <div class="eh-podium-row">
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${medals[i]} ${u.name}</span>
+                <span style="color:#fbbf24; white-space:nowrap;">${u.xp} XP</span>
+              </div>
+            `).join("")
+          : `<div style="font-size:0.78rem; color:var(--text-muted);">Nessun punteggio registrato</div>`;
+      }
+
+      // Contatore Compagni Online Adesso (ultimi 5 min)
+      const onlineEl = document.getElementById("ehOnlineCountText");
+      if (onlineEl) {
+        const nowMs = Date.now();
+        const activeCount = users.filter(u => {
+          const last = u.lastSeen ? new Date(u.lastSeen).getTime() : 0;
+          return u.online === true || (last > 0 && nowMs - last < 5 * 60 * 1000);
+        }).length;
+        onlineEl.textContent = `${Math.max(1, activeCount)} online`;
+      }
+    });
+
+    // 8. Ultimo Annuncio in Bacheca
     const qBach = query(collection(db, "bacheca_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qBach, (snap) => {
       const titleEl = document.getElementById("latestBachecaTitle");
@@ -1932,7 +2423,7 @@
       subEl.textContent = dataStr ? `Pubblicato da ${autore} il ${dataStr}` : `Pubblicato da ${autore}`;
     });
 
-    // 7. Prossime Verifiche & Interrogazioni in calendario
+    // 9. Prossime Verifiche & Interrogazioni in calendario
     onSnapshot(collection(db, "verifiche_1bi"), (snap) => {
       const titleEl = document.getElementById("nextVerificaTitle");
       const subEl = document.getElementById("nextVerificaSub");
@@ -1958,7 +2449,7 @@
       }
     });
 
-    // 8. Banner Compleanno del Giorno (controlla compleanni_1bi)
+    // 10. Banner Compleanno del Giorno (controlla compleanni_1bi)
     onSnapshot(collection(db, "compleanni_1bi"), (snap) => {
       const banner = document.getElementById("ehBirthdayBanner");
       const title = document.getElementById("ehBirthdayTitle");
@@ -1980,7 +2471,7 @@
       }
     });
 
-    // 9. Controllo nuovi messaggi non letti nella Chat 1BI
+    // 11. Controllo nuovi messaggi non letti nella Chat 1BI
     const qLastMsg = query(collection(db, "chat_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qLastMsg, (snap) => {
       if (snap.empty) return;
@@ -1991,7 +2482,7 @@
       }
     });
 
-    // 10. Pillola Live Spotify 1BI collegata al Worker 24h/24 su Firestore
+    // 12. Pillola Live Spotify 1BI collegata al Worker 24h/24 su Firestore
     onSnapshot(collection(db, "spotify_stats_1bi"), (snap) => {
       const pillText = document.getElementById("ehSpotifyLiveText");
       if (!pillText) return;
