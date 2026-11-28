@@ -647,9 +647,12 @@
             </div>
 
             ${isOpenFeed && (isAuthor || isRep) ? `
-              <div style="display:flex; justify-content:flex-end;">
+              <div style="display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-sos btn-award" style="min-height:38px; padding:7px 14px; font-size:0.78rem;" data-self-solve-ticket="${t.id}">
+                  ✅ Segna come Risolto (+${t.bountyXp} XP indietro)
+                </button>
                 <button type="button" class="btn-sos btn-cancel-sos" style="min-height:38px; padding:7px 14px; font-size:0.78rem;" data-cancel-ticket="${t.id}">
-                  ↩️ Chiudi SOS & Rimborsa ${t.bountyXp} XP
+                  ↩️ Annulla SOS
                 </button>
               </div>
             ` : ""}
@@ -739,6 +742,40 @@
             alert("🎉 Taglia consegnata al compagno che ti ha aiutato!");
           } catch (err) {
             alert(err.message || "Errore consegna taglia.");
+          }
+        });
+      });
+
+      // Segna come Risolto in autonomia e recupera la taglia XP
+      container.querySelectorAll("[data-self-solve-ticket]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const ticketId = btn.dataset.selfSolveTicket;
+          if (!confirm("Vuoi segnare questo esercizio come risolto e recuperare i tuoi XP?")) return;
+
+          try {
+            await runTransaction(db, async (tx) => {
+              const ticketRef = doc(db, "sos_esercizi_1bi", ticketId);
+              const tSnap = await tx.get(ticketRef);
+              if (!tSnap.exists()) return;
+              const tData = tSnap.data();
+              if (tData.status !== "open") throw new Error("Richiesta già chiusa.");
+
+              const authorRef = doc(db, "utenti_registrati", tData.autoreUid);
+              const aSnap = await tx.get(authorRef);
+              if (aSnap.exists()) {
+                const aXp = Number(aSnap.data().xp ?? aSnap.data().punti ?? 0) + Number(tData.bountyXp);
+                tx.update(authorRef, { xp: aXp, punti: aXp });
+              }
+
+              tx.update(ticketRef, {
+                status: "solved",
+                winnerUid: tData.autoreUid,
+                winnerName: `${tData.autoreName} (Risolto in autonomia)`
+              });
+            });
+            alert("✅ Esercizio spostato in Risolti e taglia XP riaccreditata!");
+          } catch (err) {
+            alert(err.message || "Errore durante la chiusura.");
           }
         });
       });
