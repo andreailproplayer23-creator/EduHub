@@ -2551,11 +2551,37 @@
       }
     } catch (_) {}
 
-    // Sincronizza in tempo reale con Firebase appena pronto
+    // Sincronizza in tempo reale con Firebase appena pronto + Stato Online Live
+    let presenceInterval = null;
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
       currentUser = user;
-      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+      const userRef = doc(db, "utenti_registrati", user.uid);
+
+      const markOnline = () => {
+        setDoc(userRef, {
+          online: true,
+          lastSeen: new Date().toISOString()
+        }, { merge: true }).catch(() => {});
+      };
+
+      markOnline();
+      if (presenceInterval) clearInterval(presenceInterval);
+      presenceInterval = setInterval(markOnline, 60 * 1000);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          markOnline();
+        } else {
+          setDoc(userRef, { online: false, lastSeen: new Date().toISOString() }, { merge: true }).catch(() => {});
+        }
+      });
+
+      window.addEventListener("beforeunload", () => {
+        setDoc(userRef, { online: false, lastSeen: new Date().toISOString() }, { merge: true }).catch(() => {});
+      });
+
+      onSnapshot(userRef, (snap) => {
         userProfileData = snap.exists() ? snap.data() : {};
         try {
           localStorage.setItem("eduhub_cached_profile", JSON.stringify(userProfileData));
@@ -2606,7 +2632,7 @@
         const nowMs = Date.now();
         const activeCount = users.filter(u => {
           const last = u.lastSeen ? new Date(u.lastSeen).getTime() : 0;
-          return u.online === true || (last > 0 && nowMs - last < 5 * 60 * 1000);
+          return last > 0 && (nowMs - last) < 3 * 60 * 1000;
         }).length;
         onlineEl.textContent = `${Math.max(1, activeCount)} online`;
       }

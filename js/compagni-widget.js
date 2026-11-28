@@ -1,5 +1,8 @@
 import { db } from "./firebase-config.js";
 import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { db, auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { collection, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const REP_EMAILS = [
   "andrea.ilproplayer23@gmail.com",
@@ -49,14 +52,38 @@ function isUserRep(u) {
 }
 
 function isUserOnline(u) {
-  if (u.online === true) return true;
   if (!u.lastSeen) return false;
   const lastMs = new Date(u.lastSeen).getTime();
-  return Number.isFinite(lastMs) && Date.now() - lastMs < 5 * 60 * 1000;
+  return Number.isFinite(lastMs) && (Date.now() - lastMs) < 3 * 60 * 1000;
 }
 
 export function initCompagniWidget() {
   if (document.getElementById("compagniFloatingBtn")) return;
+
+  let heartbeatTimer = null;
+  onAuthStateChanged(auth, (user) => {
+    if (!user) return;
+    const userRef = doc(db, "utenti_registrati", user.uid);
+
+    const pingOnline = () => {
+      setDoc(userRef, {
+        online: true,
+        lastSeen: new Date().toISOString()
+      }, { merge: true }).catch(() => {});
+    };
+
+    pingOnline();
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+    heartbeatTimer = setInterval(pingOnline, 60 * 1000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        pingOnline();
+      } else {
+        setDoc(userRef, { online: false, lastSeen: new Date().toISOString() }, { merge: true }).catch(() => {});
+      }
+    });
+  });
 
   const style = document.createElement("style");
   style.textContent = `
