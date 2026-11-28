@@ -2506,6 +2506,63 @@
         });
       });
     }
+    
+    document.getElementById("claimAllMissionsBonusBtn")?.addEventListener("click", async () => {
+      if (!currentUser) return;
+      const today = getTodayKey();
+      const latestXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0) + 50;
+      await setDoc(doc(db, "utenti_registrati", currentUser.uid), {
+        xp: latestXp,
+        punti: latestXp,
+        superMissionBonusToday: { [today]: true }
+      }, { merge: true });
+      launchNeonConfetti();
+      showToast("🎁 Super Bonus 3/3 riscattato! +50 XP!");
+    });
+
+    document.getElementById("claimStreakBtn")?.addEventListener("click", async () => {
+      if (!currentUser) return;
+      const today = getTodayKey();
+      const yesterday = getYesterdayKey();
+      const lastClaim = userProfileData.lastStreakDate || "";
+      if (lastClaim === today) return;
+
+      const prevStreak = lastClaim === yesterday ? Number(userProfileData.streakCount || 0) : 0;
+      const newStreak = prevStreak + 1;
+      const daySlot = ((newStreak - 1) % 7) + 1;
+      const bonusXp = daySlot === 7 ? 300 : 30 + (daySlot - 1) * 15;
+      const newTotalXp = Number(userProfileData.xp ?? userProfileData.punti ?? 0) + bonusXp;
+
+      await setDoc(doc(db, "utenti_registrati", currentUser.uid), {
+        xp: newTotalXp,
+        punti: newTotalXp,
+        streakCount: newStreak,
+        lastStreakDate: today
+      }, { merge: true });
+      showToast(`🔥 Streak Giorno ${newStreak} riscattata! +${bonusXp} XP`);
+    });
+
+    // Carica subito gli ultimi dati salvati in cache (0 ms di attesa)
+    try {
+      const cachedProfile = JSON.parse(localStorage.getItem("eduhub_cached_profile") || "null");
+      if (cachedProfile) {
+        userProfileData = cachedProfile;
+        renderStreakAndMissions();
+      }
+    } catch (_) {}
+
+    // Sincronizza in tempo reale con Firebase appena pronto
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+        userProfileData = snap.exists() ? snap.data() : {};
+        try {
+          localStorage.setItem("eduhub_cached_profile", JSON.stringify(userProfileData));
+        } catch (_) {}
+        renderStreakAndMissions();
+      });
+    });
 
     // =========================================================================
     // 7. PODIO TOP 3 XP LIVE (CON BARRA PROPORZIONALE) + CONTATORE ONLINE
