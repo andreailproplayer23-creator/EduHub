@@ -185,6 +185,47 @@
     .rank-row.top2 { border-color: #94a3b8; }
     .rank-row.top3 { border-color: #d97706; }
 
+    /* CARD LIVE NOW PLAYING / IN PAUSA */
+    .live-spoti-card {
+      background: var(--solid-sub);
+      border: 1.5px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .live-spoti-card.playing {
+      border-color: rgba(29, 185, 84, 0.65);
+      background: linear-gradient(145deg, rgba(29, 185, 84, 0.12), var(--solid-sub));
+    }
+    .live-spoti-card.paused {
+      opacity: 0.85;
+    }
+    .status-pill-playing {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(29, 185, 84, 0.22);
+      color: #4ade80;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+    .status-pill-paused {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.18);
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
     /* BARRE PROGRESSO MATERIE */
     .bar-track {
       width: 100%;
@@ -291,7 +332,7 @@
       <div>
         <h2 style="font-size: clamp(1.28rem, 3.6vw, 1.65rem); font-weight: 900;">📊 Centro Statistiche & Wrapped 1BI</h2>
         <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 4px;">
-          Tutti i record della classe, il tuo riepilogo personale stile Wrapped e la classifica musicale Spotify della settimana.
+          Tutti i record della classe, il tuo riepilogo personale stile Wrapped e gli ascolti Spotify live della 1BI.
         </p>
       </div>
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -330,9 +371,7 @@
           </button>
         </div>
 
-        <div class="kpi-grid" id="myPersonalKpiGrid">
-          <!-- Popolato via JS con TUTTE le metriche personali -->
-        </div>
+        <div class="kpi-grid" id="myPersonalKpiGrid"></div>
       </div>
 
       <!-- RIEPILOGO MUSICALE PERSONALE NEL WRAPPED -->
@@ -345,7 +384,7 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 2: SPOTIFY & MUSICA 1BI (CLASSIFICA SETTIMANALE + ARTISTI + LIVE) -->
+    <!-- TAB 2: SPOTIFY & MUSICA 1BI (LIVE NOW PLAYING + CLASSIFICA + ARTISTI) -->
     <!-- ===================================================================== -->
     <section id="tab-spotify" style="display: none;">
       <div class="spoti-banner">
@@ -353,20 +392,36 @@
           <div style="font-size: 0.76rem; font-weight: 900; text-transform: uppercase; color: #4ade80; letter-spacing: 0.6px;">
             🎧 Spotify Club • Settimana <span id="currentWeekBadge">--</span>
           </div>
-          <h3 style="font-size: 1.25rem; font-weight: 900; margin-top: 4px;">Classifica Ascolti Settimanali della 1BI</h3>
+          <h3 style="font-size: 1.25rem; font-weight: 900; margin-top: 4px;">Ascolti Live & Classifica Settimanale 1BI</h3>
           <p style="font-size: 0.83rem; color: #cbd5e1; margin-top: 3px;">
-            Collega il tuo account Spotify oppure aggiorna manualmente i tuoi minuti e il brano che stai ascoltando ora!
+            Vedi in tempo reale chi sta ascoltando musica (con canzone, autori esatti e playlist) e chi è in pausa!
           </p>
         </div>
 
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button type="button" id="connectSpotifyOAuthBtn" class="btn-st btn-spoti">
-            🟢 Sincronizza Spotify API
+            🟢 Collega / Sincronizza Spotify
           </button>
           <button type="button" id="configSpotifyClientBtn" class="btn-st" style="display:none; background:rgba(255,255,255,0.14); color:#fff;">
             ⚙️ Client ID (Rep)
           </button>
         </div>
+      </div>
+
+      <!-- BACHECA LIVE: CHI STA ASCOLTANDO COSA IN QUESTO MOMENTO / IN PAUSA -->
+      <div class="panel-box" style="margin-bottom: 18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom: 12px;">
+          <div>
+            <h3 style="font-size: 1.08rem; font-weight: 900;">📻 In Ascolto in Questo Momento (Live 1BI)</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Aggiornato automaticamente ogni 10 secondi: mostra brano, autori ufficiali e playlist per chi sta ascoltando, oppure <strong>In pausa</strong>.
+            </p>
+          </div>
+          <span id="liveListenersCountBadge" style="font-size:0.76rem; font-weight:900; padding:4px 11px; border-radius:999px; background:rgba(29,185,84,0.16); color:#4ade80;">
+            0 in ascolto ora
+          </span>
+        </div>
+        <div id="classNowPlayingGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px;"></div>
       </div>
 
       <div class="spoti-grid">
@@ -381,12 +436,12 @@
           </div>
         </div>
 
-        <!-- COLONNA 2: AGGIORNA I TUOI DATI MUSICALI + TOP ARTISTI / BRANI 1BI -->
+        <!-- COLONNA 2: AGGIORNA MANUALMENTE + TOP ARTISTI DELLA CLASSE -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <div class="panel-box">
-            <h3 style="font-size: 1.02rem; font-weight: 900; margin-bottom: 6px;">🎛️ Il Tuo Stato Musicale Settimanale</h3>
+            <h3 style="font-size: 1.02rem; font-weight: 900; margin-bottom: 6px;">🎛️ Aggiornamento Manuale (Per chi non ha OAuth)</h3>
             <p style="font-size: 0.78rem; color: var(--text-muted);">
-              Se non usi la sincronizzazione automatica OAuth, aggiorna qui i tuoi dati della settimana per entrare in classifica:
+              Se non usi la sincronizzazione automatica Spotify, inserisci qui i tuoi dati della settimana:
             </p>
             <form id="manualSpotifyForm">
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -395,22 +450,15 @@
                   <input type="number" id="spotiMinutesInput" class="st-input" min="0" max="10080" placeholder="Es. 420" required />
                 </div>
                 <div>
-                  <label class="st-label">Genere / Vibe</label>
-                  <select id="spotiGenreInput" class="st-select">
-                    <option value="Rap / Trap">🎤 Rap / Trap</option>
-                    <option value="Pop / Hit">🎵 Pop / Hit</option>
-                    <option value="Lo-Fi / Studio">📚 Lo-Fi / Studio</option>
-                    <option value="Rock / Metal">🎸 Rock / Metal</option>
-                    <option value="Elettronica / Phonk">⚡ Elettronica / Phonk</option>
-                    <option value="Indie / Cantautori">🌙 Indie / Cantautori</option>
-                  </select>
+                  <label class="st-label">Genere / Playlist</label>
+                  <input type="text" id="spotiPlaylistInput" class="st-input" placeholder="Es. Rap Italia / Lo-Fi" />
                 </div>
               </div>
 
-              <label class="st-label">Artista #1 della Settimana *</label>
-              <input type="text" id="spotiArtistInput" class="st-input" placeholder="Es. Geolier, Lazza, Travis Scott, Tedua..." required />
+              <label class="st-label">Artista / DJ del Brano *</label>
+              <input type="text" id="spotiArtistInput" class="st-input" placeholder="Es. DJ Blayox, Geolier, Lazza..." required />
 
-              <label class="st-label">Brano in Ripetizione / In Ascolto Ora *</label>
+              <label class="st-label">Brano del Momento *</label>
               <input type="text" id="spotiTrackInput" class="st-input" placeholder="Es. Titolo canzone" required />
 
               <label class="st-label">Link Spotify / YouTube del Brano (Opzionale)</label>
@@ -422,18 +470,12 @@
             </form>
           </div>
 
-          <!-- TOP ARTISTI & GENERI DELLA CLASSE -->
+          <!-- TOP ARTISTI DELLA CLASSE -->
           <div class="panel-box">
-            <h3 style="font-size: 1.02rem; font-weight: 900; margin-bottom: 10px;">🔥 Artisti & Generi più Ascoltati dalla 1BI</h3>
+            <h3 style="font-size: 1.02rem; font-weight: 900; margin-bottom: 10px;">🔥 Artisti & DJ più Ascoltati dalla 1BI</h3>
             <div id="topClassArtistsBox"></div>
           </div>
         </div>
-      </div>
-
-      <!-- BACHECA "IN ASCOLTO ORA / BRANI CONSIGLIATI DALLA CLASSE" -->
-      <div class="panel-box" style="margin-top: 16px;">
-        <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 12px;">📻 Playlist Live — Cosa Ascoltano i Compagni Questa Settimana</h3>
-        <div id="classNowPlayingGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;"></div>
       </div>
     </section>
 
@@ -512,6 +554,7 @@
     let currentUser = null;
     let isRep = false;
     let spotifyClientId = "";
+    const playlistNameCache = new Map();
 
     // Struttura aggregata globale
     let state = {
@@ -556,7 +599,6 @@
       });
     });
 
-    // Helper fetch sicuro per non bloccare mai il caricamento
     async function safeGetCollection(colName) {
       try {
         const snap = await getDocs(collection(db, colName));
@@ -564,6 +606,222 @@
       } catch (e) {
         console.warn(`Collezione ${colName} non accessibile:`, e.message);
         return [];
+      }
+    }
+
+    // =========================================================================
+    // HELPER SPOTIFY WEB API (DATI ESATTI, AUTORI ESATTI, PLAYLIST, NOW PLAYING)
+    // =========================================================================
+    function formatTrackArtists(trackObj) {
+      if (!trackObj || !Array.isArray(trackObj.artists) || trackObj.artists.length === 0) {
+        return "Artista Sconosciuto";
+      }
+      return trackObj.artists.map(a => a.name).filter(Boolean).join(", ");
+    }
+
+    async function fetchSpotifyJsonSafe(url, headers, retries = 1) {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        const res = await fetch(url, { headers });
+        if (res.status === 204) return { _noContent: true };
+        const rawText = await res.text();
+        if (res.ok) {
+          try {
+            return JSON.parse(rawText);
+          } catch (_) {
+            return null;
+          }
+        }
+        if (res.status === 503 && attempt < retries) {
+          await new Promise(r => setTimeout(r, 1200));
+          continue;
+        }
+        return null;
+      }
+      return null;
+    }
+
+    // Rinnova automaticamente il token OAuth PKCE se scaduto
+    async function getValidSpotifyAccessToken() {
+      const accessToken = localStorage.getItem("spoti_access_token");
+      const refreshToken = localStorage.getItem("spoti_refresh_token");
+      const expiresAt = Number(localStorage.getItem("spoti_token_expires_at") || 0);
+
+      if (accessToken && Date.now() < expiresAt - 30000) {
+        return accessToken;
+      }
+      if (!refreshToken || !spotifyClientId) return null;
+
+      try {
+        const res = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: spotifyClientId,
+            grant_type: "refresh_token",
+            refresh_token: refreshToken
+          })
+        });
+        const raw = await res.text();
+        const data = JSON.parse(raw);
+        if (data.access_token) {
+          localStorage.setItem("spoti_access_token", data.access_token);
+          if (data.refresh_token) {
+            localStorage.setItem("spoti_refresh_token", data.refresh_token);
+          }
+          localStorage.setItem("spoti_token_expires_at", String(Date.now() + (data.expires_in || 3600) * 1000));
+          return data.access_token;
+        }
+      } catch (e) {
+        console.warn("Impossibile rinnovare token Spotify:", e.message);
+      }
+      return null;
+    }
+
+    // Ricava il nome reale della Playlist (o Album/Libreria) dal context Spotify
+    async function resolveSpotifyContextName(contextObj, itemObj, headers) {
+      if (!contextObj || !contextObj.type) {
+        return { name: "Riproduzione Singola / Coda", url: "" };
+      }
+      if (contextObj.type === "playlist" && contextObj.uri) {
+        const parts = contextObj.uri.split(":");
+        const playlistId = parts[parts.length - 1];
+        if (playlistId) {
+          if (playlistNameCache.has(playlistId)) {
+            return playlistNameCache.get(playlistId);
+          }
+          const plData = await fetchSpotifyJsonSafe(
+            `https://api.spotify.com/v1/playlists/${playlistId}?fields=name,external_urls`,
+            headers,
+            0
+          );
+          if (plData && plData.name) {
+            const info = {
+              name: `Playlist: ${plData.name}`,
+              url: plData.external_urls?.spotify || contextObj.external_urls?.spotify || ""
+            };
+            playlistNameCache.set(playlistId, info);
+            return info;
+          }
+        }
+        return {
+          name: "Playlist Spotify",
+          url: contextObj.external_urls?.spotify || ""
+        };
+      }
+      if (contextObj.type === "album") {
+        return {
+          name: `Album: ${itemObj?.album?.name || "Album Spotify"}`,
+          url: contextObj.external_urls?.spotify || ""
+        };
+      }
+      if (contextObj.type === "collection") {
+        return { name: "Brani che ti piacciono", url: "" };
+      }
+      if (contextObj.type === "artist") {
+        return {
+          name: `Pagina Artista: ${formatTrackArtists(itemObj)}`,
+          url: contextObj.external_urls?.spotify || ""
+        };
+      }
+      return { name: "Spotify", url: contextObj.external_urls?.spotify || "" };
+    }
+
+    // Scarica e salva su Firestore:
+    // 1) Brano in riproduzione ORA (con autori esatti e playlist) oppure stato "In pausa"
+    // 2) Minuti reali degli ultimi 7 giorni + vero artista #1 della settimana
+    async function syncSpotifyLiveFromToken(user, token, showSuccessAlert = false) {
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const [nowJson, recentJson] = await Promise.all([
+        fetchSpotifyJsonSafe("https://api.spotify.com/v1/me/player/currently-playing", headers, 1),
+        fetchSpotifyJsonSafe("https://api.spotify.com/v1/me/player/recently-played?limit=50", headers, 1)
+      ]);
+
+      // 1. Analizza brano attuale (In ascolto ora vs In pausa)
+      let isPlaying = false;
+      let nowTrack = "";
+      let nowArtists = "";
+      let nowTrackUrl = "";
+      let nowPlaylistName = "";
+      let nowPlaylistUrl = "";
+      let nowCover = "";
+
+      if (nowJson && !nowJson._noContent && nowJson.is_playing && nowJson.item) {
+        isPlaying = true;
+        nowTrack = nowJson.item.name || "Brano in riproduzione";
+        nowArtists = formatTrackArtists(nowJson.item);
+        nowTrackUrl = nowJson.item.external_urls?.spotify || "";
+        nowCover = nowJson.item.album?.images?.[1]?.url || nowJson.item.album?.images?.[0]?.url || "";
+        const ctx = await resolveSpotifyContextName(nowJson.context, nowJson.item, headers);
+        nowPlaylistName = ctx.name;
+        nowPlaylistUrl = ctx.url;
+      }
+
+      // 2. Analizza cronologia ultimi 7 giorni con gli AUTORI ESATTI di ciascun brano
+      let minutesWeek = null;
+      let topArtist = "";
+      let topTrack = "";
+      let trackUrl = "";
+
+      if (recentJson && Array.isArray(recentJson.items)) {
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const items = recentJson.items.filter(it => new Date(it.played_at).getTime() >= sevenDaysAgo);
+
+        const totalMs = items.reduce((acc, it) => acc + (it.track?.duration_ms || 0), 0);
+        minutesWeek = Math.round(totalMs / 60000);
+
+        // Calcola l'artista più ascoltato della settimana sommando i ms reali di ogni brano
+        const artistMsMap = {};
+        items.forEach(it => {
+          const dur = it.track?.duration_ms || 0;
+          (it.track?.artists || []).forEach(a => {
+            if (a.name) {
+              artistMsMap[a.name] = (artistMsMap[a.name] || 0) + dur;
+            }
+          });
+        });
+        const sortedArtists = Object.entries(artistMsMap).sort((a, b) => b[1] - a[1]);
+
+        const latestTrack = items[0]?.track;
+        topTrack = isPlaying ? nowTrack : (latestTrack?.name || "Nessun brano recente");
+        // Se sta ascoltando ora, mostra gli autori esatti del brano attuale; altrimenti gli autori esatti dell'ultimo brano
+        const exactLatestArtists = isPlaying ? nowArtists : formatTrackArtists(latestTrack);
+        topArtist = sortedArtists[0]?.[0] || exactLatestArtists;
+        trackUrl = isPlaying ? nowTrackUrl : (latestTrack?.external_urls?.spotify || "");
+      }
+
+      const payload = {
+        uid: user.uid,
+        weekKey: CURRENT_WEEK,
+        oauthConnected: true,
+        isPlaying,
+        nowTrack,
+        nowArtists,
+        nowTrackUrl,
+        nowPlaylistName,
+        nowPlaylistUrl,
+        nowCover,
+        source: "oauth",
+        updatedAt: serverTimestamp()
+      };
+
+      if (minutesWeek !== null) {
+        payload.minutesWeek = minutesWeek;
+        if (topArtist) payload.topArtist = topArtist;
+        if (topTrack) payload.topTrack = topTrack;
+        if (trackUrl) payload.trackUrl = trackUrl;
+        if (isPlaying && nowArtists) {
+          payload.latestTrackArtists = nowArtists;
+        }
+      }
+
+      await setDoc(doc(db, "spotify_stats_1bi", user.uid), payload, { merge: true });
+
+      if (showSuccessAlert) {
+        const statusMsg = isPlaying
+          ? `In ascolto ora: "${nowTrack}" di ${nowArtists} (${nowPlaylistName})`
+          : `Stato attuale: In pausa`;
+        alert(`🟢 Spotify sincronizzato!\n${statusMsg}\nMinuti ultimi 7 giorni: ${minutesWeek ?? 0} min`);
       }
     }
 
@@ -598,7 +856,6 @@
         sondaggi, proposte, verifiche, spotifyList
       };
 
-      // Leggi eventuale Client ID Spotify configurato dai Rappresentanti
       try {
         const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
         if (cfgSnap.exists()) {
@@ -609,13 +866,10 @@
       renderAllSections();
     }
 
-    // Calcola metriche arricchite per ogni studente della 1BI
     function buildEnrichedStudents() {
       const spotiMap = new Map();
       state.spotifyList.forEach(s => {
-        if (s.weekKey === CURRENT_WEEK) {
-          spotiMap.set(s.uid || s.id, s);
-        }
+        spotiMap.set(s.uid || s.id, s);
       });
 
       return state.users.map(u => {
@@ -636,8 +890,9 @@
                             state.scambi.filter(s => s.proposerUid === uid || s.acceptedByUid === uid).length;
 
         const totalContributions = notesCount + messagesCount + decksCreated + aiSavedCount + sosSolved;
-        const spoti = spotiMap.get(uid) || null;
-        const spotiMinutes = spoti ? Number(spoti.minutesWeek || 0) : 0;
+        const rawSpoti = spotiMap.get(uid) || null;
+        const isCurrentWeek = rawSpoti && rawSpoti.weekKey === CURRENT_WEEK;
+        const spotiMinutes = isCurrentWeek ? Number(rawSpoti.minutesWeek || 0) : 0;
 
         return {
           uid,
@@ -654,7 +909,8 @@
           aiSavedCount,
           tradesCount,
           totalContributions,
-          spoti,
+          spoti: rawSpoti,
+          spotiCurrentWeek: isCurrentWeek ? rawSpoti : null,
           spotiMinutes
         };
       });
@@ -680,10 +936,9 @@
         xp: 0, level: 1, streak: 0, cosmeticsCount: 0,
         sosSolved: 0, sosCreated: 0, decksCreated: 0,
         notesCount: 0, messagesCount: 0, aiSavedCount: 0,
-        tradesCount: 0, totalContributions: 0, spoti: null, spotiMinutes: 0
+        tradesCount: 0, totalContributions: 0, spoti: null, spotiCurrentWeek: null, spotiMinutes: 0
       };
 
-      // Determina Archetipo Wrapped in base all'attività reale
       let archetype = "🌟 Esploratore della 1BI";
       let archDesc = "Sempre connesso con la classe e pronto a scoprire nuove funzioni su EduHub!";
       if (me.sosSolved >= 2) {
@@ -727,10 +982,13 @@
         </div>
       `).join("");
 
-      // Box musicale nel Wrapped
       const musicBox = document.getElementById("myWrappedMusicBox");
       if (me.spoti) {
         const hrs = (me.spotiMinutes / 60).toFixed(1);
+        const liveStatusLine = me.spoti.isPlaying
+          ? `<div style="margin-top:6px; color:#4ade80; font-weight:800;">🟢 In ascolto ora: "${escapeHtml(me.spoti.nowTrack)}" — ${escapeHtml(me.spoti.nowArtists)} (${escapeHtml(me.spoti.nowPlaylistName || "Spotify")})</div>`
+          : `<div style="margin-top:6px; color:#94a3b8; font-weight:700;">⏸️ Stato attuale Spotify: In pausa</div>`;
+
         musicBox.innerHTML = `
           <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;">
             <div>
@@ -738,26 +996,25 @@
                 ⏱️ <strong>${me.spotiMinutes} minuti</strong> (${hrs} ore) ascoltati nella settimana ${CURRENT_WEEK}
               </div>
               <div style="margin-top:4px;">
-                🎤 Artista #1: <strong>${escapeHtml(me.spoti.topArtist)}</strong> • 🎵 Brano: <strong>${escapeHtml(me.spoti.topTrack)}</strong> (${escapeHtml(me.spoti.genre || "Musica")})
+                🎤 Artista #1 della settimana: <strong>${escapeHtml(me.spoti.topArtist || "-")}</strong> • 🎵 Brano recente: <strong>${escapeHtml(me.spoti.topTrack || "-")}</strong>
               </div>
+              ${liveStatusLine}
             </div>
-            ${me.spoti.trackUrl ? `<a href="${escapeHtml(me.spoti.trackUrl)}" target="_blank" rel="noopener" class="btn-st btn-spoti" style="text-decoration:none;">▶️ Ascolta Brano</a>` : ""}
+            ${me.spoti.trackUrl ? `<a href="${escapeHtml(me.spoti.trackUrl)}" target="_blank" rel="noopener" class="btn-st btn-spoti" style="text-decoration:none;">▶️ Apri su Spotify</a>` : ""}
           </div>
         `;
 
-        // Precompila il form Spotify solo se l'utente non ci sta scrivendo dentro
         const activeTag = document.activeElement?.id || "";
-        const isTypingInSpoti = ["spotiMinutesInput", "spotiArtistInput", "spotiTrackInput", "spotiGenreInput", "spotiLinkInput"].includes(activeTag);
+        const isTypingInSpoti = ["spotiMinutesInput", "spotiArtistInput", "spotiTrackInput", "spotiPlaylistInput", "spotiLinkInput"].includes(activeTag);
         if (!isTypingInSpoti) {
           document.getElementById("spotiMinutesInput").value = me.spotiMinutes;
           document.getElementById("spotiArtistInput").value = me.spoti.topArtist || "";
           document.getElementById("spotiTrackInput").value = me.spoti.topTrack || "";
-          document.getElementById("spotiGenreInput").value = me.spoti.genre || "Rap / Trap";
+          document.getElementById("spotiPlaylistInput").value = me.spoti.nowPlaylistName || "";
           document.getElementById("spotiLinkInput").value = me.spoti.trackUrl || "";
         }
       }
 
-      // Copia riepilogo Wrapped per WhatsApp
       document.getElementById("copyWrappedBtn").onclick = async () => {
         const summary = [
           `📊 IL MIO WRAPPED EDUHUB 1BI (${me.name})`,
@@ -774,20 +1031,86 @@
     }
 
     // =========================================================================
-    // 2. RENDER SPOTIFY & MUSICA 1BI
+    // 2. RENDER SPOTIFY & MUSICA 1BI (LIVE NOW PLAYING / IN PAUSA + CLASSIFICA)
     // =========================================================================
     function renderSpotifyHub(students) {
       if (isRep) {
         document.getElementById("configSpotifyClientBtn").style.display = "inline-flex";
       }
 
+      // A) BACHECA LIVE: TUTTI GLI UTENTI CON SPOTIFY COLLEGATO (IN ASCOLTO ORA vs IN PAUSA)
+      const connectedUsers = students
+        .filter(s => s.spoti !== null)
+        .sort((a, b) => Number(Boolean(b.spoti.isPlaying)) - Number(Boolean(a.spoti.isPlaying)) || b.spotiMinutes - a.spotiMinutes);
+
+      const playingCount = connectedUsers.filter(s => s.spoti.isPlaying).length;
+      document.getElementById("liveListenersCountBadge").textContent = `${playingCount} ${playingCount === 1 ? "in ascolto ora" : "in ascolto ora"}`;
+
+      const nowGrid = document.getElementById("classNowPlayingGrid");
+      if (connectedUsers.length === 0) {
+        nowGrid.innerHTML = `<p style="font-size:0.84rem; color:var(--text-muted);">Nessun compagno ha ancora collegato Spotify. Premi <strong>🟢 Collega / Sincronizza Spotify</strong> in alto!</p>`;
+      } else {
+        nowGrid.innerHTML = connectedUsers.map(s => {
+          const sp = s.spoti;
+          if (sp.isPlaying && sp.nowTrack) {
+            return `
+              <div class="live-spoti-card playing">
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:8px;">
+                    <strong style="font-size:0.92rem;">🎧 ${escapeHtml(s.name)}</strong>
+                    <span class="status-pill-playing">🟢 In ascolto ora</span>
+                  </div>
+                  <div style="display:flex; gap:10px; align-items:center;">
+                    ${sp.nowCover ? `<img src="${escapeHtml(sp.nowCover)}" alt="Cover" style="width:52px; height:52px; border-radius:10px; object-fit:cover; flex-shrink:0;" />` : ""}
+                    <div style="min-width:0;">
+                      <div style="font-size:0.95rem; font-weight:900; color:#f8fafc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${escapeHtml(sp.nowTrack)}
+                      </div>
+                      <div style="font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-top:2px;">
+                        👤 ${escapeHtml(sp.nowArtists || sp.topArtist || "Artista")}
+                      </div>
+                      <div style="font-size:0.75rem; color:#4ade80; font-weight:800; margin-top:3px;">
+                        📂 ${escapeHtml(sp.nowPlaylistName || "Spotify")}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid rgba(148,163,184,0.16); font-size:0.76rem;">
+                  <span style="color:var(--text-muted);">⏱️ ${s.spotiMinutes} min sett.</span>
+                  ${sp.nowTrackUrl ? `<a href="${escapeHtml(sp.nowTrackUrl)}" target="_blank" rel="noopener" style="color:#4ade80; font-weight:800; text-decoration:none;">▶️ Ascolta su Spotify ↗</a>` : ""}
+                </div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="live-spoti-card paused">
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">
+                    <strong style="font-size:0.92rem;">🎧 ${escapeHtml(s.name)}</strong>
+                    <span class="status-pill-paused">⏸️ In pausa</span>
+                  </div>
+                  <div style="font-size:0.8rem; color:var(--text-muted);">
+                    Nessun brano in riproduzione in questo momento.
+                  </div>
+                  ${sp.topTrack ? `<div style="font-size:0.76rem; color:var(--text-muted); margin-top:6px;">Ultimo ascolto: <strong>${escapeHtml(sp.topTrack)}</strong> (${escapeHtml(sp.latestTrackArtists || sp.topArtist || "")})</div>` : ""}
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); padding-top:6px; border-top:1px solid rgba(148,163,184,0.14);">
+                  ⏱️ ${s.spotiMinutes} min ascoltati questa settimana
+                </div>
+              </div>
+            `;
+          }
+        }).join("");
+      }
+
+      // B) CLASSIFICA SETTIMANALE PER MINUTI ASCOLTATI
       const listeners = students
-        .filter(s => s.spoti && s.spotiMinutes > 0)
+        .filter(s => s.spotiCurrentWeek && s.spotiMinutes > 0)
         .sort((a, b) => b.spotiMinutes - a.spotiMinutes);
 
       const lbEl = document.getElementById("spotifyWeeklyLeaderboard");
       if (listeners.length === 0) {
-        lbEl.innerHTML = `<p style="color:var(--text-muted);">Nessuno ha ancora registrato minuti musicali per la settimana ${CURRENT_WEEK}. Sii il primo usando il modulo accanto!</p>`;
+        lbEl.innerHTML = `<p style="color:var(--text-muted);">Nessun minuto registrato ancora per la settimana ${CURRENT_WEEK}.</p>`;
       } else {
         const maxMin = listeners[0].spotiMinutes || 1;
         lbEl.innerHTML = listeners.map((s, idx) => {
@@ -795,15 +1118,16 @@
           const rowCls = idx === 0 ? "top1" : idx === 1 ? "top2" : idx === 2 ? "top3" : "";
           const pct = Math.max(8, Math.round((s.spotiMinutes / maxMin) * 100));
           const hrs = (s.spotiMinutes / 60).toFixed(1);
+          const statusIcon = s.spoti?.isPlaying ? "🟢" : "⏸️";
           return `
             <div class="rank-row ${rowCls}">
               <div style="flex:1; min-width:0;">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                  <strong style="font-size:0.9rem;">${medal} ${escapeHtml(s.name)}</strong>
+                  <strong style="font-size:0.9rem;">${medal} ${escapeHtml(s.name)} ${statusIcon}</strong>
                   <span style="color:#4ade80; font-weight:900; font-size:0.86rem;">${s.spotiMinutes} min (${hrs}h)</span>
                 </div>
                 <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                  🎤 ${escapeHtml(s.spoti.topArtist)} • 🎵 ${escapeHtml(s.spoti.topTrack)}
+                  🎤 Top Artista: ${escapeHtml(s.spoti.topArtist || "-")} • 🎵 ${escapeHtml(s.spoti.topTrack || "-")}
                 </div>
                 <div class="bar-track">
                   <div class="bar-fill" style="width:${pct}%; background:linear-gradient(90deg, #1db954, #4ade80);"></div>
@@ -814,25 +1138,20 @@
         }).join("");
       }
 
-      // Aggrega Top Artisti & Top Generi della classe
+      // C) AGGREGA TOP ARTISTI DELLA CLASSE
       const artistCounts = {};
-      const genreCounts = {};
       listeners.forEach(s => {
         const art = (s.spoti.topArtist || "").trim();
-        const gen = (s.spoti.genre || "").trim();
         if (art) artistCounts[art] = (artistCounts[art] || 0) + 1;
-        if (gen) genreCounts[gen] = (genreCounts[gen] || 0) + 1;
       });
-
-      const topArtists = Object.entries(artistCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      const topGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      const topArtists = Object.entries(artistCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
 
       const topArtBox = document.getElementById("topClassArtistsBox");
       if (topArtists.length === 0) {
-        topArtBox.innerHTML = `<p style="font-size:0.82rem; color:var(--text-muted);">Aggiungi il tuo artista preferito per generare la classifica artisti della 1BI!</p>`;
+        topArtBox.innerHTML = `<p style="font-size:0.82rem; color:var(--text-muted);">Collega Spotify o inserisci il tuo artista per vedere i preferiti della 1BI!</p>`;
       } else {
         topArtBox.innerHTML = `
-          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+          <div style="display:flex; flex-direction:column; gap:8px;">
             ${topArtists.map(([art, cnt], i) => `
               <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-radius:10px; background:var(--solid-sub);">
                 <span style="font-weight:800; font-size:0.86rem;">#${i + 1} 🎤 ${escapeHtml(art)}</span>
@@ -840,34 +1159,7 @@
               </div>
             `).join("")}
           </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            ${topGenres.map(([gen, cnt]) => `
-              <span style="padding:4px 10px; border-radius:999px; background:rgba(29,185,84,0.16); color:#4ade80; font-size:0.74rem; font-weight:800;">
-                ${escapeHtml(gen)} (${cnt})
-              </span>
-            `).join("")}
-          </div>
         `;
-      }
-
-      // Bacheca "Cosa Ascoltano i Compagni"
-      const nowGrid = document.getElementById("classNowPlayingGrid");
-      if (listeners.length === 0) {
-        nowGrid.innerHTML = `<p style="font-size:0.84rem; color:var(--text-muted);">Nessun brano condiviso ancora questa settimana.</p>`;
-      } else {
-        nowGrid.innerHTML = listeners.map(s => `
-          <div style="background:var(--solid-sub); border:1px solid var(--solid-border); border-radius:14px; padding:13px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
-            <div>
-              <div style="font-size:0.74rem; color:#4ade80; font-weight:800;">🎧 ${escapeHtml(s.name)} • ${escapeHtml(s.spoti.genre || "Musica")}</div>
-              <div style="font-size:0.95rem; font-weight:900; margin-top:4px;">${escapeHtml(s.spoti.topTrack)}</div>
-              <div style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(s.spoti.topArtist)}</div>
-            </div>
-            ${s.spoti.trackUrl
-              ? `<a href="${escapeHtml(s.spoti.trackUrl)}" target="_blank" rel="noopener" style="font-size:0.78rem; font-weight:800; color:#38bdf8; text-decoration:none;">▶️ Apri su Spotify / YT ↗</a>`
-              : `<span style="font-size:0.74rem; color:var(--text-muted);">⏱️ ${s.spotiMinutes} min questa settimana</span>`
-            }
-          </div>
-        `).join("");
       }
     }
 
@@ -877,7 +1169,7 @@
       if (!currentUser) return;
 
       const minutesWeek = Math.max(0, Math.floor(Number(document.getElementById("spotiMinutesInput").value) || 0));
-      const genre = document.getElementById("spotiGenreInput").value;
+      const playlistLabel = document.getElementById("spotiPlaylistInput").value.trim();
       const topArtist = document.getElementById("spotiArtistInput").value.trim();
       const topTrack = document.getElementById("spotiTrackInput").value.trim();
       const trackUrl = document.getElementById("spotiLinkInput").value.trim();
@@ -891,10 +1183,12 @@
           uid: currentUser.uid,
           weekKey: CURRENT_WEEK,
           minutesWeek,
-          genre,
           topArtist,
           topTrack,
+          latestTrackArtists: topArtist,
           trackUrl,
+          isPlaying: false,
+          nowPlaylistName: playlistLabel || "Inserimento Manuale",
           source: "manual",
           updatedAt: serverTimestamp()
         }, { merge: true });
@@ -924,10 +1218,18 @@
       alert("✅ Configurazione Spotify salvata!");
     });
 
-    // Flusso OAuth PKCE Spotify Web API (se Client ID configurato)
+    // Flusso OAuth PKCE Spotify Web API (con scope completi per now playing + playlist + cronologia)
     document.getElementById("connectSpotifyOAuthBtn").addEventListener("click", async () => {
       if (!spotifyClientId) {
-        alert("ℹ️ Il Client ID Spotify API non è ancora stato configurato dai Rappresentanti.\nPuoi comunque usare subito il modulo qui sotto per inserire i tuoi minuti settimanali, artista #1 e brano del momento!");
+        alert("ℹ️ Il Client ID Spotify API non è ancora stato configurato dai Rappresentanti.\nPuoi comunque usare il modulo manuale qui sotto!");
+        return;
+      }
+
+      // Se abbiamo già un token valido, sincronizziamo subito senza neanche uscire dalla pagina!
+      const existingToken = await getValidSpotifyAccessToken();
+      if (existingToken && currentUser) {
+        await syncSpotifyLiveFromToken(currentUser, existingToken, true);
+        await loadAllPortalData();
         return;
       }
 
@@ -947,99 +1249,57 @@
         redirect_uri: redirectUri,
         code_challenge_method: "S256",
         code_challenge: challenge,
-        scope: "user-read-recently-played user-top-read user-read-currently-playing"
+        scope: "user-read-recently-played user-read-currently-playing user-read-playback-state playlist-read-private playlist-read-collaborative"
       });
       window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
     });
 
-    async function fetchSpotifyJsonSafe(url, headers, retries = 1) {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    const res = await fetch(url, { headers });
-    const rawText = await res.text();
-    if (res.ok) {
+    // Gestione rientro OAuth PKCE da Spotify
+    async function handleSpotifyOAuthCallback(user) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const verifier = localStorage.getItem("spoti_pkce_verifier");
+      if (!code || !verifier) return;
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+      localStorage.removeItem("spoti_pkce_verifier");
+
       try {
-        return JSON.parse(rawText);
-      } catch (_) {
-        return null;
+        const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
+        const cId = cfgSnap.exists() ? (cfgSnap.data().clientId || "").trim() : "";
+        if (!cId) return;
+        spotifyClientId = cId;
+
+        const redirectUri = window.location.origin + window.location.pathname;
+        const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: cId,
+            grant_type: "authorization_code",
+            code,
+            redirect_uri: redirectUri,
+            code_verifier: verifier
+          })
+        });
+        const tokenRaw = await tokenRes.text();
+        let tokenData = {};
+        try { tokenData = JSON.parse(tokenRaw); } catch (_) {}
+        if (!tokenData.access_token) {
+          throw new Error("Spotify ha risposto con un blocco temporaneo. Riprova tra qualche secondo.");
+        }
+
+        localStorage.setItem("spoti_access_token", tokenData.access_token);
+        if (tokenData.refresh_token) {
+          localStorage.setItem("spoti_refresh_token", tokenData.refresh_token);
+        }
+        localStorage.setItem("spoti_token_expires_at", String(Date.now() + (tokenData.expires_in || 3600) * 1000));
+
+        await syncSpotifyLiveFromToken(user, tokenData.access_token, true);
+      } catch (err) {
+        alert("Avviso Spotify OAuth: " + err.message);
       }
     }
-    if (res.status === 503 && attempt < retries) {
-      await new Promise(r => setTimeout(r, 1500));
-      continue;
-    }
-    return null;
-  }
-  return null;
-}
-
-async function handleSpotifyOAuthCallback(user) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get("code");
-  const verifier = localStorage.getItem("spoti_pkce_verifier");
-  if (!code || !verifier) return;
-
-  window.history.replaceState({}, document.title, window.location.pathname);
-  localStorage.removeItem("spoti_pkce_verifier");
-
-  try {
-    const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
-    const cId = cfgSnap.exists() ? (cfgSnap.data().clientId || "").trim() : "";
-    if (!cId) return;
-
-    const redirectUri = window.location.origin + window.location.pathname;
-    const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: cId,
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: redirectUri,
-        code_verifier: verifier
-      })
-    });
-    const tokenRaw = await tokenRes.text();
-    let tokenData = {};
-    try { tokenData = JSON.parse(tokenRaw); } catch (_) {}
-    if (!tokenData.access_token) {
-      throw new Error("Spotify ha bloccato temporaneamente la richiesta (503). Riprova tra qualche secondo.");
-    }
-
-    const headers = { Authorization: `Bearer ${tokenData.access_token}` };
-    const recentJson = await fetchSpotifyJsonSafe("https://api.spotify.com/v1/me/player/recently-played?limit=50", headers, 1);
-    if (!recentJson || !Array.isArray(recentJson.items)) {
-      throw new Error("Impossibile leggere gli ascolti recenti da Spotify (filtro 503 attivo). Riprova tra 10 secondi.");
-    }
-
-    const topArtJson = await fetchSpotifyJsonSafe("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1", headers, 0);
-
-    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const items = recentJson.items.filter(it => new Date(it.played_at).getTime() >= sevenDaysAgo);
-    const totalMs = items.reduce((acc, it) => acc + (it.track?.duration_ms || 0), 0);
-    const minutesWeek = Math.max(1, Math.round(totalMs / 60000));
-
-    const latestTrack = items[0]?.track;
-    const topArtist = topArtJson?.items?.[0]?.name || latestTrack?.artists?.[0]?.name || "Artista Spotify";
-    const topTrack = latestTrack?.name || "Brano Recente";
-    const trackUrl = latestTrack?.external_urls?.spotify || "";
-
-    await setDoc(doc(db, "spotify_stats_1bi", user.uid), {
-      uid: user.uid,
-      weekKey: CURRENT_WEEK,
-      minutesWeek,
-      topArtist,
-      topTrack,
-      trackUrl,
-      genre: "Spotify Sync",
-      source: "oauth",
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-
-    alert(`🟢 Spotify sincronizzato! Rilevati ${minutesWeek} minuti negli ultimi ascolti.`);
-  } catch (err) {
-    alert("Avviso Spotify OAuth: " + err.message + "\nPuoi comunque aggiornare i dati manualmente nel modulo Spotify.");
-  }
-}
 
     // =========================================================================
     // 3. RENDER STATISTICHE GLOBALI & RECORD ASSOLUTI 1BI
@@ -1162,10 +1422,16 @@ async function handleSpotifyOAuthCallback(user) {
       }).join("");
     }
 
-    document.getElementById("refreshAllStatsBtn").addEventListener("click", loadAllPortalData);
+    document.getElementById("refreshAllStatsBtn").addEventListener("click", async () => {
+      if (currentUser) {
+        const token = await getValidSpotifyAccessToken();
+        if (token) await syncSpotifyLiveFromToken(currentUser, token, false);
+      }
+      await loadAllPortalData();
+    });
 
     // =========================================================================
-    // AUTO-REFRESH OGNI 10 SECONDI (SOLO QUANDO LA SCHEDA È ATTIVA)
+    // AUTO-REFRESH OGNI 10 SECONDI (SPOTIFY LIVE + STATISTICHE CLASSE)
     // =========================================================================
     let autoRefreshTimer = null;
     let isRefreshing = false;
@@ -1176,6 +1442,10 @@ async function handleSpotifyOAuthCallback(user) {
         if (document.hidden || !currentUser || isRefreshing) return;
         isRefreshing = true;
         try {
+          const token = await getValidSpotifyAccessToken();
+          if (token) {
+            await syncSpotifyLiveFromToken(currentUser, token, false);
+          }
           await loadAllPortalData();
           const badge = document.getElementById("autoRefreshBadge");
           if (badge) {
@@ -1194,6 +1464,12 @@ async function handleSpotifyOAuthCallback(user) {
       isRep = isRappresentante(user);
       await handleSpotifyOAuthCallback(user);
       await loadAllPortalData();
+      // Se già connesso in precedenza, aggiorna subito anche lo stato live Spotify
+      const token = await getValidSpotifyAccessToken();
+      if (token) {
+        await syncSpotifyLiveFromToken(user, token, false);
+        await loadAllPortalData();
+      }
       startAutoRefresh();
     });
 
