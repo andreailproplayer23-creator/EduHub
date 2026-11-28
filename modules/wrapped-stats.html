@@ -294,9 +294,14 @@
           Tutti i record della classe, il tuo riepilogo personale stile Wrapped e la classifica musicale Spotify della settimana.
         </p>
       </div>
-      <button type="button" id="refreshAllStatsBtn" class="btn-st" style="background:rgba(255,255,255,0.14); color:#fff; border:1px solid rgba(255,255,255,0.25);">
-        🔄 Aggiorna Dati Live
-      </button>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span id="autoRefreshBadge" style="font-size:0.75rem; font-weight:800; padding:6px 12px; border-radius:999px; background:rgba(16,185,129,0.18); border:1px solid rgba(52,211,153,0.45); color:#34d399;">
+          🟢 Live (ogni 10s)
+        </span>
+        <button type="button" id="refreshAllStatsBtn" class="btn-st" style="background:rgba(255,255,255,0.14); color:#fff; border:1px solid rgba(255,255,255,0.25);">
+          🔄 Aggiorna Ora
+        </button>
+      </div>
     </div>
 
     <!-- TABS PRINCIPALI -->
@@ -618,7 +623,7 @@
         const name = u.nome || u.nomeCompleto || u.email?.split("@")[0] || "Studente 1BI";
         const xp = Number(u.xp ?? u.punti ?? 0);
         const level = Math.floor(xp / 250) + 1;
-        const streak = Number(u.streak || u.loginStreak || 0);
+        const streak = Number(u.streak || u.streakCount || u.loginStreak || 0);
         const cosmeticsCount = Array.isArray(u.shopOwned) ? u.shopOwned.length : 0;
 
         const sosCreated = state.sos.filter(t => t.autoreUid === uid).length;
@@ -739,12 +744,17 @@
             ${me.spoti.trackUrl ? `<a href="${escapeHtml(me.spoti.trackUrl)}" target="_blank" rel="noopener" class="btn-st btn-spoti" style="text-decoration:none;">▶️ Ascolta Brano</a>` : ""}
           </div>
         `;
-        // Precompila il form Spotify
-        document.getElementById("spotiMinutesInput").value = me.spotiMinutes;
-        document.getElementById("spotiArtistInput").value = me.spoti.topArtist || "";
-        document.getElementById("spotiTrackInput").value = me.spoti.topTrack || "";
-        document.getElementById("spotiGenreInput").value = me.spoti.genre || "Rap / Trap";
-        document.getElementById("spotiLinkInput").value = me.spoti.trackUrl || "";
+
+        // Precompila il form Spotify solo se l'utente non ci sta scrivendo dentro
+        const activeTag = document.activeElement?.id || "";
+        const isTypingInSpoti = ["spotiMinutesInput", "spotiArtistInput", "spotiTrackInput", "spotiGenreInput", "spotiLinkInput"].includes(activeTag);
+        if (!isTypingInSpoti) {
+          document.getElementById("spotiMinutesInput").value = me.spotiMinutes;
+          document.getElementById("spotiArtistInput").value = me.spoti.topArtist || "";
+          document.getElementById("spotiTrackInput").value = me.spoti.topTrack || "";
+          document.getElementById("spotiGenreInput").value = me.spoti.genre || "Rap / Trap";
+          document.getElementById("spotiLinkInput").value = me.spoti.trackUrl || "";
+        }
       }
 
       // Copia riepilogo Wrapped per WhatsApp
@@ -949,7 +959,6 @@
       const verifier = localStorage.getItem("spoti_pkce_verifier");
       if (!code || !verifier) return;
 
-      // Pulisci URL
       window.history.replaceState({}, document.title, window.location.pathname);
       localStorage.removeItem("spoti_pkce_verifier");
 
@@ -1042,7 +1051,6 @@
         </div>
       `).join("");
 
-      // Hall of Fame (6 Primati)
       const topBy = (fn) => [...students].sort((a, b) => fn(b) - fn(a))[0];
       const recXp = topBy(s => s.xp);
       const recSos = topBy(s => s.sosSolved);
@@ -1071,7 +1079,6 @@
         </div>
       `).join("");
 
-      // Distribuzione per Materia
       const matCounts = {};
       [...state.sos, ...state.appunti, ...state.flashcards].forEach(item => {
         const m = (item.materia || item.subject || "Altro").trim();
@@ -1135,12 +1142,37 @@
 
     document.getElementById("refreshAllStatsBtn").addEventListener("click", loadAllPortalData);
 
+    // =========================================================================
+    // AUTO-REFRESH OGNI 10 SECONDI (SOLO QUANDO LA SCHEDA È ATTIVA)
+    // =========================================================================
+    let autoRefreshTimer = null;
+    let isRefreshing = false;
+
+    function startAutoRefresh() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(async () => {
+        if (document.hidden || !currentUser || isRefreshing) return;
+        isRefreshing = true;
+        try {
+          await loadAllPortalData();
+          const badge = document.getElementById("autoRefreshBadge");
+          if (badge) {
+            const nowStr = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+            badge.textContent = `🟢 Live • ${nowStr}`;
+          }
+        } finally {
+          isRefreshing = false;
+        }
+      }, 10000);
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
       currentUser = user;
       isRep = isRappresentante(user);
       await handleSpotifyOAuthCallback(user);
       await loadAllPortalData();
+      startAutoRefresh();
     });
 
     function escapeHtml(str) {
