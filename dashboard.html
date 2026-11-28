@@ -9,7 +9,7 @@
   <script src="js/theme.js"></script>
   <style>
     /* =========================================================================
-       EDUHUB 1BI - ULTRA UI/UX UPGRADE PACK
+       EDUHUB 1BI - ULTRA UI/UX UPGRADE PACK (0 WARNINGS)
        ========================================================================= */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: rgba(7, 11, 20, 0.4); }
@@ -27,7 +27,7 @@
     #eh-ambient-bg {
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: -2;
       pointer-events: none;
       overflow: hidden;
       background-image: radial-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px);
@@ -43,15 +43,26 @@
       opacity: 0.26;
       animation: ehFloatOrb 18s ease-in-out infinite alternate;
     }
-    html[data-theme="light"] .eh-orb {
-      opacity: 0.14;
-    }
+    html[data-theme="light"] .eh-orb { opacity: 0.14; }
     .eh-orb-1 { width: 460px; height: 460px; background: #2563eb; top: -120px; left: -90px; }
     .eh-orb-2 { width: 420px; height: 420px; background: #7c3aed; bottom: -110px; right: -80px; animation-delay: -6s; }
     .eh-orb-3 { width: 320px; height: 320px; background: #06b6d4; top: 42%; left: 48%; opacity: 0.14; animation-delay: -12s; }
     @keyframes ehFloatOrb {
       0% { transform: translate(0, 0) scale(1); }
       100% { transform: translate(45px, 35px) scale(1.12); }
+    }
+
+    /* Canvas Matrix Mode 1BI */
+    #eh-matrix-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    body.eh-matrix-active #eh-matrix-canvas {
+      opacity: 0.24;
     }
 
     /* Barra Progresso Scorrimento in alto */
@@ -103,6 +114,38 @@
     @keyframes ehPulseDot {
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.45); opacity: 0.45; }
+    }
+    .eh-matrix-btn {
+      padding: 5px 10px;
+      border-radius: 9px;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.12);
+      color: #4ade80;
+      font-family: monospace;
+      font-size: 0.76rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+    .eh-matrix-btn:hover { transform: translateY(-1px); background: rgba(34, 197, 94, 0.22); }
+    body.eh-matrix-active .eh-matrix-btn {
+      background: #22c55e;
+      color: #052e16;
+    }
+
+    /* Banner Compleanno del Giorno */
+    #ehBirthdayBanner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.22), rgba(245, 158, 11, 0.18));
+      border: 1.5px solid rgba(244, 114, 182, 0.55);
+      box-shadow: 0 12px 30px -12px rgba(236, 72, 153, 0.45);
     }
 
     /* Hero Banner Potenziato */
@@ -296,9 +339,7 @@
       cursor: pointer;
       transition: transform 0.18s ease, opacity 0.18s ease;
     }
-    .btn-claim-streak:hover:not(:disabled) {
-      transform: translateY(-1px);
-    }
+    .btn-claim-streak:hover:not(:disabled) { transform: translateY(-1px); }
     .btn-claim-streak:disabled {
       background: rgba(16, 185, 129, 0.2);
       border: 1px solid rgba(16, 185, 129, 0.45);
@@ -387,79 +428,172 @@
     }
     .wrapped-pill-btn:hover { transform: translateY(-2px); }
 
-    /* Sticky Filter Bar + Ricerca Rapida */
-    .eh-sticky-filter-bar {
-      position: sticky;
-      top: 66px;
-      z-index: 40;
-      display: flex;
+    /* Griglia Riepiloghi Rapidi (Bacheca + Prossime Verifiche) */
+    .eh-recaps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .recap-verifiche {
+      border-color: rgba(245, 158, 11, 0.4) !important;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(234, 88, 12, 0.05)) !important;
+    }
+
+    /* Striscia Usati di Recente */
+    #ehRecentStrip {
+      display: none;
+      align-items: center;
       gap: 8px;
       flex-wrap: wrap;
-      margin: 20px 0 18px;
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: rgba(11, 17, 32, 0.78);
+      margin: 14px 0 6px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.45);
       border: 1px solid rgba(148, 163, 184, 0.16);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      align-items: center;
-      box-shadow: 0 10px 25px -12px rgba(0, 0, 0, 0.55);
     }
-    html[data-theme="light"] .eh-sticky-filter-bar {
-      background: rgba(255, 255, 255, 0.85);
-      border-color: rgba(15, 23, 42, 0.1);
+    html[data-theme="light"] #ehRecentStrip {
+      background: rgba(241, 245, 249, 0.85);
+    }
+    .eh-recent-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      color: #7dd3fc;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+    html[data-theme="light"] .eh-recent-chip {
+      color: #0369a1;
+      background: rgba(14, 165, 233, 0.12);
+    }
+    .eh-recent-chip:hover { transform: translateY(-1px); background: rgba(56, 189, 248, 0.24); }
+
+    /* BARRA RICERCA CENTRATA STICKY + FILTRI */
+    .eh-sticky-controls {
+      position: sticky;
+      top: 64px;
+      z-index: 45;
+      margin: 18px 0 18px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(10, 16, 30, 0.84);
+      border: 1px solid rgba(56, 189, 248, 0.24);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 14px 32px -14px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    html[data-theme="light"] .eh-sticky-controls {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(14, 165, 233, 0.25);
+    }
+
+    .eh-center-search-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 540px;
     }
     .eh-search-box {
       position: relative;
-      margin-left: auto;
-      min-width: 220px;
-      flex: 1 1 220px;
-      max-width: 290px;
+      flex: 1;
+      width: 100%;
     }
     .eh-search-box input {
       width: 100%;
-      padding: 7px 54px 7px 32px;
+      padding: 9px 115px 9px 36px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      background: rgba(15, 23, 42, 0.65);
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      background: rgba(15, 23, 42, 0.82);
       color: var(--text-main, #f8fafc);
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.85rem;
+      font-weight: 700;
       outline: none;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     html[data-theme="light"] .eh-search-box input {
-      background: rgba(241, 245, 249, 0.9);
+      background: rgba(241, 245, 249, 0.95);
       color: #0f172a;
     }
     .eh-search-box input:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
     }
     .eh-search-icon {
       position: absolute;
-      left: 11px;
+      left: 13px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 0.76rem;
-      opacity: 0.65;
+      font-size: 0.82rem;
+      opacity: 0.75;
       pointer-events: none;
     }
-    .eh-search-kbd {
+    .eh-search-badges {
       position: absolute;
-      right: 9px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: none;
+    }
+    .eh-search-count {
+      font-size: 0.68rem;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+    }
+    .eh-search-kbd {
       font-size: 0.65rem;
       font-weight: 800;
       padding: 2px 6px;
       border-radius: 6px;
       background: rgba(148, 163, 184, 0.18);
       color: var(--text-muted);
-      pointer-events: none;
+    }
+    .eh-random-tool-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.22), rgba(56, 189, 248, 0.2));
+      color: #e9d5ff;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.25s ease;
+    }
+    .eh-random-tool-btn:hover {
+      transform: rotate(25deg) scale(1.08);
     }
 
-    /* Spotlight Hover & Bottone Stella Preferiti sulle Card (senza cambiare design card) */
+    .eh-filter-pills-row {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Spotlight Hover & Bottone Stella Preferiti sulle Card */
     .hub-card {
       position: relative;
       transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, border-color 0.24s ease !important;
@@ -478,9 +612,7 @@
         transparent 70%
       );
     }
-    .hub-card:hover::after {
-      opacity: 1;
-    }
+    .hub-card:hover::after { opacity: 1; }
     .eh-fav-star {
       position: absolute;
       top: 10px;
@@ -500,20 +632,42 @@
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.18s ease, color 0.2s ease, border-color 0.2s ease;
     }
-    html[data-theme="light"] .eh-fav-star {
-      background: rgba(255, 255, 255, 0.85);
-    }
+    html[data-theme="light"] .eh-fav-star { background: rgba(255, 255, 255, 0.85); }
     .hub-card:hover .eh-fav-star,
-    .eh-fav-star.is-fav {
-      opacity: 1;
-    }
+    .eh-fav-star.is-fav { opacity: 1; }
     .eh-fav-star.is-fav {
       color: #fbbf24;
       border-color: rgba(251, 191, 36, 0.55);
       background: rgba(251, 191, 36, 0.14);
     }
-    .eh-fav-star:hover {
-      transform: scale(1.12);
+    .eh-fav-star:hover { transform: scale(1.12); }
+
+    /* Pulsante Torna Su (Back to Top) */
+    #ehBackToTopBtn {
+      position: fixed;
+      right: 24px;
+      bottom: 78px;
+      z-index: 90;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: rgba(15, 23, 42, 0.88);
+      color: #38bdf8;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #ehBackToTopBtn.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     /* Command Palette Ctrl+K & Modale Scorciatoie */
@@ -603,19 +757,20 @@
     }
 
     @media (max-width: 860px) {
-      .streak-missions-grid { grid-template-columns: 1fr; }
+      .streak-missions-grid, .eh-recaps-grid { grid-template-columns: 1fr; }
       .eh-clock-pill { display: none; }
-      .eh-sticky-filter-bar { top: 58px; }
+      .eh-sticky-controls { top: 58px; }
     }
   </style>
 </head>
 <body>
-  <!-- Sfondo Aurora + Barra Progresso -->
+  <!-- Sfondo Aurora + Canvas Matrix + Barra Progresso -->
   <div id="eh-ambient-bg">
     <div class="eh-orb eh-orb-1"></div>
     <div class="eh-orb eh-orb-2"></div>
     <div class="eh-orb eh-orb-3"></div>
   </div>
+  <canvas id="eh-matrix-canvas"></canvas>
   <div id="eh-scroll-progress"></div>
 
   <header class="topbar" id="mainTopbar">
@@ -624,12 +779,13 @@
       <span class="topbar-sub">Classe 1BI</span>
     </div>
     <div class="topbar-right">
-      <div class="eh-clock-pill" id="ehClockBellPill" title="Orario e conto alla rovescia campanella 1BI">
+      <div class="eh-clock-pill" id="ehClockBellPill" title="Orario e moduli 1BI da 54 minuti">
         <span class="eh-live-pulse"></span>
         <span id="ehClockText">--:--</span>
         <span>•</span>
         <span id="ehBellText">1BI</span>
       </div>
+      <button type="button" id="ehMatrixToggleBtn" class="eh-matrix-btn" title="Attiva/Disattiva Modalità Matrix 1BI">&lt;/&gt;</button>
       <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
       <span class="badge-role">1BI</span>
       <a href="profilo.html" class="profile-pill" data-track="profilo" title="Apri il tuo profilo">
@@ -641,6 +797,20 @@
   </header>
 
   <main class="container">
+    <!-- BANNER COMPLEANNO AUTOMATICO -->
+    <div id="ehBirthdayBanner">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.35rem;">🎂</span>
+        <div>
+          <strong id="ehBirthdayTitle" style="font-size:0.9rem; color:#fbcfe8;">Oggi è un giorno speciale in 1BI!</strong>
+          <div id="ehBirthdaySub" style="font-size:0.78rem; color:var(--text-muted);">Fai gli auguri sul biglietto digitale della classe</div>
+        </div>
+      </div>
+      <a href="modules/compleanni.html" data-track="compleanni" style="padding:7px 14px; border-radius:999px; background:linear-gradient(135deg,#ec4899,#f59e0b); color:#fff; font-size:0.78rem; font-weight:900; text-decoration:none;">
+        🎉 Firma Auguri →
+      </a>
+    </div>
+
     <div class="welcome-banner">
       <div>
         <h2>Bentornato, <span id="welcomeUserName">Studente</span>!</h2>
@@ -687,7 +857,6 @@
 
     <!-- STREAK GIORNALIERA & MISSIONI LAMPO XP -->
     <div class="streak-missions-grid">
-      <!-- BOX STREAK GIORNALIERA -->
       <div class="streak-card">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -717,7 +886,6 @@
         </button>
       </div>
 
-      <!-- BOX MISSIONI LAMPO DEL GIORNO -->
       <div class="missions-card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
           <div style="display:flex; align-items:center; gap:8px;">
@@ -739,8 +907,8 @@
       </div>
     </div>
 
-    <!-- RIEPILOGO RAPIDO: ULTIMO ANNUNCIO IN BACHECA -->
-    <div style="margin-bottom: 18px;">
+    <!-- DOPPIO RIEPILOGO RAPIDO: ULTIMO ANNUNCIO BACHECA + PROSSIME VERIFICHE -->
+    <div class="eh-recaps-grid">
       <a href="modules/bacheca.html" id="latestBachecaBox" data-track="bacheca" class="recap-box recap-bacheca" style="display: block;">
         <div>
           <span class="recap-label" style="color: #f87171;">
@@ -751,6 +919,19 @@
         <div class="recap-meta">
           <span id="latestBachecaSub">Comunicazioni 1BI</span>
           <span style="color: #f87171; font-weight: 800;">Apri →</span>
+        </div>
+      </a>
+
+      <a href="modules/verifiche.html" data-track="verifiche" class="recap-box recap-verifiche" style="display: block;">
+        <div>
+          <span class="recap-label" style="color: #fbbf24;">
+            <i data-lucide="calendar-check" style="width: 14px; height: 14px;"></i> Prossime Verifiche & Prove
+          </span>
+          <div id="nextVerificaTitle" class="recap-title" style="margin-top: 6px;">Controlla il calendario prove 1BI</div>
+        </div>
+        <div class="recap-meta">
+          <span id="nextVerificaSub">Calendario condiviso 1BI</span>
+          <span style="color: #fbbf24; font-weight: 800;">Vedi tutte →</span>
         </div>
       </a>
     </div>
@@ -795,31 +976,47 @@
       </div>
     </a>
 
-    <!-- BARRA FILTRO RAPIDO SEZIONI + RICERCA ISTANTANEA STICKY -->
-    <div class="eh-sticky-filter-bar">
-      <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:7px 15px; border-radius:999px; border:1px solid #38bdf8; background:rgba(56,189,248,0.18); color:#38bdf8; font-weight:800; font-size:0.78rem; cursor:pointer;">
-        Tutte (27)
-      </button>
-      <button type="button" class="dash-filter-btn" data-cat="favorites" id="favFilterBtn" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
-        ⭐ Preferiti (<span id="favCountNum">0</span>)
-      </button>
-      <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
-        📚 Didattica & Studio
-      </button>
-      <button type="button" class="dash-filter-btn" data-cat="tech" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
-        💻 Laboratori & Tech
-      </button>
-      <button type="button" class="dash-filter-btn" data-cat="classe" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
-        🏫 Vita di Classe
-      </button>
-      <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:7px 15px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
-        🎮 Arena, Casse XP & Svago
-      </button>
+    <!-- STRISCIA USATI DI RECENTE -->
+    <div id="ehRecentStrip">
+      <span style="font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
+        🕒 Usati di recente:
+      </span>
+      <div id="ehRecentList" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
+    </div>
 
-      <div class="eh-search-box">
-        <span class="eh-search-icon">🔍</span>
-        <input type="text" id="ehInlineSearchInput" placeholder="Cerca strumento..." autocomplete="off" />
-        <span class="eh-search-kbd">Ctrl K</span>
+    <!-- BARRA RICERCA CENTRATA STICKY + FILTRI RAPIDI -->
+    <div class="eh-sticky-controls">
+      <div class="eh-center-search-row">
+        <div class="eh-search-box">
+          <span class="eh-search-icon">🔍</span>
+          <input type="text" id="ehInlineSearchInput" placeholder="Cerca tra i 27 strumenti 1BI..." autocomplete="off" />
+          <div class="eh-search-badges">
+            <span class="eh-search-count" id="ehSearchCountBadge">27/27</span>
+            <span class="eh-search-kbd">Ctrl K</span>
+          </div>
+        </div>
+        <button type="button" class="eh-random-tool-btn" id="ehRandomToolBtn" title="Apri uno strumento a caso!">🎲</button>
+      </div>
+
+      <div class="eh-filter-pills-row">
+        <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:6px 14px; border-radius:999px; border:1px solid #38bdf8; background:rgba(56,189,248,0.18); color:#38bdf8; font-weight:800; font-size:0.77rem; cursor:pointer;">
+          Tutte (27)
+        </button>
+        <button type="button" class="dash-filter-btn" data-cat="favorites" id="favFilterBtn" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+          ⭐ Preferiti (<span id="favCountNum">0</span>)
+        </button>
+        <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+          📚 Didattica & Studio
+        </button>
+        <button type="button" class="dash-filter-btn" data-cat="tech" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+          💻 Laboratori & Tech
+        </button>
+        <button type="button" class="dash-filter-btn" data-cat="classe" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+          🏫 Vita di Classe
+        </button>
+        <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+          🎮 Arena, Casse XP & Svago
+        </button>
       </div>
     </div>
 
@@ -1071,6 +1268,9 @@
       </div>
     </div>
 
+    <!-- PULSANTE TORNA SU -->
+    <button type="button" id="ehBackToTopBtn" title="Torna in cima">↑</button>
+
     <!-- PULSANTE FLUTTUANTE CHAT & Q&A IN BASSO A DESTRA -->
     <a href="modules/chat.html" data-track="chat" class="floating-chat-btn" title="Apri Chat Live e Forum Q&A della 1BI">
       <i data-lucide="messages-square" style="width: 20px; height: 20px;"></i>
@@ -1097,6 +1297,7 @@
       <div style="display:flex; flex-direction:column; gap:8px; font-size:0.84rem;">
         <div><strong>Ctrl + K</strong> → Apre la Command Palette per saltare ovunque</div>
         <div><strong>?</strong> → Mostra questa guida rapida</div>
+        <div><strong>&lt;/&gt; in alto</strong> → Attiva/disattiva lo sfondo Matrix 1BI</div>
         <div><strong>⭐ Stellina sulle card</strong> → Salva gli strumenti nei tuoi Preferiti</div>
         <div><strong>5 click su EDUHUB</strong> → Attiva la pioggia di particelle neon</div>
       </div>
@@ -1122,9 +1323,10 @@
     }
 
     // =========================================================================
-    // 1. PREFERITI (STELLINE SULLE CARD), FILTRI & RICERCA ISTANTANEA
+    // 1. PREFERITI (STELLINE), USATI DI RECENTE, FILTRI & RICERCA CENTRATA
     // =========================================================================
     let favTools = JSON.parse(localStorage.getItem("eduhub_fav_tools") || "[]");
+    let recentTools = JSON.parse(localStorage.getItem("eduhub_recent_tools") || "[]");
     let currentCat = "all";
     let currentSearch = "";
 
@@ -1133,8 +1335,35 @@
       if (el) el.textContent = favTools.length;
     }
 
-    document.querySelectorAll(".hub-card").forEach(card => {
+    function renderRecentStrip() {
+      const strip = document.getElementById("ehRecentStrip");
+      const list = document.getElementById("ehRecentList");
+      if (!strip || !list) return;
+      if (!recentTools.length) {
+        strip.style.display = "none";
+        return;
+      }
+      strip.style.display = "flex";
+      list.innerHTML = recentTools.slice(0, 4).map(r => `
+        <a href="${r.href}" class="eh-recent-chip">${r.title}</a>
+      `).join("");
+    }
+    renderRecentStrip();
+
+    const allCards = Array.from(document.querySelectorAll(".hub-card"));
+
+    allCards.forEach(card => {
       const key = card.dataset.track || card.getAttribute("href");
+      const title = card.querySelector("h3")?.textContent.trim() || "Modulo";
+      const href = card.getAttribute("href");
+
+      // Salva in "Usati di recente" al click
+      card.addEventListener("click", () => {
+        recentTools = [{ title, href }, ...recentTools.filter(x => x.href !== href)].slice(0, 4);
+        localStorage.setItem("eduhub_recent_tools", JSON.stringify(recentTools));
+      });
+
+      // Stellina Preferiti
       const star = document.createElement("button");
       star.type = "button";
       star.className = "eh-fav-star" + (favTools.includes(key) ? " is-fav" : "");
@@ -1160,7 +1389,7 @@
       });
       card.appendChild(star);
 
-      // Effetto Spotlight al passaggio del mouse
+      // Spotlight hover
       card.addEventListener("mousemove", (e) => {
         const rect = card.getBoundingClientRect();
         card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
@@ -1171,6 +1400,8 @@
 
     function applyDashboardFilters() {
       const q = currentSearch.trim().toLowerCase();
+      let totalVisible = 0;
+
       document.querySelectorAll(".dash-section").forEach(sec => {
         const secCat = sec.dataset.section;
         const catMatches = (currentCat === "all" || currentCat === "favorites" || secCat === currentCat);
@@ -1185,10 +1416,16 @@
           const isSearchOk = !q || card.textContent.toLowerCase().includes(q);
           const show = isFavOk && isSearchOk;
           card.style.display = show ? "" : "none";
-          if (show) visibleCards++;
+          if (show) {
+            visibleCards++;
+            totalVisible++;
+          }
         });
         sec.style.display = visibleCards > 0 ? "block" : "none";
       });
+
+      const countBadge = document.getElementById("ehSearchCountBadge");
+      if (countBadge) countBadge.textContent = `${totalVisible}/${allCards.length}`;
     }
 
     document.querySelectorAll(".dash-filter-btn").forEach(btn => {
@@ -1214,10 +1451,19 @@
       });
     }
 
+    // Pulsante Strumento Casuale (Dado 🎲)
+    document.getElementById("ehRandomToolBtn")?.addEventListener("click", () => {
+      if (!allCards.length) return;
+      const pick = allCards[Math.floor(Math.random() * allCards.length)];
+      const name = pick.querySelector("h3")?.textContent.trim() || "Strumento";
+      showToast(`🎲 Apro: ${name}...`);
+      setTimeout(() => { window.location.href = pick.getAttribute("href"); }, 450);
+    });
+
     // =========================================================================
     // 2. COMMAND PALETTE (CTRL + K) & SCORCIATOIE (?)
     // =========================================================================
-    const allToolsList = Array.from(document.querySelectorAll(".hub-card")).map(c => ({
+    const allToolsList = allCards.map(c => ({
       title: c.querySelector("h3")?.textContent.trim() || "Strumento",
       desc: c.querySelector("p")?.textContent.trim() || "",
       href: c.getAttribute("href")
@@ -1293,7 +1539,7 @@
     });
 
     // =========================================================================
-    // 3. OROLOGIO LIVE, CAMPANELLA 1BI, MOOD & SCROLL PROGRESS
+    // 3. OROLOGIO LIVE & MODULI DA 54 MINUTI + 2 RICREAZIONI (10:30 E 12:20)
     // =========================================================================
     function updateClockAndBell() {
       const now = new Date();
@@ -1303,24 +1549,32 @@
       const bellEl = document.getElementById("ehBellText");
       if (clockEl) clockEl.textContent = `${hh}:${mm}`;
 
-      const day = now.getDay();
+      const day = now.getDay(); // 0 = Dom
       const mins = now.getHours() * 60 + now.getMinutes();
+
+      // 7 Moduli da 54 min + Ricreazioni 10:30-10:40 e 12:20-12:30
       const slots = [
-        { start: 480, end: 540, label: "1ª Ora" },
-        { start: 540, end: 600, label: "2ª Ora" },
-        { start: 600, end: 650, label: "3ª Ora" },
-        { start: 650, end: 665, label: "Ricreazione ☕" },
-        { start: 665, end: 720, label: "4ª Ora" },
-        { start: 720, end: 780, label: "5ª Ora" },
-        { start: 780, end: 840, label: "6ª Ora" }
+        { start: 8 * 60,      end: 8 * 60 + 54,  label: "1ª Ora" },        // 08:00 - 08:54
+        { start: 8 * 60 + 54, end: 9 * 60 + 48,  label: "2ª Ora" },        // 08:54 - 09:48
+        { start: 9 * 60 + 48, end: 10 * 60 + 30, label: "3ª Ora" },        // 09:48 - 10:30
+        { start: 10 * 60 + 30,end: 10 * 60 + 40, label: "1ª Ricreazione ☕" }, // 10:30 - 10:40
+        { start: 10 * 60 + 40,end: 11 * 60 + 34, label: "4ª Ora" },        // 10:40 - 11:34
+        { start: 11 * 60 + 34,end: 12 * 60 + 20, label: "5ª Ora" },        // 11:34 - 12:20
+        { start: 12 * 60 + 20,end: 12 * 60 + 30, label: "2ª Ricreazione ☕" }, // 12:20 - 12:30
+        { start: 12 * 60 + 30,end: 13 * 60 + 24, label: "6ª Ora" },        // 12:30 - 13:24
+        { start: 13 * 60 + 24,end: 14 * 60 + 18, label: "7ª Ora" }         // 13:24 - 14:18
       ];
+
       let msg = "1BI Online";
-      if (day === 0) msg = "Domenica";
-      else if (mins < 480) msg = `Campanella tra ${480 - mins}m`;
-      else if (mins >= 840) msg = "Pomeriggio 1BI";
-      else {
+      if (day === 0) {
+        msg = "Domenica";
+      } else if (mins < 8 * 60) {
+        msg = `1ª campanella tra ${8 * 60 - mins}m`;
+      } else if (mins >= 14 * 60 + 18) {
+        msg = "Fine Moduli • Pomeriggio";
+      } else {
         const s = slots.find(x => mins >= x.start && mins < x.end);
-        msg = s ? `${s.label} (-${s.end - mins}m)` : "In Classe";
+        msg = s ? `${s.label} (-${s.end - mins}m)` : "In Classe 1BI";
       }
       if (bellEl) bellEl.textContent = msg;
     }
@@ -1333,7 +1587,7 @@
       "📚 Studio per Verifica",
       "🎧 Musica & Chill",
       "🔥 Focus Massimo",
-      "☕ Pausa Caffè",
+      "☕ Pausa Ricreazione",
       "🚀 Pronto a spaccare"
     ];
     let moodIndex = Number(localStorage.getItem("eduhub_mood_idx") || 0) % MOODS.length;
@@ -1346,19 +1600,72 @@
       showToast(`Stato aggiornato: ${MOODS[moodIndex]}`);
     });
 
-    // Barra progresso scroll + ombra topbar
+    // Barra progresso scroll + ombra topbar + tasto Torna Su
     const topbarEl = document.getElementById("mainTopbar");
     const scrollBarEl = document.getElementById("eh-scroll-progress");
+    const backTopBtn = document.getElementById("ehBackToTopBtn");
     window.addEventListener("scroll", () => {
       const st = window.scrollY;
       const dh = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollBarEl) scrollBarEl.style.width = (dh > 0 ? (st / dh) * 100 : 0) + "%";
       if (topbarEl) topbarEl.classList.toggle("eh-scrolled", st > 10);
+      if (backTopBtn) backTopBtn.classList.toggle("visible", st > 360);
     }, { passive: true });
 
+    backTopBtn?.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
     // =========================================================================
-    // 4. EASTER EGG NEON CONFETTI (5 CLICK SU EDUHUB O KONAMI CODE)
+    // 4. MODALITÀ MATRIX / HACKER 1BI & CONFETTI EASTER EGG
     // =========================================================================
+    const matrixCanvas = document.getElementById("eh-matrix-canvas");
+    const mCtx = matrixCanvas.getContext("2d");
+    let matrixTimer = null;
+
+    function startMatrix() {
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+      const cols = Math.floor(matrixCanvas.width / 18);
+      const drops = Array(cols).fill(1);
+      const chars = "01EDUHUB1BI<>/{}[]#";
+      clearInterval(matrixTimer);
+      matrixTimer = setInterval(() => {
+        mCtx.fillStyle = "rgba(5, 10, 20, 0.14)";
+        mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+        mCtx.fillStyle = "#22c55e";
+        mCtx.font = "14px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          const ch = chars[Math.floor(Math.random() * chars.length)];
+          mCtx.fillText(ch, i * 18, drops[i] * 18);
+          if (drops[i] * 18 > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+      }, 55);
+    }
+
+    function stopMatrix() {
+      clearInterval(matrixTimer);
+      matrixTimer = null;
+    }
+
+    if (localStorage.getItem("eduhub_matrix") === "1") {
+      document.body.classList.add("eh-matrix-active");
+      startMatrix();
+    }
+
+    document.getElementById("ehMatrixToggleBtn")?.addEventListener("click", () => {
+      const active = document.body.classList.toggle("eh-matrix-active");
+      localStorage.setItem("eduhub_matrix", active ? "1" : "0");
+      if (active) {
+        startMatrix();
+        showToast("💻 Modalità Hacker 1BI attivata!");
+      } else {
+        stopMatrix();
+        showToast("Modalità Hacker disattivata");
+      }
+    });
+
     function launchNeonConfetti() {
       showToast("🎉 Modalità Party 1BI attivata!");
       const colors = ["#38bdf8", "#818cf8", "#ec4899", "#22c55e", "#f59e0b"];
@@ -1395,22 +1702,8 @@
       }
     });
 
-    const konami = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
-    let kPos = 0;
-    window.addEventListener("keydown", (e) => {
-      if (e.key === konami[kPos]) {
-        kPos++;
-        if (kPos === konami.length) {
-          kPos = 0;
-          launchNeonConfetti();
-        }
-      } else {
-        kPos = 0;
-      }
-    });
-
     // =========================================================================
-    // 5. WIDGET COMPAGNI, STREAK GIORNALIERA & 32 MISSIONI LAMPO (ORIGINALE)
+    // 5. WIDGET COMPAGNI, STREAK GIORNALIERA & 32 MISSIONI LAMPO
     // =========================================================================
     initCompagniWidget();
 
@@ -1639,7 +1932,55 @@
       subEl.textContent = dataStr ? `Pubblicato da ${autore} il ${dataStr}` : `Pubblicato da ${autore}`;
     });
 
-    // 7. Controllo nuovi messaggi non letti nella Chat 1BI
+    // 7. Prossime Verifiche & Interrogazioni in calendario
+    onSnapshot(collection(db, "verifiche_1bi"), (snap) => {
+      const titleEl = document.getElementById("nextVerificaTitle");
+      const subEl = document.getElementById("nextVerificaSub");
+      if (!titleEl || !subEl || snap.empty) return;
+
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const upcoming = snap.docs
+        .map(d => d.data())
+        .filter(v => v.data && new Date(v.data) >= todayStart)
+        .sort((a, b) => new Date(a.data) - new Date(b.data));
+
+      if (upcoming.length > 0) {
+        const next = upcoming[0];
+        const diffDays = Math.ceil((new Date(next.data) - todayStart) / 86400000);
+        const when = diffDays === 0 ? "Oggi!" : diffDays === 1 ? "Domani" : `Tra ${diffDays} giorni`;
+        titleEl.textContent = `${next.materia || "Verifica"} • ${next.argomento || next.titolo || "Prova 1BI"}`;
+        subEl.textContent = `${when} (${new Date(next.data).toLocaleDateString("it-IT")})${upcoming.length > 1 ? ` • +${upcoming.length - 1} in arrivo` : ""}`;
+      } else {
+        titleEl.textContent = "Nessuna verifica imminente in calendario";
+        subEl.textContent = "Apri per aggiungere nuove date";
+      }
+    });
+
+    // 8. Banner Compleanno del Giorno (controlla compleanni_1bi)
+    onSnapshot(collection(db, "compleanni_1bi"), (snap) => {
+      const banner = document.getElementById("ehBirthdayBanner");
+      const title = document.getElementById("ehBirthdayTitle");
+      if (!banner || !title || snap.empty) return;
+
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, "0");
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+
+      const festeggiati = snap.docs.map(d => d.data()).filter(c => {
+        const raw = String(c.data || c.compleanno || "");
+        return raw.includes(`-${mm}-${dd}`) || raw.startsWith(`${dd}/${mm}`);
+      });
+
+      if (festeggiati.length > 0) {
+        const nomi = festeggiati.map(f => f.nome || f.studente || "un compagno").join(" e ");
+        title.textContent = `Buon Compleanno a ${nomi}! 🎉`;
+        banner.style.display = "flex";
+      }
+    });
+
+    // 9. Controllo nuovi messaggi non letti nella Chat 1BI
     const qLastMsg = query(collection(db, "chat_1bi"), orderBy("creatoIl", "desc"), limit(1));
     onSnapshot(qLastMsg, (snap) => {
       if (snap.empty) return;
@@ -1650,7 +1991,7 @@
       }
     });
 
-    // 8. Pillola Live Spotify 1BI collegata al Worker 24h/24 su Firestore
+    // 10. Pillola Live Spotify 1BI collegata al Worker 24h/24 su Firestore
     onSnapshot(collection(db, "spotify_stats_1bi"), (snap) => {
       const pillText = document.getElementById("ehSpotifyLiveText");
       if (!pillText) return;
