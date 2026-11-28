@@ -952,72 +952,94 @@
       window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
     });
 
-    // Gestione rientro OAuth PKCE da Spotify
-    async function handleSpotifyOAuthCallback(user) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-      const verifier = localStorage.getItem("spoti_pkce_verifier");
-      if (!code || !verifier) return;
-
-      window.history.replaceState({}, document.title, window.location.pathname);
-      localStorage.removeItem("spoti_pkce_verifier");
-
+    async function fetchSpotifyJsonSafe(url, headers, retries = 1) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url, { headers });
+    const rawText = await res.text();
+    if (res.ok) {
       try {
-        const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
-        const cId = cfgSnap.exists() ? (cfgSnap.data().clientId || "").trim() : "";
-        if (!cId) return;
-
-        const redirectUri = window.location.origin + window.location.pathname;
-        const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            client_id: cId,
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: redirectUri,
-            code_verifier: verifier
-          })
-        });
-        const tokenData = await tokenRes.json();
-        if (!tokenData.access_token) throw new Error("Token Spotify non ottenuto.");
-
-        const headers = { Authorization: `Bearer ${tokenData.access_token}` };
-        const [recentRes, topArtRes] = await Promise.all([
-          fetch("https://api.spotify.com/v1/me/player/recently-played?limit=50", { headers }),
-          fetch("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1", { headers })
-        ]);
-
-        const recentJson = await recentRes.json();
-        const topArtJson = await topArtRes.json();
-
-        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        const items = (recentJson.items || []).filter(it => new Date(it.played_at).getTime() >= sevenDaysAgo);
-        const totalMs = items.reduce((acc, it) => acc + (it.track?.duration_ms || 0), 0);
-        const minutesWeek = Math.max(1, Math.round(totalMs / 60000));
-
-        const latestTrack = items[0]?.track;
-        const topArtist = topArtJson.items?.[0]?.name || latestTrack?.artists?.[0]?.name || "Artista Spotify";
-        const topTrack = latestTrack?.name || "Brano Recente";
-        const trackUrl = latestTrack?.external_urls?.spotify || "";
-
-        await setDoc(doc(db, "spotify_stats_1bi", user.uid), {
-          uid: user.uid,
-          weekKey: CURRENT_WEEK,
-          minutesWeek,
-          topArtist,
-          topTrack,
-          trackUrl,
-          genre: "Spotify Sync",
-          source: "oauth",
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-
-        alert(`🟢 Spotify sincronizzato! Rilevati ${minutesWeek} minuti negli ultimi ascolti.`);
-      } catch (err) {
-        alert("Avviso Spotify OAuth: " + err.message + "\nPuoi aggiornare i dati manualmente nel modulo Spotify.");
+        return JSON.parse(rawText);
+      } catch (_) {
+        return null;
       }
     }
+    if (res.status === 503 && attempt < retries) {
+      await new Promise(r => setTimeout(r, 1500));
+      continue;
+    }
+    return null;
+  }
+  return null;
+}
+
+async function handleSpotifyOAuthCallback(user) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get("code");
+  const verifier = localStorage.getItem("spoti_pkce_verifier");
+  if (!code || !verifier) return;
+
+  window.history.replaceState({}, document.title, window.location.pathname);
+  localStorage.removeItem("spoti_pkce_verifier");
+
+  try {
+    const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
+    const cId = cfgSnap.exists() ? (cfgSnap.data().clientId || "").trim() : "";
+    if (!cId) return;
+
+    const redirectUri = window.location.origin + window.location.pathname;
+    const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: cId,
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: verifier
+      })
+    });
+    const tokenRaw = await tokenRes.text();
+    let tokenData = {};
+    try { tokenData = JSON.parse(tokenRaw); } catch (_) {}
+    if (!tokenData.access_token) {
+      throw new Error("Spotify ha bloccato temporaneamente la richiesta (503). Riprova tra qualche secondo.");
+    }
+
+    const headers = { Authorization: `Bearer ${tokenData.access_token}` };
+    const recentJson = await fetchSpotifyJsonSafe("https://api.spotify.com/v1/me/player/recently-played?limit=50", headers, 1);
+    if (!recentJson || !Array.isArray(recentJson.items)) {
+      throw new Error("Impossibile leggere gli ascolti recenti da Spotify (filtro 503 attivo). Riprova tra 10 secondi.");
+    }
+
+    const topArtJson = await fetchSpotifyJsonSafe("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1", headers, 0);
+
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const items = recentJson.items.filter(it => new Date(it.played_at).getTime() >= sevenDaysAgo);
+    const totalMs = items.reduce((acc, it) => acc + (it.track?.duration_ms || 0), 0);
+    const minutesWeek = Math.max(1, Math.round(totalMs / 60000));
+
+    const latestTrack = items[0]?.track;
+    const topArtist = topArtJson?.items?.[0]?.name || latestTrack?.artists?.[0]?.name || "Artista Spotify";
+    const topTrack = latestTrack?.name || "Brano Recente";
+    const trackUrl = latestTrack?.external_urls?.spotify || "";
+
+    await setDoc(doc(db, "spotify_stats_1bi", user.uid), {
+      uid: user.uid,
+      weekKey: CURRENT_WEEK,
+      minutesWeek,
+      topArtist,
+      topTrack,
+      trackUrl,
+      genre: "Spotify Sync",
+      source: "oauth",
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    alert(`🟢 Spotify sincronizzato! Rilevati ${minutesWeek} minuti negli ultimi ascolti.`);
+  } catch (err) {
+    alert("Avviso Spotify OAuth: " + err.message + "\nPuoi comunque aggiornare i dati manualmente nel modulo Spotify.");
+  }
+}
 
     // =========================================================================
     // 3. RENDER STATISTICHE GLOBALI & RECORD ASSOLUTI 1BI
