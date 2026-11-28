@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>EduHub - Centro Statistiche & Wrapped 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+      --spoti-green: #1db954;
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    /* HERO & TABS */
+    .wrap-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #064e3b 100%);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 22px;
+      padding: clamp(18px, 3vw, 26px);
+      margin-bottom: 18px;
+      color: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .wrap-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .wrap-tab-btn {
+      padding: 11px 16px;
+      border-radius: 13px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .wrap-tab-btn.active {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      border-color: #f472b6;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+    }
+    .wrap-tab-btn.spoti-tab.active {
+      background: linear-gradient(135deg, #1db954, #15803d);
+      border-color: #4ade80;
+      box-shadow: 0 6px 18px rgba(29, 185, 84, 0.35);
+    }
+
+    /* WRAPPED PERSONAL CARD */
+    .wrapped-showcase {
+      background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.25), transparent 55%),
+                  radial-gradient(circle at bottom left, rgba(29, 185, 84, 0.22), transparent 55%),
+                  var(--solid-panel);
+      border: 2px solid rgba(168, 85, 247, 0.45);
+      border-radius: 24px;
+      padding: clamp(18px, 3.5vw, 28px);
+      margin-bottom: 20px;
+    }
+    .archetype-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #ec4899);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* GRIGLIE STATISTICHE */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .kpi-box {
+      background: var(--solid-card);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .kpi-val {
+      font-size: clamp(1.25rem, 3.2vw, 1.65rem);
+      font-weight: 900;
+      line-height: 1.15;
+    }
+    .kpi-lbl {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* RECORD & HALL OF FAME */
+    .records-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .record-card {
+      background: var(--solid-panel);
+      border: 1.5px solid var(--solid-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .record-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      flex-shrink: 0;
+    }
+
+    /* SPOTIFY SECTION */
+    .spoti-banner {
+      background: linear-gradient(135deg, #052e16 0%, #0f172a 75%);
+      border: 1.5px solid rgba(29, 185, 84, 0.5);
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 22px);
+      color: #f8fafc;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .spoti-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .panel-box {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .rank-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 13px;
+      background: var(--solid-sub);
+      border: 1px solid var(--solid-border);
+      margin-bottom: 9px;
+    }
+    .rank-row.top1 { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
+    .rank-row.top2 { border-color: #94a3b8; }
+    .rank-row.top3 { border-color: #d97706; }
+
+    /* BARRE PROGRESSO MATERIE */
+    .bar-track {
+      width: 100%;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--solid-sub);
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8, #8b5cf6);
+    }
+
+    /* INPUT & PULSANTI */
+    .st-input, .st-select {
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 11px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      min-height: 44px;
+    }
+    .st-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 10px 0 5px;
+    }
+    .btn-st {
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 900;
+      font-size: 0.84rem;
+      cursor: pointer;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .btn-spoti { background: #1db954; color: #052e16; }
+    .btn-wrap-share { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #fff; }
+
+    /* TABELLA COMPLETA */
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 18px;
+    }
+    table.stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 640px;
+    }
+    table.stats-table th, table.stats-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--solid-border);
+    }
+    table.stats-table th {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--solid-card);
+    }
+
+    @media (max-width: 540px) {
+      .topbar-sub { display: none; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Wrapped & Statistiche 1BI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1120px;">
+    <!-- HERO -->
+    <div class="wrap-hero">
+      <div>
+        <h2 style="font-size: clamp(1.28rem, 3.6vw, 1.65rem); font-weight: 900;">📊 Centro Statistiche & Wrapped 1BI</h2>
+        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 4px;">
+          Tutti i record della classe, il tuo riepilogo personale stile Wrapped e la classifica musicale Spotify della settimana.
+        </p>
+      </div>
+      <button type="button" id="refreshAllStatsBtn" class="btn-st" style="background:rgba(255,255,255,0.14); color:#fff; border:1px solid rgba(255,255,255,0.25);">
+        🔄 Aggiorna Dati Live
+      </button>
+    </div>
+
+    <!-- TABS PRINCIPALI -->
+    <div class="wrap-tabs">
+      <button type="button" class="wrap-tab-btn active" data-tab="mywrapped">✨ Il Mio Wrapped</button>
+      <button type="button" class="wrap-tab-btn spoti-tab" data-tab="spotify">🎧 Spotify & Musica 1BI</button>
+      <button type="button" class="wrap-tab-btn" data-tab="global">🌍 Statistiche & Record 1BI</button>
+      <button type="button" class="wrap-tab-btn" data-tab="leaderboard">🏆 Classifica Completa</button>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: IL MIO WRAPPED PERSONALE                                       -->
+    <!-- ===================================================================== -->
+    <section id="tab-mywrapped">
+      <div class="wrapped-showcase">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+          <div>
+            <span class="archetype-badge" id="myArchetypeBadge">✨ Calcolo profilo...</span>
+            <h3 id="myWrappedName" style="font-size: clamp(1.3rem, 3.5vw, 1.8rem); font-weight: 900; margin-top: 10px;">Studente 1BI</h3>
+            <p id="myArchetypeDesc" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+              Analisi completa della tua attività su EduHub e della tua musica settimanale.
+            </p>
+          </div>
+          <button type="button" id="copyWrappedBtn" class="btn-st btn-wrap-share">
+            📋 Copia il Mio Wrapped
+          </button>
+        </div>
+
+        <div class="kpi-grid" id="myPersonalKpiGrid">
+          <!-- Popolato via JS con TUTTE le metriche personali -->
+        </div>
+      </div>
+
+      <!-- RIEPILOGO MUSICALE PERSONALE NEL WRAPPED -->
+      <div class="panel-box">
+        <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 10px;">🎵 La Tua Settimana Musicale su Spotify</h3>
+        <div id="myWrappedMusicBox" style="font-size: 0.9rem; color: var(--text-muted);">
+          Nessun dato musicale registrato questa settimana. Vai nella scheda <strong>🎧 Spotify & Musica 1BI</strong> per collegare Spotify o inserire i tuoi ascolti!
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: SPOTIFY & MUSICA 1BI (CLASSIFICA SETTIMANALE + ARTISTI + LIVE) -->
+    <!-- ===================================================================== -->
+    <section id="tab-spotify" style="display: none;">
+      <div class="spoti-banner">
+        <div>
+          <div style="font-size: 0.76rem; font-weight: 900; text-transform: uppercase; color: #4ade80; letter-spacing: 0.6px;">
+            🎧 Spotify Club • Settimana <span id="currentWeekBadge">--</span>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 900; margin-top: 4px;">Classifica Ascolti Settimanali della 1BI</h3>
+          <p style="font-size: 0.83rem; color: #cbd5e1; margin-top: 3px;">
+            Collega il tuo account Spotify oppure aggiorna manualmente i tuoi minuti e il brano che stai ascoltando ora!
+          </p>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" id="connectSpotifyOAuthBtn" class="btn-st btn-spoti">
+            🟢 Sincronizza Spotify API
+          </button>
+          <button type="button" id="configSpotifyClientBtn" class="btn-st" style="display:none; background:rgba(255,255,255,0.14); color:#fff;">
+            ⚙️ Client ID (Rep)
+          </button>
+        </div>
+      </div>
+
+      <div class="spoti-grid">
+        <!-- COLONNA 1: CLASSIFICA CHI HA ASCOLTATO PIÙ MUSICA NELLA SETTIMANA -->
+        <div class="panel-box">
+          <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 4px;">🏆 Top Ascoltatori della Settimana</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px;">
+            Classifica ordinata per minuti ascoltati negli ultimi 7 giorni (si resetta ogni lunedì).
+          </p>
+          <div id="spotifyWeeklyLeaderboard">
+            <p style="color: var(--text-muted);">Caricamento classifica musicale...</p>
+          </div>
+        </div>
+
+        <!-- COLONNA 2: AGGIORNA I TUOI DATI MUSICALI + TOP ARTISTI / BRANI 1BI -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="panel-box">
+            <h3 style="font-size: 1.02rem; font-weight: 900; margin-bottom: 6px;">🎛️ Il Tuo Stato Musicale Settimanale</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">
+              Se non usi la sincronizzazione automatica OAuth, aggiorna qui i tuoi dati della settimana per entrare in classifica:
+            </p>
+            <form id="manualSpotifyForm">
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label class="st-label">Minuti Settimana *</label>
+                  <input type="number" id="spotiMinutesInput" class="st-input" min="0" max="10080" placeholder="Es. 420" required />
+                </div>
+                <div>
+                  <label class="st-label">Genere / Vibe</label>
+                  <select id="spotiGenreInput" class="st-select">
+                    <option value="Rap / Trap">🎤 Rap / Trap</option>
+                    <option value="Pop / Hit">🎵 Pop / Hit</option>
+                    <option value="Lo-Fi / Studio">📚 Lo-Fi / Studio</option>
+                    <option value="Rock / Metal">🎸 Rock / Metal</option>
+                    <option value="Elettronica / Phonk">⚡ Elettronica / Phonk</option>
+                    <option value="Indie / Cantautori">🌙 Indie / Cantautori</option>
+                  </select>
+                </div>
+              </div>
+
+              <label class="st-label">Artista #1 della Settimana *</label>
+              <input type="text" id="spotiArtistInput" class="st-input" placeholder="Es. Geolier, Lazza, Travis Scott, Tedua..." required />
+
+              <label class="st-label">Brano in Ripetizione / In Ascolto Ora *</label>
+              <input type="text" id="spotiTrackInput" class="st-input" placeholder="Es. Titolo canzone" required />
+
+              <label class="st-label">Link Spotify / YouTube del Brano (Opzionale)</label>
+              <input type="url" id="spotiLinkInput" class="st-input" placeholder="https://open.spotify.com/track/..." />
+
+              <button type="submit" id="saveSpotifyManualBtn" class="btn-st btn-spoti" style="width: 100%; margin-top: 14px;">
+                💾 Salva & Aggiorna Classifica Spotify
+              </button>
+            </form>
+          </div>
+
+          <!-- TOP ARTISTI & GENERI DELLA CLASSE -->
+          <div class="panel-box">
+            <h3 style="font-size: 1.02rem; font-weight: 900; margin-bottom: 10px;">🔥 Artisti & Generi più Ascoltati dalla 1BI</h3>
+            <div id="topClassArtistsBox"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BACHECA "IN ASCOLTO ORA / BRANI CONSIGLIATI DALLA CLASSE" -->
+      <div class="panel-box" style="margin-top: 16px;">
+        <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 12px;">📻 Playlist Live — Cosa Ascoltano i Compagni Questa Settimana</h3>
+        <div id="classNowPlayingGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: STATISTICHE GLOBALI & RECORD ASSOLUTI 1BI                      -->
+    <!-- ===================================================================== -->
+    <section id="tab-global" style="display: none;">
+      <div class="panel-box" style="margin-bottom: 18px;">
+        <h3 style="font-size: 1.1rem; font-weight: 900;">🌐 Numeri Totali del Portale EduHub 1BI</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Tutti i dati aggregati in tempo reale da ogni sezione di EduHub.
+        </p>
+        <div class="kpi-grid" id="globalPortalKpiGrid"></div>
+      </div>
+
+      <h3 style="font-size: 1.1rem; font-weight: 900; margin-bottom: 4px;">🏅 Hall of Fame — I Record Assoluti della Classe</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">I detentori attuali dei primati in ogni categoria:</p>
+      <div class="records-grid" id="hallOfFameGrid"></div>
+
+      <div class="panel-box" style="margin-top: 18px;">
+        <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 12px;">📚 Attività per Materia (SOS + Appunti + Flashcard)</h3>
+        <div id="subjectsBreakdownBox"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 4: CLASSIFICA GENERALE MULTICRITERIO                              -->
+    <!-- ===================================================================== -->
+    <section id="tab-leaderboard" style="display: none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 14px;">
+        <h3 style="font-size: 1.1rem; font-weight: 900;">🏆 Classifica Generale 1BI</h3>
+        <select id="sortLeaderboardSelect" class="st-select" style="width:auto; min-width: 220px;">
+          <option value="xp">⚡ Ordina per XP Totali</option>
+          <option value="sosSolved">🎯 Ordina per SOS Risolti</option>
+          <option value="streak">🔥 Ordina per Streak Giorni</option>
+          <option value="cosmetics">💎 Ordina per Oggetti Sbloccati</option>
+          <option value="spotiMin">🎧 Ordina per Minuti Spotify (Settimana)</option>
+          <option value="contributions">📚 Ordina per Contributi (Appunti/Chat/Deck)</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Studente</th>
+              <th>XP / Livello</th>
+              <th>Streak</th>
+              <th>SOS Risolti</th>
+              <th>Contributi</th>
+              <th>Cosmetici</th>
+              <th>Spotify (7gg)</th>
+            </tr>
+          </thead>
+          <tbody id="fullLeaderboardBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      setDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let currentUser = null;
+    let isRep = false;
+    let spotifyClientId = "";
+
+    // Struttura aggregata globale
+    let state = {
+      users: [],
+      sos: [],
+      flashcards: [],
+      aste: [],
+      scambi: [],
+      appunti: [],
+      progetti: [],
+      chat: [],
+      forum: [],
+      aiSpiegazioni: [],
+      sondaggi: [],
+      proposte: [],
+      verifiche: [],
+      spotifyList: []
+    };
+
+    // Calcola identificativo settimana ISO (es. "2026-W48") per reset settimanale automatico
+    function getCurrentWeekKey() {
+      const d = new Date();
+      const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const dayNum = utc.getUTCDay() || 7;
+      utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
+      return `${utc.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
+    }
+    const CURRENT_WEEK = getCurrentWeekKey();
+    document.getElementById("currentWeekBadge").textContent = CURRENT_WEEK;
+
+    // Navigazione Tab
+    document.querySelectorAll(".wrap-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".wrap-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const target = btn.dataset.tab;
+        ["mywrapped", "spotify", "global", "leaderboard"].forEach(t => {
+          document.getElementById(`tab-${t}`).style.display = t === target ? "block" : "none";
+        });
+      });
+    });
+
+    // Helper fetch sicuro per non bloccare mai il caricamento
+    async function safeGetCollection(colName) {
+      try {
+        const snap = await getDocs(collection(db, colName));
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch (e) {
+        console.warn(`Collezione ${colName} non accessibile:`, e.message);
+        return [];
+      }
+    }
+
+    // =========================================================================
+    // CARICAMENTO COMPLETO DI TUTTE LE STATISTICHE DEL PORTALE
+    // =========================================================================
+    async function loadAllPortalData() {
+      const [
+        users, sos, flashcards, aste, scambi,
+        appunti, progetti, chat, forum, aiSpiegazioni,
+        sondaggi, proposte, verifiche, spotifyList
+      ] = await Promise.all([
+        safeGetCollection("utenti_registrati"),
+        safeGetCollection("sos_esercizi_1bi"),
+        safeGetCollection("flashcards_1bi"),
+        safeGetCollection("aste_1bi"),
+        safeGetCollection("scambi_1bi"),
+        safeGetCollection("appunti_1bi"),
+        safeGetCollection("progetti_items_1bi"),
+        safeGetCollection("chat_1bi"),
+        safeGetCollection("forum_qa_1bi"),
+        safeGetCollection("ai_spiegazioni_1bi"),
+        safeGetCollection("sondaggi_1bi"),
+        safeGetCollection("proposte_1bi"),
+        safeGetCollection("verifiche_1bi"),
+        safeGetCollection("spotify_stats_1bi")
+      ]);
+
+      state = {
+        users, sos, flashcards, aste, scambi,
+        appunti, progetti, chat, forum, aiSpiegazioni,
+        sondaggi, proposte, verifiche, spotifyList
+      };
+
+      // Leggi eventuale Client ID Spotify configurato dai Rappresentanti
+      try {
+        const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
+        if (cfgSnap.exists()) {
+          spotifyClientId = (cfgSnap.data().clientId || "").trim();
+        }
+      } catch (_) {}
+
+      renderAllSections();
+    }
+
+    // Calcola metriche arricchite per ogni studente della 1BI
+    function buildEnrichedStudents() {
+      const spotiMap = new Map();
+      state.spotifyList.forEach(s => {
+        if (s.weekKey === CURRENT_WEEK) {
+          spotiMap.set(s.uid || s.id, s);
+        }
+      });
+
+      return state.users.map(u => {
+        const uid = u.id;
+        const name = u.nome || u.nomeCompleto || u.email?.split("@")[0] || "Studente 1BI";
+        const xp = Number(u.xp ?? u.punti ?? 0);
+        const level = Math.floor(xp / 250) + 1;
+        const streak = Number(u.streak || u.loginStreak || 0);
+        const cosmeticsCount = Array.isArray(u.shopOwned) ? u.shopOwned.length : 0;
+
+        const sosCreated = state.sos.filter(t => t.autoreUid === uid).length;
+        const sosSolved = state.sos.filter(t => t.status === "solved" && t.winnerUid === uid && t.autoreUid !== uid).length;
+        const decksCreated = state.flashcards.filter(d => d.autoreUid === uid).length;
+        const notesCount = state.appunti.filter(a => a.autoreUid === uid).length + state.progetti.filter(p => p.autoreUid === uid).length;
+        const messagesCount = state.chat.filter(c => c.autoreUid === uid).length + state.forum.filter(f => f.autoreUid === uid).length;
+        const aiSavedCount = state.aiSpiegazioni.filter(a => a.autoreUid === uid).length;
+        const tradesCount = state.aste.filter(a => a.sellerUid === uid || a.highestBidderUid === uid).length +
+                            state.scambi.filter(s => s.proposerUid === uid || s.acceptedByUid === uid).length;
+
+        const totalContributions = notesCount + messagesCount + decksCreated + aiSavedCount + sosSolved;
+        const spoti = spotiMap.get(uid) || null;
+        const spotiMinutes = spoti ? Number(spoti.minutesWeek || 0) : 0;
+
+        return {
+          uid,
+          name,
+          xp,
+          level,
+          streak,
+          cosmeticsCount,
+          sosCreated,
+          sosSolved,
+          decksCreated,
+          notesCount,
+          messagesCount,
+          aiSavedCount,
+          tradesCount,
+          totalContributions,
+          spoti,
+          spotiMinutes
+        };
+      });
+    }
+
+    function renderAllSections() {
+      const students = buildEnrichedStudents();
+      renderMyWrapped(students);
+      renderSpotifyHub(students);
+      renderGlobalAndRecords(students);
+      renderFullLeaderboard(students);
+    }
+
+    // =========================================================================
+    // 1. RENDER IL MIO WRAPPED PERSONALE
+    // =========================================================================
+    function renderMyWrapped(students) {
+      if (!currentUser) return;
+      const sortedByXp = [...students].sort((a, b) => b.xp - a.xp);
+      const rankPos = sortedByXp.findIndex(s => s.uid === currentUser.uid) + 1;
+      const me = students.find(s => s.uid === currentUser.uid) || {
+        name: currentUser.displayName || "Studente 1BI",
+        xp: 0, level: 1, streak: 0, cosmeticsCount: 0,
+        sosSolved: 0, sosCreated: 0, decksCreated: 0,
+        notesCount: 0, messagesCount: 0, aiSavedCount: 0,
+        tradesCount: 0, totalContributions: 0, spoti: null, spotiMinutes: 0
+      };
+
+      // Determina Archetipo Wrapped in base all'attività reale
+      let archetype = "🌟 Esploratore della 1BI";
+      let archDesc = "Sempre connesso con la classe e pronto a scoprire nuove funzioni su EduHub!";
+      if (me.sosSolved >= 2) {
+        archetype = "🦸 Salvatore Ufficiale della 1BI";
+        archDesc = `Hai risolto ${me.sosSolved} esercizi ai compagni guadagnando taglie in XP!`;
+      } else if (me.spotiMinutes >= 400) {
+        archetype = "🎧 DJ & Melomane della Classe";
+        archDesc = `Con ${me.spotiMinutes} minuti di musica questa settimana hai la colonna sonora sempre accesa!`;
+      } else if (me.notesCount + me.decksCreated >= 3) {
+        archetype = "📚 Mente Suprema dello Studio";
+        archDesc = "Appunti, progetti e flashcard: sei una colonna portante per il ripasso della 1BI.";
+      } else if (me.tradesCount >= 2 || me.cosmeticsCount >= 4) {
+        archetype = "💎 Magnate della Casa d'Aste";
+        archDesc = "Collezionista esperto di cosmetici rari, aste e scambi 1-a-1!";
+      } else if (me.messagesCount >= 10) {
+        archetype = "💬 Anima Social della 1BI";
+        archDesc = "Sempre attivo tra chat di classe, Q&A e discussioni con i compagni.";
+      }
+
+      document.getElementById("myArchetypeBadge").textContent = archetype;
+      document.getElementById("myWrappedName").textContent = `${me.name} • #${rankPos || "-"} in Classe`;
+      document.getElementById("myArchetypeDesc").textContent = archDesc;
+
+      const kpis = [
+        { val: `⚡ ${me.xp} XP`, lbl: `Livello ${me.level} (#${rankPos || "-"} in 1BI)`, color: "#fbbf24" },
+        { val: `🔥 ${me.streak} gg`, lbl: "Streak Giorni Consecutivi", color: "#fb923c" },
+        { val: `🎯 ${me.sosSolved}`, lbl: "SOS Esercizi Risolti", color: "#34d399" },
+        { val: `🃏 ${me.decksCreated}`, lbl: "Mazzi Flashcard Creati", color: "#38bdf8" },
+        { val: `📚 ${me.notesCount}`, lbl: "Appunti & Progetti Caricati", color: "#a78bfa" },
+        { val: `💬 ${me.messagesCount}`, lbl: "Messaggi Chat & Forum Q&A", color: "#f472b6" },
+        { val: `🤖 ${me.aiSavedCount}`, lbl: "Spiegazioni Tutor AI Salvate", color: "#60a5fa" },
+        { val: `⚖️ ${me.tradesCount}`, lbl: "Aste & Scambi Partecipati", color: "#facc15" },
+        { val: `💎 ${me.cosmeticsCount}`, lbl: "Oggetti Cosmetici Sbloccati", color: "#c084fc" },
+        { val: `🎧 ${me.spotiMinutes} min`, lbl: "Musica Spotify (Questa Sett.)", color: "#4ade80" }
+      ];
+
+      document.getElementById("myPersonalKpiGrid").innerHTML = kpis.map(k => `
+        <div class="kpi-box">
+          <div class="kpi-val" style="color:${k.color};">${k.val}</div>
+          <div class="kpi-lbl">${k.lbl}</div>
+        </div>
+      `).join("");
+
+      // Box musicale nel Wrapped
+      const musicBox = document.getElementById("myWrappedMusicBox");
+      if (me.spoti) {
+        const hrs = (me.spotiMinutes / 60).toFixed(1);
+        musicBox.innerHTML = `
+          <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:1.05rem; font-weight:900; color:var(--text-main);">
+                ⏱️ <strong>${me.spotiMinutes} minuti</strong> (${hrs} ore) ascoltati nella settimana ${CURRENT_WEEK}
+              </div>
+              <div style="margin-top:4px;">
+                🎤 Artista #1: <strong>${escapeHtml(me.spoti.topArtist)}</strong> • 🎵 Brano: <strong>${escapeHtml(me.spoti.topTrack)}</strong> (${escapeHtml(me.spoti.genre || "Musica")})
+              </div>
+            </div>
+            ${me.spoti.trackUrl ? `<a href="${escapeHtml(me.spoti.trackUrl)}" target="_blank" rel="noopener" class="btn-st btn-spoti" style="text-decoration:none;">▶️ Ascolta Brano</a>` : ""}
+          </div>
+        `;
+        // Precompila il form Spotify
+        document.getElementById("spotiMinutesInput").value = me.spotiMinutes;
+        document.getElementById("spotiArtistInput").value = me.spoti.topArtist || "";
+        document.getElementById("spotiTrackInput").value = me.spoti.topTrack || "";
+        document.getElementById("spotiGenreInput").value = me.spoti.genre || "Rap / Trap";
+        document.getElementById("spotiLinkInput").value = me.spoti.trackUrl || "";
+      }
+
+      // Copia riepilogo Wrapped per WhatsApp
+      document.getElementById("copyWrappedBtn").onclick = async () => {
+        const summary = [
+          `📊 IL MIO WRAPPED EDUHUB 1BI (${me.name})`,
+          `${archetype}`,
+          `⚡ ${me.xp} XP (Livello ${me.level} - Posizione #${rankPos})`,
+          `🔥 Streak: ${me.streak} giorni`,
+          `🎯 SOS Risolti: ${me.sosSolved} | 📚 Appunti/Progetti: ${me.notesCount} | 🃏 Flashcard: ${me.decksCreated}`,
+          me.spoti ? `🎧 Spotify (${CURRENT_WEEK}): ${me.spotiMinutes} min | Top Artista: ${me.spoti.topArtist} | Brano: ${me.spoti.topTrack}` : ""
+        ].filter(Boolean).join("\n");
+
+        await navigator.clipboard.writeText(summary);
+        alert("📋 Riepilogo Wrapped copiato! Ora puoi incollarlo su WhatsApp o condividerlo con la classe.");
+      };
+    }
+
+    // =========================================================================
+    // 2. RENDER SPOTIFY & MUSICA 1BI
+    // =========================================================================
+    function renderSpotifyHub(students) {
+      if (isRep) {
+        document.getElementById("configSpotifyClientBtn").style.display = "inline-flex";
+      }
+
+      const listeners = students
+        .filter(s => s.spoti && s.spotiMinutes > 0)
+        .sort((a, b) => b.spotiMinutes - a.spotiMinutes);
+
+      const lbEl = document.getElementById("spotifyWeeklyLeaderboard");
+      if (listeners.length === 0) {
+        lbEl.innerHTML = `<p style="color:var(--text-muted);">Nessuno ha ancora registrato minuti musicali per la settimana ${CURRENT_WEEK}. Sii il primo usando il modulo accanto!</p>`;
+      } else {
+        const maxMin = listeners[0].spotiMinutes || 1;
+        lbEl.innerHTML = listeners.map((s, idx) => {
+          const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`;
+          const rowCls = idx === 0 ? "top1" : idx === 1 ? "top2" : idx === 2 ? "top3" : "";
+          const pct = Math.max(8, Math.round((s.spotiMinutes / maxMin) * 100));
+          const hrs = (s.spotiMinutes / 60).toFixed(1);
+          return `
+            <div class="rank-row ${rowCls}">
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                  <strong style="font-size:0.9rem;">${medal} ${escapeHtml(s.name)}</strong>
+                  <span style="color:#4ade80; font-weight:900; font-size:0.86rem;">${s.spotiMinutes} min (${hrs}h)</span>
+                </div>
+                <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  🎤 ${escapeHtml(s.spoti.topArtist)} • 🎵 ${escapeHtml(s.spoti.topTrack)}
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:${pct}%; background:linear-gradient(90deg, #1db954, #4ade80);"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Aggrega Top Artisti & Top Generi della classe
+      const artistCounts = {};
+      const genreCounts = {};
+      listeners.forEach(s => {
+        const art = (s.spoti.topArtist || "").trim();
+        const gen = (s.spoti.genre || "").trim();
+        if (art) artistCounts[art] = (artistCounts[art] || 0) + 1;
+        if (gen) genreCounts[gen] = (genreCounts[gen] || 0) + 1;
+      });
+
+      const topArtists = Object.entries(artistCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const topGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+
+      const topArtBox = document.getElementById("topClassArtistsBox");
+      if (topArtists.length === 0) {
+        topArtBox.innerHTML = `<p style="font-size:0.82rem; color:var(--text-muted);">Aggiungi il tuo artista preferito per generare la classifica artisti della 1BI!</p>`;
+      } else {
+        topArtBox.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+            ${topArtists.map(([art, cnt], i) => `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-radius:10px; background:var(--solid-sub);">
+                <span style="font-weight:800; font-size:0.86rem;">#${i + 1} 🎤 ${escapeHtml(art)}</span>
+                <span style="font-size:0.76rem; color:#4ade80; font-weight:800;">${cnt} ${cnt === 1 ? "compagno" : "compagni"}</span>
+              </div>
+            `).join("")}
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${topGenres.map(([gen, cnt]) => `
+              <span style="padding:4px 10px; border-radius:999px; background:rgba(29,185,84,0.16); color:#4ade80; font-size:0.74rem; font-weight:800;">
+                ${escapeHtml(gen)} (${cnt})
+              </span>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      // Bacheca "Cosa Ascoltano i Compagni"
+      const nowGrid = document.getElementById("classNowPlayingGrid");
+      if (listeners.length === 0) {
+        nowGrid.innerHTML = `<p style="font-size:0.84rem; color:var(--text-muted);">Nessun brano condiviso ancora questa settimana.</p>`;
+      } else {
+        nowGrid.innerHTML = listeners.map(s => `
+          <div style="background:var(--solid-sub); border:1px solid var(--solid-border); border-radius:14px; padding:13px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
+            <div>
+              <div style="font-size:0.74rem; color:#4ade80; font-weight:800;">🎧 ${escapeHtml(s.name)} • ${escapeHtml(s.spoti.genre || "Musica")}</div>
+              <div style="font-size:0.95rem; font-weight:900; margin-top:4px;">${escapeHtml(s.spoti.topTrack)}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(s.spoti.topArtist)}</div>
+            </div>
+            ${s.spoti.trackUrl
+              ? `<a href="${escapeHtml(s.spoti.trackUrl)}" target="_blank" rel="noopener" style="font-size:0.78rem; font-weight:800; color:#38bdf8; text-decoration:none;">▶️ Apri su Spotify / YT ↗</a>`
+              : `<span style="font-size:0.74rem; color:var(--text-muted);">⏱️ ${s.spotiMinutes} min questa settimana</span>`
+            }
+          </div>
+        `).join("");
+      }
+    }
+
+    // Salvataggio manuale dati musicali settimanali
+    document.getElementById("manualSpotifyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const minutesWeek = Math.max(0, Math.floor(Number(document.getElementById("spotiMinutesInput").value) || 0));
+      const genre = document.getElementById("spotiGenreInput").value;
+      const topArtist = document.getElementById("spotiArtistInput").value.trim();
+      const topTrack = document.getElementById("spotiTrackInput").value.trim();
+      const trackUrl = document.getElementById("spotiLinkInput").value.trim();
+
+      if (!topArtist || !topTrack) return;
+
+      const btn = document.getElementById("saveSpotifyManualBtn");
+      btn.disabled = true;
+      try {
+        await setDoc(doc(db, "spotify_stats_1bi", currentUser.uid), {
+          uid: currentUser.uid,
+          weekKey: CURRENT_WEEK,
+          minutesWeek,
+          genre,
+          topArtist,
+          topTrack,
+          trackUrl,
+          source: "manual",
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        await loadAllPortalData();
+        alert("🎧 Statistiche musicali aggiornate nella classifica della 1BI!");
+      } catch (err) {
+        alert("Errore salvataggio Spotify: " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Configurazione Client ID Spotify da parte dei Rappresentanti
+    document.getElementById("configSpotifyClientBtn").addEventListener("click", async () => {
+      if (!isRep) return;
+      const newId = prompt(
+        "Inserisci il Client ID dell'app Spotify Developer (lascia vuoto per disattivare OAuth):",
+        spotifyClientId
+      );
+      if (newId === null) return;
+      await setDoc(doc(db, "config_classe", "spotify"), {
+        clientId: newId.trim(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      spotifyClientId = newId.trim();
+      alert("✅ Configurazione Spotify salvata!");
+    });
+
+    // Flusso OAuth PKCE Spotify Web API (se Client ID configurato)
+    document.getElementById("connectSpotifyOAuthBtn").addEventListener("click", async () => {
+      if (!spotifyClientId) {
+        alert("ℹ️ Il Client ID Spotify API non è ancora stato configurato dai Rappresentanti.\nPuoi comunque usare subito il modulo qui sotto per inserire i tuoi minuti settimanali, artista #1 e brano del momento!");
+        return;
+      }
+
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      const rnd = crypto.getRandomValues(new Uint8Array(64));
+      const verifier = Array.from(rnd).map(x => chars[x % chars.length]).join("");
+      localStorage.setItem("spoti_pkce_verifier", verifier);
+
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+      const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+
+      const redirectUri = window.location.origin + window.location.pathname;
+      const params = new URLSearchParams({
+        client_id: spotifyClientId,
+        response_type: "code",
+        redirect_uri: redirectUri,
+        code_challenge_method: "S256",
+        code_challenge: challenge,
+        scope: "user-read-recently-played user-top-read user-read-currently-playing"
+      });
+      window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    });
+
+    // Gestione rientro OAuth PKCE da Spotify
+    async function handleSpotifyOAuthCallback(user) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const verifier = localStorage.getItem("spoti_pkce_verifier");
+      if (!code || !verifier) return;
+
+      // Pulisci URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      localStorage.removeItem("spoti_pkce_verifier");
+
+      try {
+        const cfgSnap = await getDoc(doc(db, "config_classe", "spotify"));
+        const cId = cfgSnap.exists() ? (cfgSnap.data().clientId || "").trim() : "";
+        if (!cId) return;
+
+        const redirectUri = window.location.origin + window.location.pathname;
+        const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: cId,
+            grant_type: "authorization_code",
+            code,
+            redirect_uri: redirectUri,
+            code_verifier: verifier
+          })
+        });
+        const tokenData = await tokenRes.json();
+        if (!tokenData.access_token) throw new Error("Token Spotify non ottenuto.");
+
+        const headers = { Authorization: `Bearer ${tokenData.access_token}` };
+        const [recentRes, topArtRes] = await Promise.all([
+          fetch("https://api.spotify.com/v1/me/player/recently-played?limit=50", { headers }),
+          fetch("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1", { headers })
+        ]);
+
+        const recentJson = await recentRes.json();
+        const topArtJson = await topArtRes.json();
+
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const items = (recentJson.items || []).filter(it => new Date(it.played_at).getTime() >= sevenDaysAgo);
+        const totalMs = items.reduce((acc, it) => acc + (it.track?.duration_ms || 0), 0);
+        const minutesWeek = Math.max(1, Math.round(totalMs / 60000));
+
+        const latestTrack = items[0]?.track;
+        const topArtist = topArtJson.items?.[0]?.name || latestTrack?.artists?.[0]?.name || "Artista Spotify";
+        const topTrack = latestTrack?.name || "Brano Recente";
+        const trackUrl = latestTrack?.external_urls?.spotify || "";
+
+        await setDoc(doc(db, "spotify_stats_1bi", user.uid), {
+          uid: user.uid,
+          weekKey: CURRENT_WEEK,
+          minutesWeek,
+          topArtist,
+          topTrack,
+          trackUrl,
+          genre: "Spotify Sync",
+          source: "oauth",
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        alert(`🟢 Spotify sincronizzato! Rilevati ${minutesWeek} minuti negli ultimi ascolti.`);
+      } catch (err) {
+        alert("Avviso Spotify OAuth: " + err.message + "\nPuoi aggiornare i dati manualmente nel modulo Spotify.");
+      }
+    }
+
+    // =========================================================================
+    // 3. RENDER STATISTICHE GLOBALI & RECORD ASSOLUTI 1BI
+    // =========================================================================
+    function renderGlobalAndRecords(students) {
+      const totalClassXp = students.reduce((sum, s) => sum + s.xp, 0);
+      const totalSosOpen = state.sos.filter(t => t.status === "open").length;
+      const totalSosSolved = state.sos.filter(t => t.status === "solved").length;
+      const totalSpotiMin = students.reduce((sum, s) => sum + s.spotiMinutes, 0);
+      const totalCosmetics = students.reduce((sum, s) => sum + s.cosmeticsCount, 0);
+
+      const globalKpis = [
+        { val: students.length, lbl: "Studenti Registrati 1BI", color: "#38bdf8" },
+        { val: `⚡ ${totalClassXp.toLocaleString("it-IT")}`, lbl: "XP Totali Accumulati", color: "#fbbf24" },
+        { val: totalSosSolved, lbl: "SOS Esercizi Risolti", color: "#34d399" },
+        { val: totalSosOpen, lbl: "SOS Attualmente Aperti", color: "#fb923c" },
+        { val: state.flashcards.length, lbl: "Mazzi Flashcard AI", color: "#a78bfa" },
+        { val: state.appunti.length + state.progetti.length, lbl: "Appunti & Progetti", color: "#60a5fa" },
+        { val: state.chat.length + state.forum.length, lbl: "Messaggi Chat & Q&A", color: "#f472b6" },
+        { val: state.aiSpiegazioni.length, lbl: "Spiegazioni Tutor AI", color: "#818cf8" },
+        { val: state.aste.length + state.scambi.length, lbl: "Aste & Scambi 1-a-1", color: "#facc15" },
+        { val: totalCosmetics, lbl: "Cosmetici Sbloccati Totali", color: "#c084fc" },
+        { val: state.verifiche.length, lbl: "Verifiche in Calendario", color: "#f87171" },
+        { val: `${totalSpotiMin} min`, lbl: "Musica Classe (Settimana)", color: "#4ade80" }
+      ];
+
+      document.getElementById("globalPortalKpiGrid").innerHTML = globalKpis.map(k => `
+        <div class="kpi-box">
+          <div class="kpi-val" style="color:${k.color};">${k.val}</div>
+          <div class="kpi-lbl">${k.lbl}</div>
+        </div>
+      `).join("");
+
+      // Hall of Fame (6 Primati)
+      const topBy = (fn) => [...students].sort((a, b) => fn(b) - fn(a))[0];
+      const recXp = topBy(s => s.xp);
+      const recSos = topBy(s => s.sosSolved);
+      const recStreak = topBy(s => s.streak);
+      const recNotes = topBy(s => s.notesCount + s.decksCreated);
+      const recCosm = topBy(s => s.cosmeticsCount);
+      const recSpoti = topBy(s => s.spotiMinutes);
+
+      const records = [
+        { icon: "👑", bg: "rgba(251,191,36,0.2)", title: "Re / Regina degli XP", holder: recXp, metric: recXp ? `${recXp.xp} XP (Lv.${recXp.level})` : "-" },
+        { icon: "🦸", bg: "rgba(16,185,129,0.2)", title: "Eroe degli SOS Esercizi", holder: recSos, metric: recSos ? `${recSos.sosSolved} esercizi risolti` : "-" },
+        { icon: "🔥", bg: "rgba(249,115,22,0.2)", title: "Streak Giornaliero Record", holder: recStreak, metric: recStreak ? `${recStreak.streak} giorni consecutivi` : "-" },
+        { icon: "📚", bg: "rgba(56,189,248,0.2)", title: "Archivista Supremo", holder: recNotes, metric: recNotes ? `${recNotes.notesCount + recNotes.decksCreated} appunti/deck` : "-" },
+        { icon: "💎", bg: "rgba(168,85,247,0.2)", title: "Collezionista d'Élite", holder: recCosm, metric: recCosm ? `${recCosm.cosmeticsCount} oggetti sbloccati` : "-" },
+        { icon: "🎧", bg: "rgba(29,185,84,0.2)", title: "Top Ascoltatore Spotify", holder: recSpoti, metric: recSpoti && recSpoti.spotiMinutes > 0 ? `${recSpoti.spotiMinutes} min questa sett.` : "Nessun dato" }
+      ];
+
+      document.getElementById("hallOfFameGrid").innerHTML = records.map(r => `
+        <div class="record-card">
+          <div class="record-icon" style="background:${r.bg};">${r.icon}</div>
+          <div>
+            <div style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:var(--text-muted);">${r.title}</div>
+            <div style="font-size:1.02rem; font-weight:900; margin-top:2px;">${escapeHtml(r.holder?.name || "In attesa")}</div>
+            <div style="font-size:0.8rem; color:#38bdf8; font-weight:700;">${r.metric}</div>
+          </div>
+        </div>
+      `).join("");
+
+      // Distribuzione per Materia
+      const matCounts = {};
+      [...state.sos, ...state.appunti, ...state.flashcards].forEach(item => {
+        const m = (item.materia || item.subject || "Altro").trim();
+        matCounts[m] = (matCounts[m] || 0) + 1;
+      });
+      const matEntries = Object.entries(matCounts).sort((a, b) => b[1] - a[1]);
+      const matBox = document.getElementById("subjectsBreakdownBox");
+      if (matEntries.length === 0) {
+        matBox.innerHTML = `<p style="font-size:0.84rem; color:var(--text-muted);">Nessun contenuto per materia registrato finora.</p>`;
+      } else {
+        const maxM = matEntries[0][1] || 1;
+        matBox.innerHTML = matEntries.map(([mat, cnt]) => `
+          <div style="margin-bottom: 12px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:800;">
+              <span>${escapeHtml(mat)}</span>
+              <span>${cnt} contenuti</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${Math.max(6, Math.round((cnt / maxM) * 100))}%;"></div>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    // =========================================================================
+    // 4. RENDER TABELLA CLASSIFICA COMPLETA
+    // =========================================================================
+    document.getElementById("sortLeaderboardSelect").addEventListener("change", () => {
+      renderFullLeaderboard(buildEnrichedStudents());
+    });
+
+    function renderFullLeaderboard(students) {
+      const sortBy = document.getElementById("sortLeaderboardSelect").value;
+      const sorted = [...students].sort((a, b) => {
+        if (sortBy === "sosSolved") return b.sosSolved - a.sosSolved || b.xp - a.xp;
+        if (sortBy === "streak") return b.streak - a.streak || b.xp - a.xp;
+        if (sortBy === "cosmetics") return b.cosmeticsCount - a.cosmeticsCount || b.xp - a.xp;
+        if (sortBy === "spotiMin") return b.spotiMinutes - a.spotiMinutes || b.xp - a.xp;
+        if (sortBy === "contributions") return b.totalContributions - a.totalContributions || b.xp - a.xp;
+        return b.xp - a.xp;
+      });
+
+      document.getElementById("fullLeaderboardBody").innerHTML = sorted.map((s, idx) => {
+        const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `${idx + 1}`;
+        const isMe = currentUser && s.uid === currentUser.uid;
+        return `
+          <tr style="${isMe ? "background:rgba(139,92,246,0.14); font-weight:800;" : ""}">
+            <td><strong>${medal}</strong></td>
+            <td>${escapeHtml(s.name)} ${isMe ? "<span style='color:#c084fc;'>(Tu)</span>" : ""}</td>
+            <td style="color:#fbbf24; font-weight:800;">⚡ ${s.xp} (Lv.${s.level})</td>
+            <td>🔥 ${s.streak} gg</td>
+            <td>🎯 ${s.sosSolved}</td>
+            <td>📚 ${s.totalContributions}</td>
+            <td>💎 ${s.cosmeticsCount}</td>
+            <td style="color:#4ade80;">🎧 ${s.spotiMinutes} min</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("refreshAllStatsBtn").addEventListener("click", loadAllPortalData);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      currentUser = user;
+      isRep = isRappresentante(user);
+      await handleSpotifyOAuthCallback(user);
+      await loadAllPortalData();
+    });
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
