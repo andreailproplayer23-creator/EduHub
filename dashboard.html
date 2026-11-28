@@ -9,7 +9,7 @@
   <script src="js/theme.js"></script>
   <style>
     /* =========================================================================
-       EDUHUB 1BI - ULTRA UI/UX UPGRADE PACK V2 (0 WARNINGS)
+       EDUHUB 1BI - ULTRA UI/UX PACK (CLEAN & BUG-FREE)
        ========================================================================= */
     :root {
       --eh-accent: #38bdf8;
@@ -18,7 +18,6 @@
       --eh-orb-1: #2563eb;
       --eh-orb-2: #7c3aed;
       --eh-orb-3: #06b6d4;
-      --eh-sticky-top: 64px;
     }
 
     /* 7 SKIN MULTI-TEMA */
@@ -131,7 +130,7 @@
       transition: width 0.08s linear;
     }
 
-    /* Topbar Glassmorphism Fissa in cima */
+    /* Topbar Glassmorphism */
     .topbar {
       position: sticky !important;
       top: 0 !important;
@@ -551,12 +550,13 @@
     }
     .wrapped-pill-btn:hover { transform: translateY(-2px) scale(1.03); }
 
-    /* NUOVA GRIGLIA WIDGET EXTRA: PODIO TOP 3 XP + QUIZ TECH + BLOCCO NOTE */
+    /* GRIGLIA WIDGET EXTRA: PODIO TOP 3 XP + QUIZ TECH + BLOCCO NOTE */
     .eh-extra-widgets-grid {
       display: grid;
       grid-template-columns: 1fr 1.15fr 1fr;
       gap: 14px;
       margin-bottom: 18px;
+      align-items: stretch;
     }
     .eh-mini-widget {
       background: var(--card-bg);
@@ -565,7 +565,7 @@
       padding: 15px 17px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 10px;
       transition: transform 0.25s ease, border-color 0.25s ease;
     }
@@ -573,18 +573,41 @@
       transform: translateY(-2px);
       border-color: var(--eh-accent);
     }
+
+    /* Podio Live compatto e bilanciato senza vuoti */
     .eh-podium-row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: rgba(15, 23, 42, 0.35);
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px 11px;
+      border-radius: 11px;
+      background: rgba(15, 23, 42, 0.42);
+      border: 1px solid rgba(148, 163, 184, 0.14);
       font-size: 0.8rem;
       font-weight: 800;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+    .eh-podium-row:hover {
+      transform: translateX(3px);
+      border-color: rgba(251, 191, 36, 0.45);
+    }
+    .eh-podium-row.rank-1 {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(15, 23, 42, 0.45));
+      border-color: rgba(251, 191, 36, 0.35);
     }
     html[data-theme="light"] .eh-podium-row { background: rgba(15, 23, 42, 0.04); }
+    .eh-podium-bar-track {
+      width: 100%;
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+    }
+    .eh-podium-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #f59e0b, #fde047);
+    }
 
     .eh-quiz-opt {
       width: 100%;
@@ -617,7 +640,8 @@
 
     .eh-scratchpad-area {
       width: 100%;
-      min-height: 86px;
+      flex: 1;
+      min-height: 92px;
       resize: vertical;
       border-radius: 10px;
       border: 1px solid rgba(148, 163, 184, 0.24);
@@ -645,20 +669,29 @@
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(234, 88, 12, 0.05)) !important;
     }
 
-    /* Striscia Usati di Recente & Preferiti Rapidi */
-    #ehRecentStrip {
+    /* Strisce Rapide: I Tuoi Preferiti + Usati di Recente */
+    .eh-quick-access-strips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0 12px;
+    }
+    .eh-quick-strip {
       display: none;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
-      margin: 14px 0 6px;
-      padding: 10px 14px;
+      padding: 9px 14px;
       border-radius: 14px;
-      background: rgba(15, 23, 42, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.52);
+      border: 1px solid rgba(148, 163, 184, 0.18);
     }
-    html[data-theme="light"] #ehRecentStrip {
-      background: rgba(241, 245, 249, 0.85);
+    .eh-quick-strip.fav-strip {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(15, 23, 42, 0.55));
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+    html[data-theme="light"] .eh-quick-strip {
+      background: rgba(241, 245, 249, 0.9);
     }
     .eh-recent-chip {
       display: inline-flex;
@@ -674,34 +707,47 @@
       text-decoration: none;
       transition: transform 0.16s ease, background 0.16s ease;
     }
+    .eh-fav-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.16);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      color: #fde68a;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+    html[data-theme="light"] .eh-fav-chip {
+      color: #92400e;
+      background: rgba(251, 191, 36, 0.22);
+    }
+    .eh-fav-chip:hover { transform: translateY(-1px); background: rgba(251, 191, 36, 0.28); }
     html[data-theme="light"] .eh-recent-chip {
       color: #0369a1;
       background: rgba(14, 165, 233, 0.12);
     }
     .eh-recent-chip:hover { transform: translateY(-1px); background: rgba(56, 189, 248, 0.24); }
 
-    /* BARRA RICERCA CENTRATA STICKY AGGANCIATA ALLA TOPBAR (ZERO GAP!) */
-    .eh-sticky-controls {
-      position: sticky;
-      top: var(--eh-sticky-top);
-      z-index: 45;
-      margin: 18px 0 18px;
-      padding: 12px 14px;
-      border-radius: 0 0 18px 18px;
-      background: rgba(10, 16, 30, 0.94);
-      border: 1px solid rgba(56, 189, 248, 0.28);
-      border-top: none;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 16px 34px -14px rgba(0, 0, 0, 0.78);
+    /* BARRA RICERCA & CATEGORIE (NON STICKY, PULITA E BEN PROPORZIONATA) */
+    .eh-search-filter-panel {
+      position: relative;
+      margin: 10px 0 22px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(56, 189, 248, 0.26);
+      box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.65);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      transition: border-color 0.3s ease, background-color 0.3s ease;
+      gap: 12px;
     }
-    html[data-theme="light"] .eh-sticky-controls {
-      background: rgba(255, 255, 255, 0.96);
+    html[data-theme="light"] .eh-search-filter-panel {
+      background: rgba(255, 255, 255, 0.95);
       border-color: rgba(14, 165, 233, 0.25);
     }
 
@@ -709,9 +755,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       width: 100%;
-      max-width: 560px;
+      max-width: 620px;
     }
     .eh-search-box {
       position: relative;
@@ -720,12 +766,12 @@
     }
     .eh-search-box input {
       width: 100%;
-      padding: 9px 115px 9px 36px;
-      border-radius: 999px;
-      border: 1.5px solid rgba(56, 189, 248, 0.38);
-      background: rgba(15, 23, 42, 0.85);
+      padding: 11px 118px 11px 38px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      background: rgba(7, 11, 20, 0.75);
       color: var(--text-main, #f8fafc);
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 700;
       outline: none;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -736,15 +782,15 @@
     }
     .eh-search-box input:focus {
       border-color: var(--eh-accent);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
     }
     .eh-search-icon {
       position: absolute;
       left: 13px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 0.82rem;
-      opacity: 0.75;
+      font-size: 0.85rem;
+      opacity: 0.8;
       pointer-events: none;
     }
     .eh-search-badges {
@@ -758,7 +804,7 @@
       pointer-events: none;
     }
     .eh-search-count {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       font-weight: 900;
       padding: 2px 7px;
       border-radius: 999px;
@@ -766,7 +812,7 @@
       color: var(--eh-accent);
     }
     .eh-search-kbd {
-      font-size: 0.65rem;
+      font-size: 0.66rem;
       font-weight: 800;
       padding: 2px 6px;
       border-radius: 6px;
@@ -774,30 +820,31 @@
       color: var(--text-muted);
     }
     .eh-random-tool-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       border: 1px solid rgba(168, 85, 247, 0.45);
       background: linear-gradient(135deg, rgba(168, 85, 247, 0.22), rgba(56, 189, 248, 0.2));
       color: #e9d5ff;
-      font-size: 1rem;
+      font-size: 1.05rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .eh-random-tool-btn:hover {
-      transform: rotate(35deg) scale(1.1);
+      transform: rotate(25deg) scale(1.08);
     }
 
     .eh-filter-pills-row {
       display: flex;
-      gap: 7px;
+      gap: 8px;
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
+      width: 100%;
     }
     .dash-filter-btn {
       transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background 0.2s ease, color 0.2s ease !important;
@@ -833,27 +880,27 @@
       top: 10px;
       right: 10px;
       z-index: 5;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 8px;
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.65);
       color: #94a3b8;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.78rem;
+      font-size: 0.84rem;
       cursor: pointer;
-      opacity: 0.45;
+      opacity: 0.65;
       transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, border-color 0.2s ease;
     }
-    html[data-theme="light"] .eh-fav-star { background: rgba(255, 255, 255, 0.85); }
+    html[data-theme="light"] .eh-fav-star { background: rgba(255, 255, 255, 0.9); }
     .hub-card:hover .eh-fav-star,
     .eh-fav-star.is-fav { opacity: 1; }
     .eh-fav-star.is-fav {
       color: #fbbf24;
-      border-color: rgba(251, 191, 36, 0.55);
-      background: rgba(251, 191, 36, 0.14);
+      border-color: rgba(251, 191, 36, 0.6);
+      background: rgba(251, 191, 36, 0.18);
     }
     .eh-fav-star:hover { transform: scale(1.18) rotate(12deg); }
 
@@ -1143,7 +1190,7 @@
       </div>
     </div>
 
-    <!-- NUOVA GRIGLIA WIDGET EXTRA: PODIO TOP 3 XP + QUIZ TECH DEL GIORNO + BLOCCO NOTE -->
+    <!-- GRIGLIA WIDGET EXTRA: PODIO TOP 3 XP + QUIZ TECH DEL GIORNO + BLOCCO NOTE -->
     <div class="eh-extra-widgets-grid eh-reveal">
       <!-- 1. Podio Live Top 3 XP -->
       <div class="eh-mini-widget">
@@ -1153,7 +1200,7 @@
           </span>
           <a href="modules/classifica.html" style="font-size:0.74rem; font-weight:800; color:var(--eh-accent); text-decoration:none;">Classifica →</a>
         </div>
-        <div id="ehMiniPodiumList" style="display:flex; flex-direction:column; gap:6px;">
+        <div id="ehMiniPodiumList" style="display:flex; flex-direction:column; gap:8px;">
           <div style="font-size:0.78rem; color:var(--text-muted);">Caricamento podio XP...</div>
         </div>
       </div>
@@ -1261,16 +1308,25 @@
       </div>
     </a>
 
-    <!-- STRISCIA USATI DI RECENTE -->
-    <div id="ehRecentStrip">
-      <span style="font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
-        🕒 Usati di recente:
-      </span>
-      <div id="ehRecentList" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
+    <!-- STRISCE ACCESSO RAPIDO: PREFERITI + USATI DI RECENTE -->
+    <div class="eh-quick-access-strips">
+      <div id="ehFavQuickStrip" class="eh-quick-strip fav-strip">
+        <span style="font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; color:#fbbf24;">
+          ⭐ I tuoi Preferiti:
+        </span>
+        <div id="ehFavQuickList" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
+      </div>
+
+      <div id="ehRecentStrip" class="eh-quick-strip">
+        <span style="font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">
+          🕒 Usati di recente:
+        </span>
+        <div id="ehRecentList" style="display:flex; gap:7px; flex-wrap:wrap;"></div>
+      </div>
     </div>
 
-    <!-- BARRA RICERCA CENTRATA STICKY AGGANCIATA ALLA TOPBAR + FILTRI RAPIDI -->
-    <div class="eh-sticky-controls" id="ehStickyControls">
+    <!-- PANNELLO RICERCA & CATEGORIE (NON STICKY, SCORRE CON LA PAGINA) -->
+    <div class="eh-search-filter-panel">
       <div class="eh-center-search-row">
         <div class="eh-search-box">
           <span class="eh-search-icon">🔍</span>
@@ -1284,22 +1340,22 @@
       </div>
 
       <div class="eh-filter-pills-row">
-        <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:6px 14px; border-radius:999px; border:1px solid var(--eh-accent); background:rgba(56,189,248,0.18); color:var(--eh-accent); font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn active" data-cat="all" style="padding:7px 15px; border-radius:10px; border:1px solid var(--eh-accent); background:rgba(56,189,248,0.18); color:var(--eh-accent); font-weight:800; font-size:0.78rem; cursor:pointer;">
           Tutte (27)
         </button>
-        <button type="button" class="dash-filter-btn" data-cat="favorites" id="favFilterBtn" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn" data-cat="favorites" id="favFilterBtn" style="padding:7px 15px; border-radius:10px; border:1px solid rgba(251,191,36,0.35); background:rgba(251,191,36,0.1); color:#fde68a; font-weight:800; font-size:0.78rem; cursor:pointer;">
           ⭐ Preferiti (<span id="favCountNum">0</span>)
         </button>
-        <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn" data-cat="studio" style="padding:7px 15px; border-radius:10px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
           📚 Didattica & Studio
         </button>
-        <button type="button" class="dash-filter-btn" data-cat="tech" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn" data-cat="tech" style="padding:7px 15px; border-radius:10px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
           💻 Laboratori & Tech
         </button>
-        <button type="button" class="dash-filter-btn" data-cat="classe" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn" data-cat="classe" style="padding:7px 15px; border-radius:10px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
           🏫 Vita di Classe
         </button>
-        <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:6px 14px; border-radius:999px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.77rem; cursor:pointer;">
+        <button type="button" class="dash-filter-btn" data-cat="svago" style="padding:7px 15px; border-radius:10px; border:1px solid var(--table-border, rgba(255,255,255,0.12)); background:var(--card-bg); color:var(--text-muted); font-weight:800; font-size:0.78rem; cursor:pointer;">
           🎮 Arena, Casse XP & Svago
         </button>
       </div>
@@ -1609,21 +1665,10 @@
     }
 
     // =========================================================================
-    // 0. AGGANCIO TOPBAR -> BARRA RICERCA (ZERO GAP) + MULTI-TEMA + SCROLL REVEAL
+    // 0. MULTI-TEMA + SCROLL REVEAL
     // =========================================================================
     const topbarEl = document.getElementById("mainTopbar");
-    function syncStickyOffset() {
-      if (!topbarEl) return;
-      const h = Math.ceil(topbarEl.getBoundingClientRect().height);
-      document.documentElement.style.setProperty("--eh-sticky-top", `${h}px`);
-    }
-    syncStickyOffset();
-    window.addEventListener("resize", syncStickyOffset);
-    if (window.ResizeObserver && topbarEl) {
-      new ResizeObserver(syncStickyOffset).observe(topbarEl);
-    }
 
-    // Selettore Multi-Tema (7 Skin)
     const skinSelector = document.getElementById("ehSkinSelector");
     const savedSkin = localStorage.getItem("eduhub_skin") || "default";
     if (savedSkin && savedSkin !== "default") {
@@ -1640,7 +1685,6 @@
       });
     }
 
-    // Scroll Reveal animato
     const revealEls = document.querySelectorAll(".eh-reveal");
     if ("IntersectionObserver" in window) {
       const revObs = new IntersectionObserver((entries) => {
@@ -1657,16 +1701,38 @@
     }
 
     // =========================================================================
-    // 1. PREFERITI (STELLINE), USATI DI RECENTE, FILTRI & RICERCA CENTRATA
+    // 1. PREFERITI (STRISCIA DEDICATA + FILTRO), USATI DI RECENTE & RICERCA
     // =========================================================================
     let favTools = JSON.parse(localStorage.getItem("eduhub_fav_tools") || "[]");
     let recentTools = JSON.parse(localStorage.getItem("eduhub_recent_tools") || "[]");
     let currentCat = "all";
     let currentSearch = "";
 
-    function updateFavCount() {
-      const el = document.getElementById("favCountNum");
-      if (el) el.textContent = favTools.length;
+    const allCards = Array.from(document.querySelectorAll(".hub-card"));
+
+    function renderFavQuickStrip() {
+      const strip = document.getElementById("ehFavQuickStrip");
+      const list = document.getElementById("ehFavQuickList");
+      const countEl = document.getElementById("favCountNum");
+      if (countEl) countEl.textContent = favTools.length;
+      if (!strip || !list) return;
+
+      const favItems = allCards
+        .map(c => ({
+          key: c.dataset.track || c.getAttribute("href"),
+          title: c.querySelector("h3")?.textContent.trim() || "Modulo",
+          href: c.getAttribute("href")
+        }))
+        .filter(item => favTools.includes(item.key));
+
+      if (!favItems.length) {
+        strip.style.display = "none";
+        return;
+      }
+      strip.style.display = "flex";
+      list.innerHTML = favItems.map(f => `
+        <a href="${f.href}" class="eh-fav-chip">★ ${f.title}</a>
+      `).join("");
     }
 
     function renderRecentStrip() {
@@ -1682,9 +1748,6 @@
         <a href="${r.href}" class="eh-recent-chip">${r.title}</a>
       `).join("");
     }
-    renderRecentStrip();
-
-    const allCards = Array.from(document.querySelectorAll(".hub-card"));
 
     allCards.forEach(card => {
       const key = card.dataset.track || card.getAttribute("href");
@@ -1718,7 +1781,7 @@
           showToast("⭐ Aggiunto ai Preferiti!");
         }
         localStorage.setItem("eduhub_fav_tools", JSON.stringify(favTools));
-        updateFavCount();
+        renderFavQuickStrip();
         applyDashboardFilters();
       });
       card.appendChild(star);
@@ -1738,7 +1801,9 @@
         card.style.transform = "";
       });
     });
-    updateFavCount();
+
+    renderFavQuickStrip();
+    renderRecentStrip();
 
     function applyDashboardFilters() {
       const q = currentSearch.trim().toLowerCase();
@@ -1773,13 +1838,25 @@
     document.querySelectorAll(".dash-filter-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".dash-filter-btn").forEach(b => {
-          b.style.borderColor = "var(--table-border, rgba(255,255,255,0.12))";
-          b.style.background = "var(--card-bg)";
-          b.style.color = "var(--text-muted)";
+          if (b.dataset.cat === "favorites") {
+            b.style.borderColor = "rgba(251,191,36,0.35)";
+            b.style.background = "rgba(251,191,36,0.1)";
+            b.style.color = "#fde68a";
+          } else {
+            b.style.borderColor = "var(--table-border, rgba(255,255,255,0.12))";
+            b.style.background = "var(--card-bg)";
+            b.style.color = "var(--text-muted)";
+          }
         });
-        btn.style.borderColor = "var(--eh-accent)";
-        btn.style.background = "rgba(56,189,248,0.18)";
-        btn.style.color = "var(--eh-accent)";
+        if (btn.dataset.cat === "favorites") {
+          btn.style.borderColor = "#fbbf24";
+          btn.style.background = "rgba(251,191,36,0.24)";
+          btn.style.color = "#fef08a";
+        } else {
+          btn.style.borderColor = "var(--eh-accent)";
+          btn.style.background = "rgba(56,189,248,0.18)";
+          btn.style.color = "var(--eh-accent)";
+        }
         currentCat = btn.dataset.cat;
         applyDashboardFilters();
       });
@@ -2366,12 +2443,11 @@
     });
 
     // =========================================================================
-    // 7. PODIO TOP 3 XP LIVE + CONTATORE COMPAGNI ONLINE NELLA TOPBAR
+    // 7. PODIO TOP 3 XP LIVE (CON BARRA PROPORZIONALE) + CONTATORE ONLINE
     // =========================================================================
     onSnapshot(collection(db, "utenti_registrati"), (snap) => {
       const users = snap.docs.map(d => d.data());
 
-      // Podio Top 3 XP
       const podiumEl = document.getElementById("ehMiniPodiumList");
       if (podiumEl) {
         const sorted = [...users]
@@ -2383,17 +2459,26 @@
           .slice(0, 3);
 
         const medals = ["🥇", "🥈", "🥉"];
+        const maxXp = Math.max(1, sorted[0]?.xp || 1);
+
         podiumEl.innerHTML = sorted.length
-          ? sorted.map((u, i) => `
-              <div class="eh-podium-row">
-                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${medals[i]} ${u.name}</span>
-                <span style="color:#fbbf24; white-space:nowrap;">${u.xp} XP</span>
-              </div>
-            `).join("")
+          ? sorted.map((u, i) => {
+              const barPct = u.xp > 0 ? Math.max(12, Math.round((u.xp / maxXp) * 100)) : 6;
+              return `
+                <div class="eh-podium-row ${i === 0 ? "rank-1" : ""}">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${medals[i]} ${u.name}</span>
+                    <span style="color:#fbbf24; white-space:nowrap;">${u.xp} XP</span>
+                  </div>
+                  <div class="eh-podium-bar-track">
+                    <div class="eh-podium-bar-fill" style="width:${barPct}%;"></div>
+                  </div>
+                </div>
+              `;
+            }).join("")
           : `<div style="font-size:0.78rem; color:var(--text-muted);">Nessun punteggio registrato</div>`;
       }
 
-      // Contatore Compagni Online Adesso (ultimi 5 min)
       const onlineEl = document.getElementById("ehOnlineCountText");
       if (onlineEl) {
         const nowMs = Date.now();
