@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>EduHub - Flashcard Swipe 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    .fc-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .fc-tab-btn {
+      padding: 12px 8px;
+      border-radius: 14px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: clamp(0.75rem, 2.3vw, 0.88rem);
+      cursor: pointer;
+      min-height: 46px;
+      transition: all 0.2s ease;
+    }
+    .fc-tab-btn.active {
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      border-color: #a78bfa;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+    }
+
+    .panel-box {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 24px);
+    }
+
+    /* AREA SWIPE INTERATTIVA */
+    .swipe-arena {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .deck-stats-bar {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .progress-rail {
+      width: 100%;
+      max-width: 440px;
+      height: 8px;
+      background: var(--solid-sub);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #38bdf8);
+      transition: width 0.25s ease;
+    }
+
+    .card-stage {
+      width: 100%;
+      max-width: 440px;
+      height: clamp(320px, 52vh, 410px);
+      position: relative;
+      perspective: 1200px;
+      touch-action: pan-y;
+    }
+
+    .swipe-card-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      cursor: grab;
+      will-change: transform;
+    }
+    .swipe-card-wrapper:active {
+      cursor: grabbing;
+    }
+
+    .flip-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .swipe-card-wrapper.flipped .flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 24px;
+      padding: clamp(20px, 4vw, 28px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      border: 2px solid var(--solid-border);
+    }
+
+    .card-front {
+      background: linear-gradient(155deg, #162033 0%, #0f172a 100%);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    html[data-theme="light"] .card-front {
+      background: linear-gradient(155deg, #ffffff 0%, #f1f5f9 100%);
+    }
+
+    .card-back {
+      background: linear-gradient(155deg, #1e1b4b 0%, #0f172a 100%);
+      border-color: rgba(167, 139, 250, 0.55);
+      transform: rotateY(180deg);
+    }
+    html[data-theme="light"] .card-back {
+      background: linear-gradient(155deg, #eef2ff 0%, #e0e7ff 100%);
+    }
+
+    .card-main-text {
+      font-size: clamp(1.08rem, 3.4vw, 1.32rem);
+      font-weight: 800;
+      line-height: 1.48;
+      text-align: center;
+      overflow-y: auto;
+      max-height: 230px;
+      padding: 4px;
+    }
+    .card-back .card-main-text {
+      font-size: clamp(0.98rem, 3vw, 1.16rem);
+      font-weight: 700;
+    }
+
+    /* TIMBRI SWIPE SINISTRA / DESTRA */
+    .swipe-stamp {
+      position: absolute;
+      top: 22px;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .stamp-know {
+      left: 20px;
+      border: 3px solid #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.14);
+      transform: rotate(-12deg);
+    }
+    .stamp-again {
+      right: 20px;
+      border: 3px solid #ef4444;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.14);
+      transform: rotate(12deg);
+    }
+
+    /* PULSANTI TOUCH IN BASSO */
+    .swipe-controls-row {
+      width: 100%;
+      max-width: 440px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-swipe-ctrl {
+      min-height: 52px;
+      border-radius: 16px;
+      border: none;
+      font-weight: 900;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: transform 0.15s ease;
+    }
+    .btn-swipe-ctrl:active { transform: scale(0.96); }
+    .btn-no {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1.5px solid rgba(239, 68, 68, 0.5);
+      color: #f87171;
+    }
+    .btn-flip {
+      padding: 0 16px;
+      background: var(--solid-sub);
+      border: 1.5px solid var(--solid-border);
+      color: var(--text-main);
+    }
+    .btn-yes {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+    }
+
+    /* FORM GENERATORE AI */
+    .fc-input, .fc-select, .fc-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .fc-label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 12px 0 6px;
+    }
+
+    .decks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 275px), 1fr));
+      gap: 14px;
+    }
+    .deck-card {
+      background: var(--solid-card);
+      border: 1px solid var(--solid-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .topbar-sub { display: none; }
+      .fc-tabs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Flashcard Swipe AI</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 960px;">
+    <div class="welcome-banner" style="margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size: clamp(1.22rem, 3.5vw, 1.5rem);">🃏 Flashcard Swipe — Ripasso Lampo</h2>
+        <p style="font-size: 0.85rem;">Scorri a <strong>destra</strong> se la sai, a <strong>sinistra</strong> per ripeterla • +35 XP a mazzo completato</p>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        <span>Touch & Desktop</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="fc-tabs">
+      <button type="button" class="fc-tab-btn active" data-tab="play">🃏 Ripassa Ora</button>
+      <button type="button" class="fc-tab-btn" data-tab="create">✨ Crea Mazzo con AI</button>
+      <button type="button" class="fc-tab-btn" data-tab="library">📚 Mazzi 1BI (<span id="decksCount">0</span>)</button>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TAB 1: AREA SWIPE                                     -->
+    <!-- ===================================================== -->
+    <section id="tabPlay" class="panel-box">
+      <div id="swipeArenaContainer" class="swipe-arena">
+        <div class="deck-stats-bar">
+          <span id="activeDeckTitle" style="color:#38bdf8;">Mazzo Base Informatica 1BI</span>
+          <span id="deckCounterText">1 / 6</span>
+        </div>
+
+        <div class="progress-rail">
+          <div id="deckProgressFill" class="progress-bar-fill"></div>
+        </div>
+
+        <div class="card-stage" id="cardStage">
+          <!-- Carta generata via JS -->
+        </div>
+
+        <div class="swipe-controls-row" id="swipeControlsRow">
+          <button type="button" id="btnSwipeLeft" class="btn-swipe-ctrl btn-no">↺ Ripassa</button>
+          <button type="button" id="btnFlipCard" class="btn-swipe-ctrl btn-flip" title="Gira carta">🔄 Gira</button>
+          <button type="button" id="btnSwipeRight" class="btn-swipe-ctrl btn-yes">La so ✓</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- TAB 2: GENERATORE FLASHCARD CON AI                    -->
+    <!-- ===================================================== -->
+    <section id="tabCreate" class="panel-box" style="display: none;">
+      <h3 style="font-size: 1.12rem; font-weight: 900;">✨ Genera un Mazzo Flashcard con l'AI</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+        Scrivi un argomento, incolla i tuoi appunti oppure carica le foto del libro: l'AI crea subito le carte pronte da swipare!
+      </p>
+
+      <form id="generateDeckForm" style="margin-top: 12px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div>
+            <label class="fc-label">Titolo del Mazzo *</label>
+            <input type="text" id="deckTitleInput" class="fc-input" placeholder="Es. Sistema Binario e Porte Logiche" required />
+          </div>
+          <div>
+            <label class="fc-label">Materia</label>
+            <select id="deckSubjectSelect" class="fc-select">
+              <option value="Informatica">💻 Informatica</option>
+              <option value="Matematica">📐 Matematica</option>
+              <option value="Fisica & Chimica">🧪 Fisica & Chimica</option>
+              <option value="Storia">🏛️ Storia</option>
+              <option value="Italiano">📖 Italiano</option>
+              <option value="Inglese">🇬🇧 Inglese</option>
+              <option value="Diritto">⚖️ Diritto</option>
+            </select>
+          </div>
+          <div>
+            <label class="fc-label">Numero Carte</label>
+            <select id="deckCardCountSelect" class="fc-select">
+              <option value="6">6 Flashcard (Lampo)</option>
+              <option value="8" selected>8 Flashcard (Standard)</option>
+              <option value="12">12 Flashcard (Verifica)</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="fc-label">Argomento o Appunti da studiare</label>
+        <textarea id="deckNotesInput" class="fc-textarea" rows="4" placeholder="Scrivi l'argomento (es. 'La rivoluzione francese e Napoleone') oppure incolla qui il testo degli appunti..."></textarea>
+
+        <label class="fc-label">Oppure carica Foto del Libro / Quaderno (Opzionale — usa Gemini Vision)</label>
+        <input type="file" id="deckImagesInput" accept="image/*" multiple class="fc-input" style="padding:10px;" />
+        <div id="selectedPhotosCount" style="font-size:0.76rem; color:#38bdf8; margin-top:4px; font-weight:700;"></div>
+
+        <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:0.84rem; font-weight:700; cursor:pointer;">
+          <input type="checkbox" id="shareWithClassCheck" checked />
+          Condividi questo mazzo anche con tutta la 1BI nella libreria
+        </label>
+
+        <button type="submit" id="generateDeckBtn" class="btn-swipe-ctrl btn-yes" style="width:100%; margin-top:16px; background:linear-gradient(135deg, #7c3aed, #2563eb);">
+          🚀 Genera Flashcard & Inizia Swipe
+        </button>
+      </form>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- TAB 3: LIBRERIA MAZZI DELLA CLASSE 1BI                -->
+    <!-- ===================================================== -->
+    <section id="tabLibrary" class="panel-box" style="display: none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-size:1.1rem; font-weight:900;">📚 Mazzi di Ripasso della 1BI</h3>
+        <select id="filterDecksSubject" class="fc-select" style="width:auto; min-width:170px;">
+          <option value="TUTTE">Tutte le materie</option>
+          <option value="Informatica">💻 Informatica</option>
+          <option value="Matematica">📐 Matematica</option>
+          <option value="Fisica & Chimica">🧪 Fisica & Chimica</option>
+          <option value="Storia">🏛️ Storia</option>
+          <option value="Italiano">📖 Italiano</option>
+          <option value="Inglese">🇬🇧 Inglese</option>
+          <option value="Diritto">⚖️ Diritto</option>
+        </select>
+      </div>
+      <div id="decksLibraryGrid" class="decks-grid"></div>
+    </section>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      addDoc,
+      getDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      updateDoc,
+      increment
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const DEFAULT_DECK = {
+      id: "default-1bi",
+      titolo: "Informatica 1BI — Basi & Porte Logiche",
+      materia: "Informatica",
+      autore: "EduHub 1BI",
+      cards: [
+        { q: "Quanti valori può assumere un singolo BIT?", a: "2 valori: 0 (falso / spento) oppure 1 (vero / acceso)." },
+        { q: "A quanti BIT corrisponde 1 Byte?", a: "1 Byte = 8 bit (256 combinazioni possibili, da 0 a 255)." },
+        { q: "Quando l'uscita di una porta AND è uguale a 1?", a: "Solo quando TUTTI gli ingressi sono uguali a 1." },
+        { q: "Quando l'uscita di una porta OR è uguale a 1?", a: "Quando ALMENO UNO degli ingressi è uguale a 1." },
+        { q: "Cosa fa la porta logica XOR (OR esclusivo)?", a: "Restituisce 1 solo se i due ingressi sono DIVERSI tra loro (0-1 oppure 1-0)." },
+        { q: "Quanto vale in decimale il numero binario 1010?", a: "10 (8 + 0 + 2 + 0 = 10)." }
+      ]
+    };
+
+    let currentUser = null;
+    let isRep = false;
+    let geminiSharedKey = localStorage.getItem("eduhub_gemini_key") || "";
+    let allDecks = [DEFAULT_DECK];
+
+    // Stato sessione Swipe
+    let activeDeck = DEFAULT_DECK;
+    let queueCards = [];
+    let masteredCount = 0;
+    let totalInitialCount = 0;
+    let isFlipped = false;
+    let selectedBookPhotos = [];
+
+    // Navigazione Tab
+    document.querySelectorAll(".fc-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".fc-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const t = btn.dataset.tab;
+        document.getElementById("tabPlay").style.display = t === "play" ? "block" : "none";
+        document.getElementById("tabCreate").style.display = t === "create" ? "block" : "none";
+        document.getElementById("tabLibrary").style.display = t === "library" ? "block" : "none";
+      });
+    });
+
+    function loadDeckIntoArena(deck) {
+      activeDeck = deck;
+      queueCards = [...(deck.cards || [])];
+      masteredCount = 0;
+      totalInitialCount = queueCards.length;
+      isFlipped = false;
+      document.getElementById("activeDeckTitle").textContent = deck.titolo;
+      document.getElementById("swipeControlsRow").style.display = "grid";
+      renderCurrentSwipeCard();
+    }
+
+    function renderCurrentSwipeCard() {
+      const stage = document.getElementById("cardStage");
+      const pct = totalInitialCount > 0 ? Math.round((masteredCount / totalInitialCount) * 100) : 0;
+      document.getElementById("deckProgressFill").style.width = `${pct}%`;
+      document.getElementById("deckCounterText").textContent = `${masteredCount} / ${totalInitialCount} imparate`;
+
+      if (queueCards.length === 0) {
+        document.getElementById("swipeControlsRow").style.display = "none";
+        stage.innerHTML = `
+          <div style="height:100%; border-radius:24px; background:linear-gradient(145deg, rgba(16,185,129,0.2), rgba(59,130,246,0.16)); border:2px solid #34d399; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; gap:12px;">
+            <div style="font-size:3.2rem;">🏆</div>
+            <h3 style="font-size:1.3rem; font-weight:900; color:#34d399;">Mazzo Completato al 100%!</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted);">Hai ripassato tutte le ${totalInitialCount} flashcard. +35 XP accreditati!</p>
+            <button type="button" id="restartDeckBtn" class="btn-swipe-ctrl btn-yes" style="padding:0 22px; margin-top:6px;">
+              🔁 Ripeti Mazzo
+            </button>
+          </div>
+        `;
+        document.getElementById("restartDeckBtn")?.addEventListener("click", () => loadDeckIntoArena(activeDeck));
+        awardCompletionXp();
+        return;
+      }
+
+      const card = queueCards[0];
+      isFlipped = false;
+
+      stage.innerHTML = `
+        <div class="swipe-card-wrapper" id="activeSwipeCard">
+          <div class="swipe-stamp stamp-know" id="stampKnow">LA SO ✓</div>
+          <div class="swipe-stamp stamp-again" id="stampAgain">RIPASSA ↺</div>
+
+          <div class="flip-inner">
+            <div class="card-face card-front">
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; font-weight:900; color:#38bdf8; text-transform:uppercase;">
+                <span>❓ DOMANDA</span>
+                <span>Rimaste: ${queueCards.length}</span>
+              </div>
+              <div class="card-main-text">${escapeHtml(card.q)}</div>
+              <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); font-weight:700;">
+                👆 Tocca per girare • Trascina a sinistra o destra
+              </div>
+            </div>
+
+            <div class="card-face card-back">
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; font-weight:900; color:#c4b5fd; text-transform:uppercase;">
+                <span>💡 RISPOSTA</span>
+                <span>Rimaste: ${queueCards.length}</span>
+              </div>
+              <div class="card-main-text">${escapeHtml(card.a)}</div>
+              <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); font-weight:700;">
+                ← Ripassa dopo &nbsp;•&nbsp; La so →
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      attachSwipePhysics(document.getElementById("activeSwipeCard"));
+    }
+
+    function attachSwipePhysics(cardEl) {
+      let startX = 0;
+      let startY = 0;
+      let currentX = 0;
+      let isDragging = false;
+      let moved = false;
+
+      const stampKnow = document.getElementById("stampKnow");
+      const stampAgain = document.getElementById("stampAgain");
+
+      const onDown = (e) => {
+        const pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX;
+        startY = pt.clientY;
+        currentX = 0;
+        isDragging = true;
+        moved = false;
+        cardEl.style.transition = "none";
+      };
+
+      const onMove = (e) => {
+        if (!isDragging) return;
+        const pt = e.touches ? e.touches[0] : e;
+        const dx = pt.clientX - startX;
+        const dy = pt.clientY - startY;
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+        if (Math.abs(dx) < Math.abs(dy) && Math.abs(dx) < 20) return;
+
+        currentX = dx;
+        const rotate = dx * 0.055;
+        cardEl.style.transform = `translateX(${dx}px) rotate(${rotate}deg)`;
+
+        const ratio = Math.min(1, Math.abs(dx) / 100);
+        if (dx > 15) {
+          stampKnow.style.opacity = ratio;
+          stampAgain.style.opacity = 0;
+        } else if (dx < -15) {
+          stampAgain.style.opacity = ratio;
+          stampKnow.style.opacity = 0;
+        } else {
+          stampKnow.style.opacity = 0;
+          stampAgain.style.opacity = 0;
+        }
+      };
+
+      const onUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (!moved) {
+          cardEl.style.transform = "";
+          toggleFlipCard();
+          return;
+        }
+
+        if (currentX > 95) {
+          triggerSwipeDecision("right");
+        } else if (currentX < -95) {
+          triggerSwipeDecision("left");
+        } else {
+          cardEl.style.transition = "transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)";
+          cardEl.style.transform = "translateX(0px) rotate(0deg)";
+          stampKnow.style.opacity = 0;
+          stampAgain.style.opacity = 0;
+        }
+      };
+
+      cardEl.addEventListener("touchstart", onDown, { passive: true });
+      cardEl.addEventListener("touchmove", onMove, { passive: true });
+      cardEl.addEventListener("touchend", onUp);
+      cardEl.addEventListener("mousedown", onDown);
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+    }
+
+    function toggleFlipCard() {
+      const cardEl = document.getElementById("activeSwipeCard");
+      if (!cardEl) return;
+      isFlipped = !isFlipped;
+      cardEl.classList.toggle("flipped", isFlipped);
+    }
+
+    function triggerSwipeDecision(dir) {
+      const cardEl = document.getElementById("activeSwipeCard");
+      if (!cardEl || queueCards.length === 0) return;
+
+      const flyX = dir === "right" ? 520 : -520;
+      const flyRot = dir === "right" ? 24 : -24;
+      cardEl.style.transition = "transform 0.28s ease-out, opacity 0.25s ease";
+      cardEl.style.transform = `translateX(${flyX}px) rotate(${flyRot}deg)`;
+      cardEl.style.opacity = "0";
+
+      setTimeout(() => {
+        const currentCard = queueCards.shift();
+        if (dir === "right") {
+          masteredCount++;
+        } else {
+          // Rimette la carta in fondo alla coda per ripassarla
+          queueCards.push(currentCard);
+        }
+        renderCurrentSwipeCard();
+      }, 240);
+    }
+
+    document.getElementById("btnFlipCard").addEventListener("click", toggleFlipCard);
+    document.getElementById("btnSwipeLeft").addEventListener("click", () => triggerSwipeDecision("left"));
+    document.getElementById("btnSwipeRight").addEventListener("click", () => triggerSwipeDecision("right"));
+
+    // Supporto frecce tastiera su PC
+    window.addEventListener("keydown", (e) => {
+      if (document.getElementById("tabPlay").style.display === "none") return;
+      if (e.key === "ArrowLeft") triggerSwipeDecision("left");
+      if (e.key === "ArrowRight") triggerSwipeDecision("right");
+      if (e.key === " " || e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+        toggleFlipCard();
+      }
+    });
+
+    async function awardCompletionXp() {
+      if (!currentUser) return;
+      const cooldownKey = `eduhub_fc_xp_${activeDeck.id}`;
+      const lastAward = Number(localStorage.getItem(cooldownKey) || 0);
+      if (Date.now() - lastAward < 3600000) return; // Max 1 premio l'ora per lo stesso mazzo
+      localStorage.setItem(cooldownKey, String(Date.now()));
+
+      try {
+        await updateDoc(doc(db, "utenti_registrati", currentUser.uid), {
+          xp: increment(35),
+          punti: increment(35)
+        });
+      } catch (_) {}
+    }
+
+    // =========================================================================
+    // GENERATORE AI DI FLASHCARD (TESTO + FOTO LIBRO GEMINI VISION + PUTER.JS)
+    // =========================================================================
+    document.getElementById("deckImagesInput").addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      selectedBookPhotos = [];
+      for (const f of files.slice(0, 4)) {
+        if (!f.type.startsWith("image/")) continue;
+        selectedBookPhotos.push(await compressPhoto(f, 1450, 0.85));
+      }
+      document.getElementById("selectedPhotosCount").textContent = selectedBookPhotos.length > 0
+        ? `📸 ${selectedBookPhotos.length} foto pronte per l'analisi con Gemini Vision`
+        : "";
+    });
+
+    function compressPhoto(file, maxSide, quality) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL("image/jpeg", quality);
+            resolve({ base64: dataUrl.split(",")[1], mimeType: "image/jpeg" });
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("generateDeckForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("deckTitleInput").value.trim();
+      const subject = document.getElementById("deckSubjectSelect").value;
+      const count = Number(document.getElementById("deckCardCountSelect").value) || 8;
+      const notes = document.getElementById("deckNotesInput").value.trim();
+      const shareWithClass = document.getElementById("shareWithClassCheck").checked;
+
+      if (!notes && selectedBookPhotos.length === 0) {
+        return alert("Scrivi un argomento/appunti oppure carica almeno una foto del libro!");
+      }
+
+      const btn = document.getElementById("generateDeckBtn");
+      btn.disabled = true;
+      btn.textContent = "⏳ L'AI sta creando le tue Flashcard...";
+
+      const prompt = `Sei un docente delle scuole superiori italiane (classe 1BI). Crea esattamente ${count} flashcard di ripasso rapido su:
+Titolo: "${title}"
+Materia: ${subject}
+${notes ? `Testo / Argomento: "${notes}"` : "Analizza le foto delle pagine del libro allegate ed estrai i concetti chiave."}
+
+Rispondi ESCLUSIVAMENTE con un array JSON valido senza markdown o testo extra, in questo formato esatto:
+[{"q":"Domanda breve e chiara?","a":"Risposta sintetica, precisa e facile da memorizzare."}]`;
+
+      try {
+        const rawJsonText = await generateFlashcardsRaw(prompt, selectedBookPhotos);
+        const cleaned = rawJsonText.replace(/```json/gi, "").replace(/```/g, "").trim();
+        const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) throw new Error("Formato risposta AI non valido. Riprova.");
+
+        const cards = JSON.parse(jsonMatch[0]).filter(c => c && c.q && c.a);
+        if (cards.length === 0) throw new Error("Nessuna carta generata.");
+
+        const newDeck = {
+          id: "local_" + Date.now(),
+          titolo: title,
+          materia: subject,
+          autore: currentUser?.displayName || "Studente 1BI",
+          autoreUid: currentUser?.uid || "",
+          cards,
+          creatoIl: Date.now()
+        };
+
+        if (shareWithClass && currentUser) {
+          const docRef = await addDoc(collection(db, "flashcards_1bi"), {
+            titolo: newDeck.titolo,
+            materia: newDeck.materia,
+            autore: newDeck.autore,
+            autoreUid: newDeck.autoreUid,
+            cards: newDeck.cards,
+            creatoIl: Date.now()
+          });
+          newDeck.id = docRef.id;
+        }
+
+        loadDeckIntoArena(newDeck);
+        document.querySelector('[data-tab="play"]').click();
+        document.getElementById("generateDeckForm").reset();
+        selectedBookPhotos = [];
+        document.getElementById("selectedPhotosCount").textContent = "";
+      } catch (err) {
+        alert("Errore generazione flashcard: " + (err.message || "Riprova"));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "🚀 Genera Flashcard & Inizia Swipe";
+      }
+    });
+
+    async function generateFlashcardsRaw(prompt, photos) {
+      const apiKey = localStorage.getItem("eduhub_gemini_key") || geminiSharedKey;
+
+      // 1. Se ci sono foto o chiave Gemini configurata, usa Gemini
+      if (apiKey) {
+        const parts = [{ text: prompt }];
+        photos.forEach(p => {
+          parts.push({ inline_data: { mime_type: p.mimeType, data: p.base64 } });
+        });
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts }] })
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (txt) return txt;
+        }
+      } else if (photos.length > 0) {
+        throw new Error("Per analizzare le foto del libro serve la chiave Gemini attivata dai Rappresentanti!");
+      }
+
+      // 2. Fallback gratuito Puter.js per testo / argomenti
+      if (window.puter && window.puter.ai) {
+        const response = await window.puter.ai.chat(prompt, { model: "gpt-4o" });
+        const txt = typeof response === "string"
+          ? response
+          : (response?.message?.content?.[0]?.text || response?.message?.content || response?.text || "");
+        if (txt) return txt;
+      }
+
+      throw new Error("Servizio AI momentaneamente non raggiungibile.");
+    }
+
+    // =========================================================================
+    // LIBRERIA MAZZI 1BI
+    // =========================================================================
+    document.getElementById("filterDecksSubject").addEventListener("change", renderDecksLibrary);
+
+    function renderDecksLibrary() {
+      const grid = document.getElementById("decksLibraryGrid");
+      const filter = document.getElementById("filterDecksSubject").value;
+      const filtered = allDecks.filter(d => filter === "TUTTE" || d.materia === filter);
+      document.getElementById("decksCount").textContent = allDecks.length;
+
+      grid.innerHTML = filtered.map(d => {
+        const canDelete = d.id !== "default-1bi" && (isRep || (currentUser && d.autoreUid === currentUser.uid));
+        return `
+          <div class="deck-card">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                <span style="font-size:0.7rem; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(56,189,248,0.16); color:#38bdf8;">
+                  ${escapeHtml(d.materia)}
+                </span>
+                <span style="font-size:0.75rem; font-weight:800; color:var(--text-muted);">${(d.cards || []).length} carte</span>
+              </div>
+              <div style="font-size:0.98rem; font-weight:900; margin-top:8px;">${escapeHtml(d.titolo)}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">Creato da ${escapeHtml(d.autore || "1BI")}</div>
+            </div>
+
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-swipe-ctrl btn-yes" style="flex:1; min-height:42px; font-size:0.84rem;" data-play-deck="${d.id}">
+                🃏 Avvia Ripasso
+              </button>
+              ${canDelete ? `<button type="button" class="btn-swipe-ctrl btn-no" style="padding:0 12px; min-height:42px;" data-del-deck="${d.id}">🗑️</button>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-play-deck]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const found = allDecks.find(x => x.id === btn.dataset.playDeck);
+          if (!found) return;
+          loadDeckIntoArena(found);
+          document.querySelector('[data-tab="play"]').click();
+        });
+      });
+
+      grid.querySelectorAll("[data-del-deck]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!confirm("Eliminare questo mazzo di flashcard?")) return;
+          await deleteDoc(doc(db, "flashcards_1bi", btn.dataset.delDeck));
+        });
+      });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      currentUser = user;
+      isRep = isRappresentante(user);
+
+      try {
+        const snap1 = await getDoc(doc(db, "ai_config_1bi", "gemini"));
+        if (snap1.exists() && snap1.data().apiKey) {
+          geminiSharedKey = snap1.data().apiKey;
+        } else {
+          const snap2 = await getDoc(doc(db, "ai_config_1bi", "keys"));
+          if (snap2.exists() && snap2.data().gemini) geminiSharedKey = snap2.data().gemini;
+        }
+      } catch (_) {}
+
+      onSnapshot(query(collection(db, "flashcards_1bi"), orderBy("creatoIl", "desc")), (snap) => {
+        const remote = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        allDecks = [DEFAULT_DECK, ...remote];
+        renderDecksLibrary();
+      });
+    });
+
+    loadDeckIntoArena(DEFAULT_DECK);
+    renderDecksLibrary();
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>

@@ -357,6 +357,14 @@
           <p>Carica le foto delle pagine del libro e fatti interrogare da Gemini Pro</p>
         </a>
 
+        <a href="modules/flashcard-swipe.html" class="hub-card" data-track="flashcard">
+          <div class="icon-badge" style="background: rgba(168,85,247,0.18); color: #c084fc;">
+            <i data-lucide="layers"></i>
+          </div>
+          <h3>Flashcard Swipe AI</h3>
+          <p>Ripasso lampo col dito stile TikTok generato da appunti o foto del libro</p>
+        </a>
+
         <a href="modules/mindmap.html" class="hub-card" data-track="mindmap">
           <div class="icon-badge" style="background: rgba(236,72,153,0.16); color: #f472b6;">
             <i data-lucide="network"></i>
@@ -509,6 +517,14 @@
           <p>Spendi i tuoi punti XP per sbloccare cornici avatar, titoli e badge rari</p>
         </a>
 
+        <a href="modules/asta-scambi.html" class="hub-card" data-track="aste">
+          <div class="icon-badge" style="background: rgba(245,158,11,0.18); color: #fbbf24;">
+            <i data-lucide="scale"></i>
+          </div>
+          <h3>Casa d'Aste & Scambi</h3>
+          <p>Metti all'asta cosmetici rari per XP o scambiali alla pari con la 1BI</p>
+        </a>
+
         <a href="modules/kahoot.html" class="hub-card" data-track="kahoot">
           <div class="icon-badge" style="background: rgba(139,92,246,0.18); color: #a78bfa;">
             <i data-lucide="gamepad-2"></i>
@@ -588,7 +604,7 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     }
 
-    // Mega-catalogo di 28 Missioni Lampo (ne vengono sorteggiate 3 diverse ogni giorno!)
+    // Mega-catalogo di 30 Missioni Lampo (ne vengono sorteggiate 3 diverse ogni giorno!)
     const MISSION_POOL = [
       { id: "m_casse", track: "casse", label: "🎰 Visita la Sala Casse & Ruota XP", xp: 30, href: "modules/casse-xp.html" },
       { id: "m_shop", track: "shop", label: "✨ Controlla le novità nel Negozio XP", xp: 25, href: "modules/negozio-xp.html" },
@@ -617,7 +633,9 @@
       { id: "m_compleanni", track: "compleanni", label: "🎂 Controlla i prossimi Compleanni 1BI", xp: 25, href: "modules/compleanni.html" },
       { id: "m_countdown", track: "countdown", label: "⏳ Controlla il Countdown & Ponti", xp: 20, href: "modules/countdown.html" },
       { id: "m_assemblee", track: "assemblee", label: "📣 Controlla le Assemblee di Classe", xp: 25, href: "modules/assemblee.html" },
-      { id: "m_profilo", track: "profilo", label: "🪪 Aggiorna o controlla il tuo Profilo", xp: 25, href: "profilo.html" }
+      { id: "m_profilo", track: "profilo", label: "🪪 Aggiorna o controlla il tuo Profilo", xp: 25, href: "profilo.html" },
+      { id: "m_flashcard", track: "flashcard", label: "🃏 Ripassa un mazzo su Flashcard Swipe AI", xp: 35, href: "modules/flashcard-swipe.html" },
+      { id: "m_aste", track: "aste", label: "⚖️ Controlla le offerte nella Casa d'Aste", xp: 25, href: "modules/asta-scambi.html" },
     ];
 
     // Seleziona 3 missioni diverse in modo deterministico in base alla data odierna

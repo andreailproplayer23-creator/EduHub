@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>EduHub - Casa d'Aste & Scambi 1BI</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../js/theme.js"></script>
+  <style>
+    :root {
+      --solid-panel: #0f172a;
+      --solid-card: #162033;
+      --solid-sub: #1e293b;
+      --solid-border: rgba(148, 163, 184, 0.24);
+    }
+    html[data-theme="light"] {
+      --solid-panel: #ffffff;
+      --solid-card: #f8fafc;
+      --solid-sub: #f1f5f9;
+      --solid-border: rgba(15, 23, 42, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .market-hero {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 20px;
+      padding: clamp(16px, 3vw, 24px);
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .wallet-badge {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.12));
+      border: 1.5px solid rgba(251, 191, 36, 0.5);
+      color: #fbbf24;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: clamp(1.15rem, 3vw, 1.45rem);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    /* TABS PRINCIPALI MOBILE-FIRST */
+    .market-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .market-tab-btn {
+      padding: 12px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-panel);
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: clamp(0.76rem, 2.4vw, 0.88rem);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .market-tab-btn.active {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      border-color: #60a5fa;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+    }
+
+    /* FORM CREAZIONE ASTA / SCAMBIO */
+    .create-box {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 18px;
+      padding: clamp(16px, 3vw, 22px);
+      margin-bottom: 22px;
+    }
+    .form-grid-responsive {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .market-input, .market-select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.88rem;
+      min-height: 46px;
+    }
+
+    /* GRIGLIA CARD ASTE & SCAMBI */
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 285px), 1fr));
+      gap: 16px;
+    }
+
+    .listing-card {
+      background: var(--solid-panel);
+      border: 1px solid var(--solid-border);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .listing-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .rarity-tag {
+      display: inline-block;
+      font-size: 0.66rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .rar-comune { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.35); }
+    .rar-raro { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .rar-epico { background: rgba(168, 85, 247, 0.22); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.45); }
+    .rar-leggendario { background: rgba(251, 191, 36, 0.22); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.5); }
+    .rar-mitico { background: linear-gradient(135deg, rgba(244, 63, 94, 0.28), rgba(34, 211, 238, 0.28)); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.55); }
+
+    .preview-stage {
+      height: 84px;
+      border-radius: 14px;
+      background: var(--solid-sub);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .mini-frame-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #0f172a;
+      color: #fff;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bid-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .bid-controls input {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--solid-border);
+      background: var(--solid-sub);
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 0.88rem;
+      min-height: 44px;
+    }
+
+    .btn-market {
+      padding: 11px 16px;
+      border-radius: 11px;
+      border: none;
+      font-weight: 900;
+      font-size: 0.85rem;
+      cursor: pointer;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: filter 0.18s ease, transform 0.18s ease;
+    }
+    .btn-market:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+    .btn-market:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-bid { background: linear-gradient(135deg, #f59e0b, #d97706); color: #0f172a; }
+    .btn-swap { background: linear-gradient(135deg, #10b981, #059669); color: #fff; width: 100%; }
+    .btn-create { background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff; width: 100%; }
+    .btn-danger-soft { background: rgba(239, 68, 68, 0.16); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); width: 100%; }
+
+    .swap-vs-box {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      background: var(--solid-sub);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      .market-tabs {
+        grid-template-columns: 1fr;
+      }
+      .topbar-sub {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../dashboard.html" class="topbar-logo">EDUHUB</a>
+      <span class="topbar-sub">Casa d'Aste & Scambi</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../dashboard.html" class="btn-logout" style="text-decoration:none;">
+        <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> CRUSCOTTO
+      </a>
+      <button id="themeToggleBtn" class="theme-toggle" title="Cambia tema"></button>
+      <a href="../profilo.html" class="profile-pill" title="Apri il tuo profilo">
+        <div class="nav-avatar" id="navAvatar">S</div>
+        <span id="userDisplayName">STUDENTE</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1120px;">
+    <!-- HEADER MERCATINO -->
+    <div class="market-hero">
+      <div>
+        <h2 style="font-size: clamp(1.25rem, 3.5vw, 1.55rem); font-weight: 900;">⚖️ Casa d'Aste & Scambi Oggetti 1BI</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+          Metti all'asta i tuoi cosmetici rari per XP oppure scambiali alla pari con i compagni di classe
+        </p>
+      </div>
+      <div class="wallet-badge" id="marketXpBalance">⚡ 0 XP</div>
+    </div>
+
+    <!-- TABS DI NAVIGAZIONE -->
+    <div class="market-tabs">
+      <button type="button" class="market-tab-btn active" data-tab="auctions">🔨 Aste Live (<span id="countAuctions">0</span>)</button>
+      <button type="button" class="market-tab-btn" data-tab="trades">🔄 Scambi 1-a-1 (<span id="countTrades">0</span>)</button>
+      <button type="button" class="market-tab-btn" data-tab="sell">➕ Metti in Vendita / Scambio</button>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- TAB 1: ASTE LIVE                                      -->
+    <!-- ===================================================== -->
+    <section id="tabAuctions">
+      <div id="auctionsGrid" class="listings-grid">
+        <p style="color: var(--text-muted);">Caricamento aste in corso...</p>
+      </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- TAB 2: SCAMBI TRA COMPAGNI                            -->
+    <!-- ===================================================== -->
+    <section id="tabTrades" style="display: none;">
+      <div id="tradesGrid" class="listings-grid">
+        <p style="color: var(--text-muted);">Caricamento proposte di scambio...</p>
+      </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- TAB 3: CREA ASTA O PROPOSTA DI SCAMBIO                -->
+    <!-- ===================================================== -->
+    <section id="tabSell" style="display: none;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 18px;">
+        <!-- CREA NUOVA ASTA -->
+        <div class="create-box">
+          <h3 style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">🔨 Metti un Oggetto all'Asta</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+            I compagni rilanciano in XP fino allo scadere del timer. Se nessuno offre, puoi ritirarlo gratis.
+          </p>
+
+          <form id="createAuctionForm" style="margin-top: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 800; display:block; margin-bottom:5px;">Scegli dal tuo Inventario</label>
+              <select id="auctionItemSelect" class="market-select" required>
+                <option value="">Nessun oggetto scambiabile disponibile</option>
+              </select>
+            </div>
+
+            <div class="form-grid-responsive" style="margin-top:0;">
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 800; display:block; margin-bottom:5px;">Base d'Asta (XP)</label>
+                <input type="number" id="auctionStartPrice" class="market-input" min="20" step="10" value="150" required />
+              </div>
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 800; display:block; margin-bottom:5px;">Durata Asta</label>
+                <select id="auctionDurationSelect" class="market-select">
+                  <option value="1">1 Ora (Lampo)</option>
+                  <option value="6">6 Ore</option>
+                  <option value="24" selected>24 Ore</option>
+                  <option value="48">48 Ore</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-market btn-create">🚀 Avvia Asta Ora</button>
+          </form>
+        </div>
+
+        <!-- CREA PROPOSTA DI SCAMBIO -->
+        <div class="create-box">
+          <h3 style="font-size: 1.1rem; font-weight: 900; color: #34d399;">🔄 Proponi uno Scambio Oggetti</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+            Scegli cosa offri del tuo inventario e quale oggetto vuoi ricevere in cambio.
+          </p>
+
+          <form id="createTradeForm" style="margin-top: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 800; display:block; margin-bottom:5px;">Oggetto che Offri (dal tuo Inventario)</label>
+              <select id="tradeOfferSelect" class="market-select" required>
+                <option value="">Nessun oggetto scambiabile disponibile</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 800; display:block; margin-bottom:5px;">Oggetto che Vuoi Ricevere</label>
+              <select id="tradeWantSelect" class="market-select" required></select>
+            </div>
+
+            <button type="submit" class="btn-market btn-swap">🤝 Pubblica Proposta di Scambio</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../js/auth.js"></script>
+  <script type="module">
+    import { auth, db } from "../js/firebase-config.js";
+    import { isRappresentante } from "../js/auth.js";
+    import { FRAME_STYLES, TITLE_LABELS, BADGE_ICONS } from "../js/xp-cosmetics.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      runTransaction,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const BASE_IDS = ["frame-default", "title-base", "badge-base"];
+
+    const CATALOG_META = {
+      // Cornici
+      "frame-mint": { type: "frame", rarity: "comune", name: "Cornice Menta Fresca" },
+      "frame-cobalt": { type: "frame", rarity: "comune", name: "Cornice Blu Cobalto" },
+      "frame-matrix": { type: "frame", rarity: "raro", name: "Cornice Matrix Hacker" },
+      "frame-sunset": { type: "frame", rarity: "raro", name: "Cornice Tramonto Corallo" },
+      "frame-neon": { type: "frame", rarity: "raro", name: "Cornice Cyber Neon" },
+      "frame-electric": { type: "frame", rarity: "epico", name: "Cornice Alta Tensione" },
+      "frame-amethyst": { type: "frame", rarity: "epico", name: "Cornice Ametista Reale" },
+      "frame-fire": { type: "frame", rarity: "epico", name: "Cornice Magma Streak" },
+      "frame-frost": { type: "frame", rarity: "epico", name: "Cornice Ghiaccio Polare" },
+      "frame-bloodmoon": { type: "frame", rarity: "leggendario", name: "Cornice Luna di Sangue" },
+      "frame-vaporwave": { type: "frame", rarity: "leggendario", name: "Cornice Vaporwave 80s" },
+      "frame-gold": { type: "frame", rarity: "leggendario", name: "Cornice Leggenda Oro" },
+      "frame-void": { type: "frame", rarity: "mitico", name: "Cornice Buco Nero" },
+      "frame-diamond": { type: "frame", rarity: "mitico", name: "Cornice Diamante 1BI" },
+      "frame-rgb": { type: "frame", rarity: "mitico", name: "Cornice RGB Full Gaming" },
+      // Titoli
+      "title-matricola": { type: "title", rarity: "comune", name: "Matricola Giorgi-Woolf" },
+      "title-coffee": { type: "title", rarity: "comune", name: "Alimentato a Caffè" },
+      "title-bughunter": { type: "title", rarity: "raro", name: "Bug Hunter C++" },
+      "title-binary": { type: "title", rarity: "raro", name: "Mago del Binario" },
+      "title-nightcoder": { type: "title", rarity: "raro", name: "Coder Notturno" },
+      "title-survivor": { type: "title", rarity: "raro", name: "Sopravvissuto alle Verifiche" },
+      "title-notes": { type: "title", rarity: "epico", name: "Spacciatore di Appunti" },
+      "title-secchione": { type: "title", rarity: "epico", name: "Re delle Interrogazioni" },
+      "title-gamer": { type: "title", rarity: "epico", name: "Pro Player 1BI" },
+      "title-kahoot": { type: "title", rarity: "epico", name: "Campione Kahoot Arena" },
+      "title-lim": { type: "title", rarity: "leggendario", name: "Signore della LIM" },
+      "title-speedrunner": { type: "title", rarity: "leggendario", name: "Speedrunner di Compiti" },
+      "title-architect": { type: "title", rarity: "leggendario", name: "System Architect" },
+      "title-ai": { type: "title", rarity: "leggendario", name: "Domatore di AI" },
+      "title-cyber": { type: "title", rarity: "mitico", name: "Cyber Ghost 1BI" },
+      "title-emperor": { type: "title", rarity: "mitico", name: "Imperatore della 1BI" },
+      "title-legend": { type: "title", rarity: "mitico", name: "Leggenda Assoluta" },
+      // Badge
+      "badge-laptop": { type: "badge", rarity: "comune", name: "Badge Dev Laptop" },
+      "badge-rocket": { type: "badge", rarity: "comune", name: "Badge Razzo" },
+      "badge-zap": { type: "badge", rarity: "raro", name: "Badge Fulmine" },
+      "badge-target": { type: "badge", rarity: "raro", name: "Badge Cecchino" },
+      "badge-brain": { type: "badge", rarity: "raro", name: "Badge Cervellone AI" },
+      "badge-alien": { type: "badge", rarity: "raro", name: "Badge Pixel Invader" },
+      "badge-robot": { type: "badge", rarity: "epico", name: "Badge Mecha Bot" },
+      "badge-shield": { type: "badge", rarity: "epico", name: "Scudo della Classe" },
+      "badge-sword": { type: "badge", rarity: "epico", name: "Spade Incrociate" },
+      "badge-fox": { type: "badge", rarity: "epico", name: "Badge Volpe Astuta" },
+      "badge-wolf": { type: "badge", rarity: "leggendario", name: "Badge Lupo Alfa" },
+      "badge-eagle": { type: "badge", rarity: "leggendario", name: "Badge Aquila Reale" },
+      "badge-fire": { type: "badge", rarity: "leggendario", name: "Fiamma Inarrestabile" },
+      "badge-ufo": { type: "badge", rarity: "mitico", name: "Badge Navicella UFO" },
+      "badge-crown": { type: "badge", rarity: "mitico", name: "Corona Imperiale" },
+      "badge-diamond": { type: "badge", rarity: "mitico", name: "Diamante Puro" },
+      "badge-dragon": { type: "badge", rarity: "mitico", name: "Drago Mitico 1BI" }
+    };
+
+    let currentUser = null;
+    let userData = {};
+    let isRep = false;
+    let auctionsList = [];
+    let tradesList = [];
+
+    // Switch Tab
+    document.querySelectorAll(".market-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".market-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById("tabAuctions").style.display = tab === "auctions" ? "block" : "none";
+        document.getElementById("tabTrades").style.display = tab === "trades" ? "block" : "none";
+        document.getElementById("tabSell").style.display = tab === "sell" ? "block" : "none";
+      });
+    });
+
+    function getMyXp() {
+      return Number(userData.xp ?? userData.punti ?? 0);
+    }
+
+    function getMyTradableIds() {
+      const owned = Array.isArray(userData.shopOwned) ? userData.shopOwned : [];
+      return Array.from(new Set(owned)).filter(id => !BASE_IDS.includes(id) && CATALOG_META[id]);
+    }
+
+    function renderPreviewHtml(itemId, compact = false) {
+      const meta = CATALOG_META[itemId] || { type: "badge", name: itemId };
+      if (meta.type === "frame") {
+        const sz = compact ? 42 : 54;
+        return `<div class="mini-frame-circle" style="width:${sz}px;height:${sz}px;${FRAME_STYLES[itemId] || ""}">1BI</div>`;
+      }
+      if (meta.type === "title") {
+        return `<span style="padding:4px 10px; border-radius:999px; background:rgba(56,189,248,0.18); color:#38bdf8; font-size:${compact ? "0.72rem" : "0.82rem"}; font-weight:800;">${escapeHtml(TITLE_LABELS[itemId] || meta.name)}</span>`;
+      }
+      return `<span style="font-size:${compact ? "1.8rem" : "2.4rem"};">${BADGE_ICONS[itemId] || "🏅"}</span>`;
+    }
+
+    function formatRemaining(endsAtMs) {
+      const diff = endsAtMs - Date.now();
+      if (diff <= 0) return "Scaduta";
+      const hrs = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      if (hrs >= 1) return `${hrs}h ${mins}m`;
+      const secs = Math.floor((diff % 60000) / 1000);
+      return `${mins}m ${secs}s`;
+    }
+
+    function populateSellForms() {
+      const myTradable = getMyTradableIds();
+      const optionsHtml = myTradable.length > 0
+        ? myTradable.map(id => `<option value="${id}">${escapeHtml(CATALOG_META[id].name)} (${CATALOG_META[id].rarity.toUpperCase()})</option>`).join("")
+        : `<option value="">Nessun oggetto scambiabile nel tuo inventario</option>`;
+
+      document.getElementById("auctionItemSelect").innerHTML = optionsHtml;
+      document.getElementById("tradeOfferSelect").innerHTML = optionsHtml;
+
+      const allWantOptions = Object.entries(CATALOG_META)
+        .filter(([id]) => !myTradable.includes(id))
+        .map(([id, m]) => `<option value="${id}">${escapeHtml(m.name)} (${m.rarity.toUpperCase()})</option>`)
+        .join("");
+      document.getElementById("tradeWantSelect").innerHTML = allWantOptions;
+    }
+
+    // =========================================================================
+    // CREA NUOVA ASTA (TRANSAZIONE SICURA)
+    // =========================================================================
+    document.getElementById("createAuctionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const itemId = document.getElementById("auctionItemSelect").value;
+      const startPrice = Math.max(20, Math.floor(Number(document.getElementById("auctionStartPrice").value) || 100));
+      const hours = Number(document.getElementById("auctionDurationSelect").value) || 24;
+      const meta = CATALOG_META[itemId];
+      if (!itemId || !meta) return alert("Seleziona un oggetto valido dal tuo inventario!");
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const userRef = doc(db, "utenti_registrati", currentUser.uid);
+          const uSnap = await tx.get(userRef);
+          if (!uSnap.exists()) throw new Error("Profilo non trovato.");
+          const uData = uSnap.data();
+          const owned = Array.isArray(uData.shopOwned) ? [...uData.shopOwned] : [];
+          if (!owned.includes(itemId)) throw new Error("Non possiedi più questo oggetto.");
+
+          const nextOwned = owned.filter(x => x !== itemId);
+          const userUpdate = { shopOwned: nextOwned };
+          if (uData.equippedFrame === itemId) userUpdate.equippedFrame = "frame-default";
+          if (uData.equippedTitle === itemId) userUpdate.equippedTitle = "title-base";
+          if (uData.equippedBadge === itemId) userUpdate.equippedBadge = "badge-base";
+
+          const newAuctionRef = doc(collection(db, "aste_1bi"));
+          tx.update(userRef, userUpdate);
+          tx.set(newAuctionRef, {
+            itemId,
+            itemType: meta.type,
+            itemName: meta.name,
+            itemRarity: meta.rarity,
+            sellerUid: currentUser.uid,
+            sellerName: uData.nome || uData.nomeCompleto || currentUser.displayName || "Studente 1BI",
+            startPrice,
+            currentBid: 0,
+            highestBidderUid: "",
+            highestBidderName: "",
+            endsAt: Date.now() + hours * 3600000,
+            status: "active",
+            createdAt: serverTimestamp()
+          });
+        });
+
+        alert("🔨 Asta avviata con successo!");
+        document.querySelector('[data-tab="auctions"]').click();
+      } catch (err) {
+        alert(err.message || "Errore durante l'avvio dell'asta.");
+      }
+    });
+
+    // =========================================================================
+    // RENDER ASTE LIVE + RILANCIO + RISCATTO
+    // =========================================================================
+    function renderAuctions() {
+      const grid = document.getElementById("auctionsGrid");
+      const activeList = auctionsList.filter(a => a.status === "active");
+      document.getElementById("countAuctions").textContent = activeList.length;
+
+      if (activeList.length === 0) {
+        grid.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">Nessuna asta attiva al momento. Metti tu un oggetto all'asta dalla terza scheda!</p>`;
+        return;
+      }
+
+      const myOwned = Array.isArray(userData.shopOwned) ? userData.shopOwned : [];
+
+      grid.innerHTML = activeList.map(a => {
+        const isExpired = Date.now() >= Number(a.endsAt || 0);
+        const hasBids = Boolean(a.highestBidderUid);
+        const minNextBid = hasBids ? Number(a.currentBid) + 20 : Number(a.startPrice);
+        const isSeller = currentUser && a.sellerUid === currentUser.uid;
+        const isWinner = currentUser && a.highestBidderUid === currentUser.uid;
+        const alreadyOwned = myOwned.includes(a.itemId);
+
+        let actionBlock = "";
+        if (isExpired) {
+          if (hasBids && (isWinner || isSeller || isRep)) {
+            actionBlock = `<button type="button" class="btn-market btn-swap" data-claim-auction="${a.id}">🎁 Concludi & Consegna Premio</button>`;
+          } else if (!hasBids && (isSeller || isRep)) {
+            actionBlock = `<button type="button" class="btn-market btn-danger-soft" data-cancel-auction="${a.id}">↩️ Ritira Oggetto Invenduto</button>`;
+          } else {
+            actionBlock = `<div style="font-size:0.8rem; color:var(--text-muted); text-align:center; font-weight:800;">⏳ Asta conclusa — in attesa di ritiro</div>`;
+          }
+        } else if (isSeller) {
+          actionBlock = !hasBids
+            ? `<button type="button" class="btn-market btn-danger-soft" data-cancel-auction="${a.id}">Annulla Asta (0 offerte)</button>`
+            : `<div style="font-size:0.8rem; color:#34d399; text-align:center; font-weight:800;">✅ Offerta attuale: ${a.currentBid} XP da ${escapeHtml(a.highestBidderName)}</div>`;
+        } else if (alreadyOwned) {
+          actionBlock = `<div style="font-size:0.78rem; color:#fbbf24; text-align:center; font-weight:800;">✓ Possiedi già questo oggetto</div>`;
+        } else {
+          actionBlock = `
+            <div class="bid-controls">
+              <input type="number" id="bidInput_${a.id}" min="${minNextBid}" step="10" value="${minNextBid}" />
+              <button type="button" class="btn-market btn-bid" data-bid-auction="${a.id}">Rilancia</button>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="listing-card">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+                <span class="rarity-tag rar-${a.itemRarity}">${escapeHtml(a.itemRarity)}</span>
+                <span style="font-size:0.75rem; font-weight:900; color:${isExpired ? "#f87171" : "#38bdf8"};">
+                  ⏱️ ${formatRemaining(Number(a.endsAt || 0))}
+                </span>
+              </div>
+
+              <div class="preview-stage">${renderPreviewHtml(a.itemId)}</div>
+
+              <div style="font-weight:900; font-size:0.98rem; margin-top:12px;">${escapeHtml(a.itemName)}</div>
+              <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">Venditore: <strong>${escapeHtml(a.sellerName)}</strong></div>
+
+              <div style="margin-top:10px; padding:9px 12px; border-radius:10px; background:var(--solid-sub); display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.76rem; color:var(--text-muted); font-weight:700;">
+                  ${hasBids ? `Top: ${escapeHtml(a.highestBidderName)}` : "Base d'asta"}
+                </span>
+                <strong style="color:#fbbf24; font-size:0.96rem;">⚡ ${hasBids ? a.currentBid : a.startPrice} XP</strong>
+              </div>
+            </div>
+
+            <div>${actionBlock}</div>
+          </div>
+        `;
+      }).join("");
+
+      // Listener Rilancio
+      grid.querySelectorAll("[data-bid-auction]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const aucId = btn.dataset.bidAuction;
+          const amount = Math.floor(Number(document.getElementById(`bidInput_${aucId}`)?.value) || 0);
+          if (!currentUser || amount <= 0) return;
+
+          try {
+            await runTransaction(db, async (tx) => {
+              const aucRef = doc(db, "aste_1bi", aucId);
+              const bidderRef = doc(db, "utenti_registrati", currentUser.uid);
+
+              const aucSnap = await tx.get(aucRef);
+              const bidderSnap = await tx.get(bidderRef);
+              if (!aucSnap.exists() || !bidderSnap.exists()) throw new Error("Dati non trovati.");
+
+              const auc = aucSnap.data();
+              const bidder = bidderSnap.data();
+
+              if (auc.status !== "active" || Date.now() >= auc.endsAt) throw new Error("Asta già scaduta!");
+              if (auc.sellerUid === currentUser.uid) throw new Error("Non puoi rilanciare sulla tua asta.");
+
+              const minReq = auc.highestBidderUid ? Number(auc.currentBid) + 20 : Number(auc.startPrice);
+              if (amount < minReq) throw new Error(`L'offerta minima è ${minReq} XP.`);
+
+              const isSameLeader = auc.highestBidderUid === currentUser.uid;
+              const effectiveBalance = Number(bidder.xp ?? bidder.punti ?? 0) + (isSameLeader ? Number(auc.currentBid) : 0);
+              if (effectiveBalance < amount) throw new Error("XP insufficienti per questa offerta!");
+
+              // Rimborsa il precedente offerente se diverso
+              if (auc.highestBidderUid && !isSameLeader) {
+                const prevRef = doc(db, "utenti_registrati", auc.highestBidderUid);
+                const prevSnap = await tx.get(prevRef);
+                if (prevSnap.exists()) {
+                  const prevXp = Number(prevSnap.data().xp ?? prevSnap.data().punti ?? 0) + Number(auc.currentBid);
+                  tx.update(prevRef, { xp: prevXp, punti: prevXp });
+                }
+              }
+
+              const newBidderXp = effectiveBalance - amount;
+              tx.update(bidderRef, { xp: newBidderXp, punti: newBidderXp });
+
+              // Anti-sniping: se manca meno di 1 minuto, aggiunge 60 secondi
+              const newEndsAt = (auc.endsAt - Date.now() < 60000) ? Date.now() + 60000 : auc.endsAt;
+
+              tx.update(aucRef, {
+                currentBid: amount,
+                highestBidderUid: currentUser.uid,
+                highestBidderName: bidder.nome || bidder.nomeCompleto || currentUser.displayName || "Studente 1BI",
+                endsAt: newEndsAt
+              });
+            });
+          } catch (err) {
+            alert(err.message || "Errore durante il rilancio.");
+          }
+        });
+      });
+
+      // Listener Consegna Premio Asta Conclusa
+      grid.querySelectorAll("[data-claim-auction]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const aucId = btn.dataset.claimAuction;
+          try {
+            await runTransaction(db, async (tx) => {
+              const aucRef = doc(db, "aste_1bi", aucId);
+              const aucSnap = await tx.get(aucRef);
+              if (!aucSnap.exists()) throw new Error("Asta non trovata.");
+              const auc = aucSnap.data();
+              if (auc.status !== "active" || !auc.highestBidderUid) throw new Error("Asta già riscattata.");
+
+              const winnerRef = doc(db, "utenti_registrati", auc.highestBidderUid);
+              const sellerRef = doc(db, "utenti_registrati", auc.sellerUid);
+              const winnerSnap = await tx.get(winnerRef);
+              const sellerSnap = await tx.get(sellerRef);
+
+              if (winnerSnap.exists()) {
+                const wOwned = Array.isArray(winnerSnap.data().shopOwned) ? winnerSnap.data().shopOwned : [];
+                tx.update(winnerRef, { shopOwned: Array.from(new Set([...wOwned, auc.itemId])) });
+              }
+              if (sellerSnap.exists()) {
+                const sXp = Number(sellerSnap.data().xp ?? sellerSnap.data().punti ?? 0) + Number(auc.currentBid);
+                tx.update(sellerRef, { xp: sXp, punti: sXp });
+              }
+              tx.update(aucRef, { status: "claimed" });
+            });
+            alert("🎉 Asta conclusa: oggetto consegnato al vincitore e XP accreditati al venditore!");
+          } catch (err) {
+            alert(err.message || "Errore chiusura asta.");
+          }
+        });
+      });
+
+      // Listener Annulla / Ritira Asta senza offerte
+      grid.querySelectorAll("[data-cancel-auction]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const aucId = btn.dataset.cancelAuction;
+          try {
+            await runTransaction(db, async (tx) => {
+              const aucRef = doc(db, "aste_1bi", aucId);
+              const aucSnap = await tx.get(aucRef);
+              if (!aucSnap.exists()) return;
+              const auc = aucSnap.data();
+              if (auc.status !== "active" || auc.highestBidderUid) throw new Error("Impossibile ritirare un'asta con offerte attive.");
+
+              const sellerRef = doc(db, "utenti_registrati", auc.sellerUid);
+              const sellerSnap = await tx.get(sellerRef);
+              if (sellerSnap.exists()) {
+                const sOwned = Array.isArray(sellerSnap.data().shopOwned) ? sellerSnap.data().shopOwned : [];
+                tx.update(sellerRef, { shopOwned: Array.from(new Set([...sOwned, auc.itemId])) });
+              }
+              tx.update(aucRef, { status: "cancelled" });
+            });
+          } catch (err) {
+            alert(err.message || "Errore ritiro oggetto.");
+          }
+        });
+      });
+    }
+
+    // =========================================================================
+    // CREA & GESTISCI SCAMBI 1-A-1
+    // =========================================================================
+    document.getElementById("createTradeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const offeredItemId = document.getElementById("tradeOfferSelect").value;
+      const wantedItemId = document.getElementById("tradeWantSelect").value;
+      if (!offeredItemId || !wantedItemId || offeredItemId === wantedItemId) {
+        return alert("Seleziona due oggetti validi e diversi tra loro!");
+      }
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const userRef = doc(db, "utenti_registrati", currentUser.uid);
+          const uSnap = await tx.get(userRef);
+          if (!uSnap.exists()) throw new Error("Profilo non trovato.");
+          const uData = uSnap.data();
+          const owned = Array.isArray(uData.shopOwned) ? [...uData.shopOwned] : [];
+          if (!owned.includes(offeredItemId)) throw new Error("Non possiedi più l'oggetto offerto.");
+
+          const nextOwned = owned.filter(x => x !== offeredItemId);
+          const userUpdate = { shopOwned: nextOwned };
+          if (uData.equippedFrame === offeredItemId) userUpdate.equippedFrame = "frame-default";
+          if (uData.equippedTitle === offeredItemId) userUpdate.equippedTitle = "title-base";
+          if (uData.equippedBadge === offeredItemId) userUpdate.equippedBadge = "badge-base";
+
+          const tradeRef = doc(collection(db, "scambi_1bi"));
+          tx.update(userRef, userUpdate);
+          tx.set(tradeRef, {
+            offeredItemId,
+            wantedItemId,
+            proposerUid: currentUser.uid,
+            proposerName: uData.nome || uData.nomeCompleto || currentUser.displayName || "Studente 1BI",
+            status: "open",
+            createdAt: serverTimestamp()
+          });
+        });
+
+        alert("🤝 Proposta di scambio pubblicata!");
+        document.querySelector('[data-tab="trades"]').click();
+      } catch (err) {
+        alert(err.message || "Errore durante la creazione dello scambio.");
+      }
+    });
+
+    function renderTrades() {
+      const grid = document.getElementById("tradesGrid");
+      const openList = tradesList.filter(t => t.status === "open");
+      document.getElementById("countTrades").textContent = openList.length;
+
+      if (openList.length === 0) {
+        grid.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">Nessuno scambio aperto al momento. Crea tu una proposta nella terza scheda!</p>`;
+        return;
+      }
+
+      const myOwned = Array.isArray(userData.shopOwned) ? userData.shopOwned : [];
+
+      grid.innerHTML = openList.map(t => {
+        const offerMeta = CATALOG_META[t.offeredItemId] || { name: t.offeredItemId, rarity: "comune" };
+        const wantMeta = CATALOG_META[t.wantedItemId] || { name: t.wantedItemId, rarity: "comune" };
+        const isMine = currentUser && t.proposerUid === currentUser.uid;
+        const canAccept = !isMine && myOwned.includes(t.wantedItemId) && !myOwned.includes(t.offeredItemId);
+
+        let btnHtml = "";
+        if (isMine || isRep) {
+          btnHtml = `<button type="button" class="btn-market btn-danger-soft" data-cancel-trade="${t.id}">Annulla Scambio</button>`;
+        } else if (canAccept) {
+          btnHtml = `<button type="button" class="btn-market btn-swap" data-accept-trade="${t.id}">⚡ Accetta Scambio Ora</button>`;
+        } else if (myOwned.includes(t.offeredItemId)) {
+          btnHtml = `<button type="button" class="btn-market" disabled style="width:100%; background:var(--solid-sub); color:var(--text-muted);">Hai già l'oggetto offerto</button>`;
+        } else {
+          btnHtml = `<button type="button" class="btn-market" disabled style="width:100%; background:var(--solid-sub); color:var(--text-muted);">Ti manca: ${escapeHtml(wantMeta.name)}</button>`;
+        }
+
+        return `
+          <div class="listing-card">
+            <div>
+              <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:10px;">
+                Proposto da <strong>${escapeHtml(t.proposerName)}</strong>
+              </div>
+
+              <div class="swap-vs-box">
+                <div>
+                  <div style="font-size:0.65rem; font-weight:900; color:#34d399; margin-bottom:6px;">RICEVI</div>
+                  <div style="display:flex; justify-content:center; margin-bottom:6px;">${renderPreviewHtml(t.offeredItemId, true)}</div>
+                  <div style="font-size:0.76rem; font-weight:800;">${escapeHtml(offerMeta.name)}</div>
+                </div>
+
+                <div style="font-size:1.3rem;">⇄</div>
+
+                <div>
+                  <div style="font-size:0.65rem; font-weight:900; color:#fbbf24; margin-bottom:6px;">DAI IN CAMBIO</div>
+                  <div style="display:flex; justify-content:center; margin-bottom:6px;">${renderPreviewHtml(t.wantedItemId, true)}</div>
+                  <div style="font-size:0.76rem; font-weight:800;">${escapeHtml(wantMeta.name)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div>${btnHtml}</div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-accept-trade]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const tradeId = btn.dataset.acceptTrade;
+          if (!currentUser) return;
+          try {
+            await runTransaction(db, async (tx) => {
+              const tradeRef = doc(db, "scambi_1bi", tradeId);
+              const acceptorRef = doc(db, "utenti_registrati", currentUser.uid);
+
+              const tSnap = await tx.get(tradeRef);
+              const aSnap = await tx.get(acceptorRef);
+              if (!tSnap.exists() || !aSnap.exists()) throw new Error("Scambio non più disponibile.");
+
+              const t = tSnap.data();
+              if (t.status !== "open") throw new Error("Scambio già concluso.");
+
+              const proposerRef = doc(db, "utenti_registrati", t.proposerUid);
+              const pSnap = await tx.get(proposerRef);
+              if (!pSnap.exists()) throw new Error("Utente proponente non trovato.");
+
+              const aData = aSnap.data();
+              const aOwned = Array.isArray(aData.shopOwned) ? [...aData.shopOwned] : [];
+              if (!aOwned.includes(t.wantedItemId)) throw new Error("Non possiedi l'oggetto richiesto.");
+
+              // Aggiorna inventario di chi accetta (toglie wanted, aggiunge offered)
+              const nextAOwned = Array.from(new Set([...aOwned.filter(x => x !== t.wantedItemId), t.offeredItemId]));
+              const aUpd = { shopOwned: nextAOwned };
+              if (aData.equippedFrame === t.wantedItemId) aUpd.equippedFrame = "frame-default";
+              if (aData.equippedTitle === t.wantedItemId) aUpd.equippedTitle = "title-base";
+              if (aData.equippedBadge === t.wantedItemId) aUpd.equippedBadge = "badge-base";
+
+              // Aggiorna inventario di chi ha proposto (aggiunge wanted)
+              const pOwned = Array.isArray(pSnap.data().shopOwned) ? pSnap.data().shopOwned : [];
+              const nextPOwned = Array.from(new Set([...pOwned, t.wantedItemId]));
+
+              tx.update(acceptorRef, aUpd);
+              tx.update(proposerRef, { shopOwned: nextPOwned });
+              tx.update(tradeRef, { status: "completed", acceptorUid: currentUser.uid });
+            });
+            alert("🎉 Scambio completato con successo!");
+          } catch (err) {
+            alert(err.message || "Errore durante lo scambio.");
+          }
+        });
+      });
+
+      grid.querySelectorAll("[data-cancel-trade]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const tradeId = btn.dataset.cancelTrade;
+          try {
+            await runTransaction(db, async (tx) => {
+              const tradeRef = doc(db, "scambi_1bi", tradeId);
+              const tSnap = await tx.get(tradeRef);
+              if (!tSnap.exists()) return;
+              const t = tSnap.data();
+              if (t.status !== "open") return;
+
+              const pRef = doc(db, "utenti_registrati", t.proposerUid);
+              const pSnap = await tx.get(pRef);
+              if (pSnap.exists()) {
+                const pOwned = Array.isArray(pSnap.data().shopOwned) ? pSnap.data().shopOwned : [];
+                tx.update(pRef, { shopOwned: Array.from(new Set([...pOwned, t.offeredItemId])) });
+              }
+              tx.update(tradeRef, { status: "cancelled" });
+            });
+          } catch (err) {
+            alert(err.message || "Errore annullamento scambio.");
+          }
+        });
+      });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      currentUser = user;
+      isRep = isRappresentante(user);
+
+      onSnapshot(doc(db, "utenti_registrati", user.uid), (snap) => {
+        userData = snap.exists() ? snap.data() : {};
+        document.getElementById("marketXpBalance").textContent = `⚡ ${getMyXp()} XP`;
+        populateSellForms();
+        renderAuctions();
+        renderTrades();
+      });
+
+      onSnapshot(query(collection(db, "aste_1bi"), orderBy("endsAt", "asc")), (snap) => {
+        auctionsList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAuctions();
+      });
+
+      onSnapshot(query(collection(db, "scambi_1bi"), orderBy("createdAt", "desc")), (snap) => {
+        tradesList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderTrades();
+      });
+    });
+
+    setInterval(() => {
+      if (auctionsList.length > 0) renderAuctions();
+    }, 10000);
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
